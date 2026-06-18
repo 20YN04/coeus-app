@@ -60,7 +60,7 @@ class Learner:
         if not context_text.strip():
             return "Ik heb nog geen kennis over dit onderwerp. Je kunt informatie toevoegen aan de kennisbank, dan kan ik je vraag de volgende keer wél beantwoorden."
 
-        prompt = f"""Je bent Memora, het AI-brein van een bedrijf. Je beantwoordt vragen op basis van wat je over het bedrijf weet.
+        prompt = f"""Je bent Coeus, het AI-brein van een bedrijf. Je beantwoordt vragen op basis van wat je over het bedrijf weet.
 
         BELANGRIJK:
         - Gebruik ALLEEN informatie uit de context hieronder

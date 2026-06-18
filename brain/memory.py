@@ -10,7 +10,7 @@ class Memory:
         # Persistente ChromaDB-client; data wordt op schijf bewaard
         self.client = chromadb.PersistentClient(path=settings.chroma_db_path)
         self.collection = self.client.get_or_create_collection(
-            name=f"memora_{settings.memora_tenant}"
+            name=f"coeus_{settings.coeus_tenant}"
         )
 
     def add(self, title: str, category: str, content: str,

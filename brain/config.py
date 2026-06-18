@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     openai_api_key: str
-    memora_tenant: str = "default"
+    coeus_tenant: str = "default"
     chroma_db_path: str = "./data/chroma"
 
     model_config = {"env_file": ".env"}

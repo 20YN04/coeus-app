@@ -1,4 +1,4 @@
-# AGENTS.md — Memora
+# AGENTS.md — Coeus
 
 Operating rules for any AI agent (or human) working in this repo.
 

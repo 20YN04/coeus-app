@@ -3,14 +3,14 @@ from brain.memory import Memory
 from brain.learner import Learner
 from brain.models import KennisItem, CreateKennisRequest, LearnRequest, AskRequest
 
-app = FastAPI(title="Memora API", description="AI Brein voor bedrijfskennis")
+app = FastAPI(title="Coeus API", description="AI Brein voor bedrijfskennis")
 memory = Memory()
 learner = Learner()
 
 @app.get("/")
 def root():
     # Statuscheck van de API
-    return {"name": "Memora", "status": "online", "tenant": "default"}
+    return {"name": "Coeus", "status": "online", "tenant": "default"}
 
 @app.get("/kennis")
 def list_kennis(category: str = None):

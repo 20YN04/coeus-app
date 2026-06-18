@@ -1,8 +1,8 @@
-# Memora — AI Brein Core
+# Coeus — AI Brein Core
 
-The Python core of **Memora**: an AI brain that learns a business's knowledge and answers questions about it. It stores knowledge in a ChromaDB vector store and uses GPT (via the OpenAI API) to extract structured knowledge from free text and to answer questions grounded in that knowledge base.
+The Python core of **Coeus**: an AI brain that learns a business's knowledge and answers questions about it. It stores knowledge in a ChromaDB vector store and uses GPT (via the OpenAI API) to extract structured knowledge from free text and to answer questions grounded in that knowledge base.
 
-Memora is a product of Ynarchive.
+Coeus is a product of Ynarchive.
 
 ## Architecture
 
@@ -17,7 +17,7 @@ Memora is a product of Ynarchive.
 Requires **Python 3.12** (the type annotations use `X | None`, which crashes on 3.9).
 
 ```bash
-cd ~/Projects/memora-app
+cd ~/Projects/coeus-app
 
 # create the virtual environment with python3.12
 python3.12 -m venv venv
@@ -39,7 +39,7 @@ cp .env.example .env
 
 ```
 OPENAI_API_KEY=sk-...        # required for /learn and /ask
-MEMORA_TENANT=default        # collection namespace
+COEUS_TENANT=default         # collection namespace
 ```
 
 `OPENAI_API_KEY` is required: the `Learner` (used by `/learn` and `/ask`) calls the OpenAI API. The knowledge-base endpoints (`/kennis*`, `/categories`) work without a real key.
@@ -51,7 +51,7 @@ The first call to `Memory.add()` downloads the default embedding model (`all-Min
 Run from the repo root so `from brain.memory import Memory` and `from main import app` resolve:
 
 ```bash
-cd ~/Projects/memora-app
+cd ~/Projects/coeus-app
 source venv/bin/activate
 uvicorn main:app --reload
 ```
@@ -75,7 +75,7 @@ The API is then available at `http://127.0.0.1:8000`. Interactive docs at `http:
 
 ## Example flow
 
-Teach Memora something, then ask about it.
+Teach Coeus something, then ask about it.
 
 ```bash
 # 1. Learn from free text — GPT extracts structured knowledge
@@ -98,7 +98,7 @@ curl -X POST http://127.0.0.1:8000/ask \
 The import tests below do not call the OpenAI API:
 
 ```bash
-cd ~/Projects/memora-app
+cd ~/Projects/coeus-app
 source venv/bin/activate
 python -c "from brain.memory import Memory; from brain.learner import Learner; from main import app; print('Alle imports OK')"
 ```
