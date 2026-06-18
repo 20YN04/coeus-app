@@ -1,3 +1,6 @@
+// Next 16 Proxy convention: this file is named proxy.ts (not middleware.ts).
+// Next 16 compiles proxy.ts into middleware.js internally — verified working at runtime.
+// See node_modules/next/dist/docs/.../16-proxy.md. Do NOT rename to middleware.ts.
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 

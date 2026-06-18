@@ -9,6 +9,32 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
+function renderBody(content: string) {
+  const paragraphs = content
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  return paragraphs.map((block, i) => {
+    if (/^[-*]\s/.test(block)) {
+      const lines = block.split('\n').filter(Boolean);
+      return (
+        <ul key={i} className="detail-body__list">
+          {lines.map((line, j) => (
+            <li key={j}>{line.replace(/^[-*]\s/, '')}</li>
+          ))}
+        </ul>
+      );
+    }
+    const withBreaks = block.split('\n').reduce<React.ReactNode[]>((acc, line, j) => {
+      if (j > 0) acc.push(<br key={`br-${j}`} />);
+      acc.push(line);
+      return acc;
+    }, []);
+    return <p key={i} className="detail-body__p">{withBreaks}</p>;
+  });
+}
+
 export default async function KennisDetailPage({ params }: Props) {
   const { id } = await params;
 
@@ -45,8 +71,11 @@ export default async function KennisDetailPage({ params }: Props) {
 
       <div className="detail-layout">
         <article className="detail-content">
+          <Link href="/kennisbank" className="detail-back">
+            ← Kennisbank
+          </Link>
           <div className="detail-body">
-            {item.content}
+            {renderBody(item.content)}
           </div>
         </article>
 
@@ -61,7 +90,7 @@ export default async function KennisDetailPage({ params }: Props) {
               <p className="meta-label">Bron</p>
               <p className="meta-value">
                 <span className={`source-badge source-badge--${item.source === 'ai' ? 'ai' : 'handmatig'}`}>
-                  {item.source === 'ai' ? '🤖 AI gegenereerd' : '✍ Handmatig'}
+                  {item.source === 'ai' ? 'AI gegenereerd' : 'Handmatig'}
                 </span>
               </p>
             </div>

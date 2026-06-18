@@ -4,37 +4,52 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { listKennis, searchKennis, type KennisItem } from '@/lib/brein';
 
-const CATEGORY_ICONS: Record<string, string> = {
-  procedures: '⟳',
-  producten: '◈',
-  hr: '◉',
-  technisch: '◧',
-  klanten: '◎',
-  finance: '◫',
-  marketing: '◬',
-  default: '◆',
-};
+function CategoryIcon({ category }: { category: string }) {
+  const key = category.toLowerCase();
+  const shared = { viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.25 } as const;
 
-function categoryIcon(cat: string): string {
-  const key = cat.toLowerCase();
-  return CATEGORY_ICONS[key] ?? CATEGORY_ICONS.default;
+  if (key === 'procedures') return (
+    <svg {...shared}><path d="M8 2v4l2.5 2.5M8 2a6 6 0 1 1 0 12A6 6 0 0 1 8 2z" strokeLinecap="round" /></svg>
+  );
+  if (key === 'producten') return (
+    <svg {...shared}><rect x="2" y="2" width="5" height="5" /><rect x="9" y="2" width="5" height="5" /><rect x="2" y="9" width="5" height="5" /><rect x="9" y="9" width="5" height="5" /></svg>
+  );
+  if (key === 'hr') return (
+    <svg {...shared}><circle cx="8" cy="5.5" r="2.5" /><path d="M3 14c0-2.76 2.24-5 5-5s5 2.24 5 5" strokeLinecap="round" /></svg>
+  );
+  if (key === 'technisch') return (
+    <svg {...shared}><path d="M2 4h12M2 8h8M2 12h10" strokeLinecap="round" /><circle cx="13" cy="8" r="1.5" /></svg>
+  );
+  if (key === 'klanten') return (
+    <svg {...shared}><circle cx="6" cy="5.5" r="2" /><circle cx="11" cy="5.5" r="2" /><path d="M2 14c0-2.21 1.79-4 4-4s4 1.79 4 4" strokeLinecap="round" /><path d="M11 11c1.66 0 3 1.34 3 3" strokeLinecap="round" /></svg>
+  );
+  if (key === 'finance') return (
+    <svg {...shared}><rect x="2" y="4" width="12" height="9" rx="1" /><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" /><path d="M8 8v2M6 9h4" strokeLinecap="round" /></svg>
+  );
+  if (key === 'marketing') return (
+    <svg {...shared}><path d="M2 11V6l5-3 5 3v5" strokeLinecap="round" strokeLinejoin="round" /><path d="M6 14v-4h4v4" strokeLinecap="round" /></svg>
+  );
+  return (
+    <svg {...shared}><path d="M2 3h12M2 6h9M2 9h11M2 12h7" strokeLinecap="round" /></svg>
+  );
 }
 
 type Props = {
   initialItems: KennisItem[];
   categories: string[];
   initialCategory?: string;
+  initialApiError?: boolean;
 };
 
-export default function KennisbankClient({ initialItems, categories, initialCategory }: Props) {
+export default function KennisbankClient({ initialItems, categories, initialCategory, initialApiError }: Props) {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState(initialCategory ?? '');
   const [items, setItems] = useState<KennisItem[]>(initialItems);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(initialApiError ? 'Kan geen verbinding maken met het brein.' : '');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetch = useCallback(
+  const fetchItems = useCallback(
     async (q: string, cat: string) => {
       setLoading(true);
       setError('');
@@ -43,8 +58,8 @@ export default function KennisbankClient({ initialItems, categories, initialCate
           ? await searchKennis(q.trim(), { category: cat || undefined })
           : await listKennis(cat || undefined);
         setItems(result);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Fout bij ophalen items.');
+      } catch {
+        setError('Kan geen verbinding maken met het brein.');
       } finally {
         setLoading(false);
       }
@@ -55,12 +70,12 @@ export default function KennisbankClient({ initialItems, categories, initialCate
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      fetch(query, activeCategory);
+      fetchItems(query, activeCategory);
     }, 320);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query, activeCategory, fetch]);
+  }, [query, activeCategory, fetchItems]);
 
   return (
     <>
@@ -106,7 +121,10 @@ export default function KennisbankClient({ initialItems, categories, initialCate
               data-active={activeCategory === cat ? 'true' : undefined}
               onClick={() => setActiveCategory(cat)}
             >
-              {categoryIcon(cat)}&nbsp;{cat}
+              <span className="filter-chip__icon" aria-hidden="true">
+                <CategoryIcon category={cat} />
+              </span>
+              {cat}
             </button>
           ))}
         </div>
@@ -131,11 +149,11 @@ export default function KennisbankClient({ initialItems, categories, initialCate
       )}
 
       {items.length > 0 && (
-        <div className="kennis-list">
+        <div className={`kennis-list${loading ? ' kennis-list--loading' : ''}`}>
           {items.map((item) => (
             <Link key={item.id} href={`/kennisbank/${item.id}`} className="kennis-row">
               <span className="kennis-row__icon" aria-hidden="true">
-                {categoryIcon(item.category)}
+                <CategoryIcon category={item.category} />
               </span>
               <span className="kennis-row__body">
                 <span className="kennis-row__title">{item.title}</span>
@@ -145,7 +163,7 @@ export default function KennisbankClient({ initialItems, categories, initialCate
                 <span className="kennis-row__category">{item.category}</span>
                 {item.source && (
                   <span className={`source-badge source-badge--${item.source === 'ai' ? 'ai' : 'handmatig'}`}>
-                    {item.source === 'ai' ? '🤖' : '✍'}
+                    {item.source === 'ai' ? 'AI' : 'Handmatig'}
                   </span>
                 )}
               </span>

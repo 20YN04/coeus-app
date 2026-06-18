@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { validateCredentials, setSession } from '@/lib/auth';
+import { loginWithCredentials } from '@/lib/auth';
 import tenant from '@/config/tenant';
 
 export default function LoginPage() {
@@ -17,14 +17,12 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    await new Promise((r) => setTimeout(r, 320));
-
-    if (validateCredentials(email.trim(), password)) {
-      setSession();
+    try {
+      await loginWithCredentials(email.trim(), password);
       router.push('/dashboard');
       router.refresh();
-    } else {
-      setError('Ongeldig e-mailadres of wachtwoord.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Aanmelden mislukt.');
       setLoading(false);
     }
   }

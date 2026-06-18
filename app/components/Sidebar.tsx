@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { clearSession } from '@/lib/auth';
+import { logoutSession } from '@/lib/auth';
 
 const NAV = [
   {
@@ -51,8 +51,8 @@ export default function Sidebar({ tenantName }: { tenantName: string }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  function handleLogout() {
-    clearSession();
+  async function handleLogout() {
+    await logoutSession();
     router.push('/login');
     router.refresh();
   }
@@ -60,8 +60,8 @@ export default function Sidebar({ tenantName }: { tenantName: string }) {
   return (
     <aside className="sidebar">
       <Link href="/dashboard" className="sidebar__wordmark">
-        Coeus
-        <span>{tenantName}</span>
+        <span className="sidebar__brand-name">Coeus</span>
+        <span className="sidebar__tenant-name">{tenantName}</span>
       </Link>
 
       <nav className="sidebar__nav">

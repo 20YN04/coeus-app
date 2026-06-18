@@ -104,8 +104,10 @@ NEXT_PUBLIC_TENANT_SLUG="uwbedrijf"
 NEXT_PUBLIC_TENANT_LOGO="/logo.svg"
 NEXT_PUBLIC_TENANT_ACCENT="#C2410C"
 NEXT_PUBLIC_BREIN_URL="http://localhost:8010"
-NEXT_PUBLIC_DEMO_EMAIL="admin@uwbedrijf.be"
-NEXT_PUBLIC_DEMO_PASSWORD="geheim"`}</pre>
+
+# Demo auth — server-only, never NEXT_PUBLIC_
+DEMO_EMAIL="admin@uwbedrijf.be"
+DEMO_PASSWORD="geheim"`}</pre>
         </section>
       </div>
     </>

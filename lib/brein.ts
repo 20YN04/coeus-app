@@ -36,6 +36,13 @@ async function req<T>(
   if (!res.ok) {
     throw new Error(`Brein API ${res.status}: ${res.statusText} — ${path}`);
   }
+  if (
+    res.status === 204 ||
+    res.headers.get('content-length') === '0' ||
+    !res.headers.get('content-type')?.includes('application/json')
+  ) {
+    return undefined as T;
+  }
   return res.json() as Promise<T>;
 }
 

@@ -12,6 +12,7 @@ export default async function KennisbankPage({ searchParams }: Props) {
 
   let initialItems: Awaited<ReturnType<typeof listKennis>> = [];
   let categories: string[] = [];
+  let apiError = false;
 
   try {
     [initialItems, categories] = await Promise.all([
@@ -19,6 +20,7 @@ export default async function KennisbankPage({ searchParams }: Props) {
       getCategories(),
     ]);
   } catch {
+    apiError = true;
   }
 
   return (
@@ -28,10 +30,17 @@ export default async function KennisbankPage({ searchParams }: Props) {
         <h1 className="page-title">Kennisbank</h1>
       </div>
 
+      {apiError && (
+        <div className="api-error-banner">
+          <span>Kan geen verbinding maken met het brein — controleer of de API bereikbaar is.</span>
+        </div>
+      )}
+
       <KennisbankClient
         initialItems={initialItems}
         categories={categories}
         initialCategory={categorie}
+        initialApiError={apiError}
       />
     </>
   );

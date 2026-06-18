@@ -3,20 +3,34 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-const CATEGORY_ICONS: Record<string, string> = {
-  procedures: '⟳',
-  producten: '◈',
-  hr: '◉',
-  technisch: '◧',
-  klanten: '◎',
-  finance: '◫',
-  marketing: '◬',
-  default: '◆',
-};
+function CategoryIcon({ category }: { category: string }) {
+  const key = category.toLowerCase();
+  const shared = { viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.25 } as const;
 
-function categoryIcon(cat: string): string {
-  const key = cat.toLowerCase();
-  return CATEGORY_ICONS[key] ?? CATEGORY_ICONS.default;
+  if (key === 'procedures') return (
+    <svg {...shared}><path d="M8 2v4l2.5 2.5M8 2a6 6 0 1 1 0 12A6 6 0 0 1 8 2z" strokeLinecap="round" /></svg>
+  );
+  if (key === 'producten') return (
+    <svg {...shared}><rect x="2" y="2" width="5" height="5" /><rect x="9" y="2" width="5" height="5" /><rect x="2" y="9" width="5" height="5" /><rect x="9" y="9" width="5" height="5" /></svg>
+  );
+  if (key === 'hr') return (
+    <svg {...shared}><circle cx="8" cy="5.5" r="2.5" /><path d="M3 14c0-2.76 2.24-5 5-5s5 2.24 5 5" strokeLinecap="round" /></svg>
+  );
+  if (key === 'technisch') return (
+    <svg {...shared}><path d="M2 4h12M2 8h8M2 12h10" strokeLinecap="round" /><circle cx="13" cy="8" r="1.5" /></svg>
+  );
+  if (key === 'klanten') return (
+    <svg {...shared}><circle cx="6" cy="5.5" r="2" /><circle cx="11" cy="5.5" r="2" /><path d="M2 14c0-2.21 1.79-4 4-4s4 1.79 4 4" strokeLinecap="round" /><path d="M11 11c1.66 0 3 1.34 3 3" strokeLinecap="round" /></svg>
+  );
+  if (key === 'finance') return (
+    <svg {...shared}><rect x="2" y="4" width="12" height="9" rx="1" /><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" /><path d="M8 8v2M6 9h4" strokeLinecap="round" /></svg>
+  );
+  if (key === 'marketing') return (
+    <svg {...shared}><path d="M2 11V6l5-3 5 3v5" strokeLinecap="round" strokeLinejoin="round" /><path d="M6 14v-4h4v4" strokeLinecap="round" /></svg>
+  );
+  return (
+    <svg {...shared}><path d="M2 3h12M2 6h9M2 9h11M2 12h7" strokeLinecap="round" /></svg>
+  );
 }
 
 function startOfWeek(): Date {
@@ -94,7 +108,7 @@ export default async function DashboardPage() {
                   className="category-row"
                 >
                   <span className="category-row__icon" aria-hidden="true">
-                    {categoryIcon(name)}
+                    <CategoryIcon category={name} />
                   </span>
                   <span className="category-row__name">{name}</span>
                   <span className="category-row__count">{count}</span>
@@ -166,7 +180,7 @@ export default async function DashboardPage() {
               {recent.map((item) => (
                 <Link key={item.id} href={`/kennisbank/${item.id}`} className="recent-row">
                   <span className="recent-row__icon" aria-hidden="true">
-                    {categoryIcon(item.category)}
+                    <CategoryIcon category={item.category} />
                   </span>
                   <span className="recent-row__body">
                     <span className="recent-row__title">{item.title}</span>
@@ -174,7 +188,7 @@ export default async function DashboardPage() {
                       <span className="recent-row__category">{item.category}</span>
                       {item.source && (
                         <span className={`source-badge source-badge--${item.source === 'ai' ? 'ai' : 'handmatig'}`}>
-                          {item.source === 'ai' ? '🤖 AI' : '✍ Handmatig'}
+                          {item.source === 'ai' ? 'AI' : 'Handmatig'}
                         </span>
                       )}
                       {item.created_at && (
