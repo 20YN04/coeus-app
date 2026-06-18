@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from brain.memory import Memory
 from brain.learner import Learner
-from brain.models import KennisItem, CreateKennisRequest, LearnRequest, AskRequest
+from brain.models import KennisItem, CreateKennisRequest, UpdateKennisRequest, LearnRequest, AskRequest
 
 app = FastAPI(title="Coeus API", description="AI Brein voor bedrijfskennis")
 memory = Memory()
@@ -40,8 +40,8 @@ def add_kennis(item: CreateKennisRequest):
     )
 
 @app.put("/kennis/{item_id}")
-def update_kennis(item_id: str, item: KennisItem):
-    # Werk een bestaand kennis-item bij
+def update_kennis(item_id: str, item: UpdateKennisRequest):
+    # Werk een bestaand kennis-item bij; alleen title/category/content zijn bewerkbaar
     updated = memory.update(item_id, item.title, item.content, item.category)
     if not updated:
         raise HTTPException(404, "Niet gevonden")
@@ -68,15 +68,20 @@ def learn(request: LearnRequest):
         raise HTTPException(422, "GPT gaf geen geldige JSON terug; probeer opnieuw")
 
     saved = []
+    skipped = 0
     for item in items:
-        saved.append(memory.add(
-            title=item["title"],
-            category=item.get("category", request.category or "algemeen"),
-            content=item["content"],
-            source="ai",
-            source_detail="GPT extractie"
-        ))
-    return {"geleerd": len(saved), "items": saved}
+        try:
+            # KeyError als GPT een verplicht veld weglaat; TypeError als item geen dict is
+            saved.append(memory.add(
+                title=item["title"],
+                category=item.get("category", request.category or "algemeen"),
+                content=item["content"],
+                source="ai",
+                source_detail="GPT extractie"
+            ))
+        except (KeyError, TypeError):
+            skipped += 1
+    return {"geleerd": len(saved), "overgeslagen": skipped, "items": saved}
 
 @app.post("/ask")
 def ask(request: AskRequest):

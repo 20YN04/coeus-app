@@ -37,10 +37,14 @@ class Learner:
             # Gooi een generieke fout — nooit de ruwe OpenAI-fout (met API-key) doorsturen
             raise RuntimeError(f"OpenAI-aanroep mislukt: {type(e).__name__}") from None
 
-        raw = response.choices[0].message.content.strip()
-        # Verwijder markdown code-fences met regex (ook varianten als ```json\n)
-        raw = re.sub(r"^```[a-z]*\n", "", raw)
-        raw = raw.rstrip("`").strip()
+        raw = response.choices[0].message.content
+        # Strip voor de regex zodat een leading newline/spatie de ^-anchor niet saboteert
+        raw = raw.strip()
+        # Verwijder opening-fence (ook ```json, ```JSON, of alleen ```)
+        raw = re.sub(r"^```[a-zA-Z]*\n?", "", raw)
+        # Verwijder sluitende fence en eventueel overblijvende witruimte
+        raw = re.sub(r"\n?```$", "", raw)
+        raw = raw.strip()
 
         try:
             items = json.loads(raw)

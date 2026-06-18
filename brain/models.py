@@ -20,6 +20,12 @@ class CreateKennisRequest(BaseModel):
     source: str = "manual"
     source_detail: Optional[str] = None
 
+class UpdateKennisRequest(BaseModel):
+    # Inkomend model voor PUT /kennis/{id} — alleen bewerkbare velden, allemaal optioneel
+    title: Optional[str] = None
+    category: Optional[str] = None
+    content: Optional[str] = None
+
 class LearnRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=10000)
     category: Optional[str] = None
