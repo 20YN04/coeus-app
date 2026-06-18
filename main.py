@@ -116,3 +116,8 @@ def ask(request: AskRequest):
 def categories():
     # Geef alle categorieën met item-aantallen terug
     return memory.get_categories()
+
+@app.get("/graph")
+def graph(neighbors: int = Query(default=4, ge=1, le=20)):
+    # Semantische kennis-graph: nodes + edges op basis van embedding-gelijkenis
+    return memory.build_graph(neighbors)

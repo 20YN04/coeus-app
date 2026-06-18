@@ -129,6 +129,48 @@ class Memory:
         # Verwijder een item uit de kennisbank
         self.collection.delete(ids=[item_id])
 
+    def build_graph(self, neighbors: int = 4) -> dict:
+        # Bouw een kennis-graph: nodes = items, edges = semantische gelijkenis.
+        # Hergebruikt de bestaande embeddings (geen nieuwe AI-call). Voor elk item
+        # zoeken we de dichtstbijzijnde buren via ChromaDB en leggen we undirected,
+        # gededupliceerde edges met een gewicht afgeleid van de afstand.
+        result = self.collection.get(include=["metadatas", "embeddings"])
+        ids = result["ids"]
+        if not ids:
+            return {"nodes": [], "edges": []}
+
+        nodes = [
+            {
+                "id": ids[i],
+                "title": result["metadatas"][i]["title"],
+                "category": result["metadatas"][i]["category"],
+            }
+            for i in range(len(ids))
+        ]
+
+        embeddings = result["embeddings"]
+        n_query = min(neighbors + 1, len(ids))  # +1 want het item zelf zit in de uitslag
+        edge_weight: dict[tuple[str, str], float] = {}
+
+        for i, item_id in enumerate(ids):
+            res = self.collection.query(
+                query_embeddings=[list(embeddings[i])],
+                n_results=n_query,
+            )
+            for nbr_id, dist in zip(res["ids"][0], res["distances"][0]):
+                if nbr_id == item_id:
+                    continue
+                key = tuple(sorted((item_id, nbr_id)))
+                weight = 1.0 / (1.0 + float(dist))  # kleinere afstand = sterkere edge
+                if key not in edge_weight or weight > edge_weight[key]:
+                    edge_weight[key] = weight
+
+        edges = [
+            {"source": a, "target": b, "weight": round(w, 4)}
+            for (a, b), w in edge_weight.items()
+        ]
+        return {"nodes": nodes, "edges": edges}
+
     def get_categories(self) -> list[dict]:
         # Geef alle categorieën terug met het aantal items per categorie
         result = self.collection.get()
