@@ -6,6 +6,8 @@ export type KennisItem = {
   title: string;
   category: string;
   content: string;
+  source?: 'ai' | 'handmatig' | string;
+  source_detail?: string;
   created_at?: string;
   updated_at?: string;
 };
@@ -14,6 +16,8 @@ export type KennisCreateInput = {
   title: string;
   category: string;
   content: string;
+  source?: string;
+  source_detail?: string;
 };
 
 export type KennisUpdateInput = Partial<KennisCreateInput>;
