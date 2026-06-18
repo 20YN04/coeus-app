@@ -38,11 +38,12 @@ type Props = {
   initialItems: KennisItem[];
   categories: string[];
   initialCategory?: string;
+  initialQuery?: string;
   initialApiError?: boolean;
 };
 
-export default function KennisbankClient({ initialItems, categories, initialCategory, initialApiError }: Props) {
-  const [query, setQuery] = useState('');
+export default function KennisbankClient({ initialItems, categories, initialCategory, initialQuery, initialApiError }: Props) {
+  const [query, setQuery] = useState(initialQuery ?? '');
   const [activeCategory, setActiveCategory] = useState(initialCategory ?? '');
   const [items, setItems] = useState<KennisItem[]>(initialItems);
   const [loading, setLoading] = useState(false);

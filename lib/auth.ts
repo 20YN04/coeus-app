@@ -17,6 +17,6 @@ export async function logoutSession(): Promise<void> {
 }
 
 export function hasSession(cookieHeader?: string): boolean {
-  const src = cookieHeader ?? (typeof document !== 'undefined' ? document.cookie : '');
-  return src.split(';').some((c) => c.trim().startsWith(`${SESSION_KEY}=1`));
+  if (!cookieHeader) return false;
+  return cookieHeader.split(';').some((c) => c.trim().startsWith(`${SESSION_KEY}=1`));
 }

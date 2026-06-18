@@ -4,11 +4,11 @@ import KennisbankClient from './KennisbankClient';
 export const dynamic = 'force-dynamic';
 
 type Props = {
-  searchParams: Promise<{ categorie?: string }>;
+  searchParams: Promise<{ categorie?: string; q?: string }>;
 };
 
 export default async function KennisbankPage({ searchParams }: Props) {
-  const { categorie } = await searchParams;
+  const { categorie, q } = await searchParams;
 
   let initialItems: Awaited<ReturnType<typeof listKennis>> = [];
   let categories: string[] = [];
@@ -40,6 +40,7 @@ export default async function KennisbankPage({ searchParams }: Props) {
         initialItems={initialItems}
         categories={categories}
         initialCategory={categorie}
+        initialQuery={q}
         initialApiError={apiError}
       />
     </>

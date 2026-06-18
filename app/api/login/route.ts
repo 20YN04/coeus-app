@@ -7,8 +7,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const { email, password } = body as { email?: string; password?: string };
 
-  const demoEmail = process.env.DEMO_EMAIL ?? 'demo@coeus.app';
-  const demoPassword = process.env.DEMO_PASSWORD ?? 'coeus2024';
+  const demoEmail = process.env.DEMO_EMAIL;
+  const demoPassword = process.env.DEMO_PASSWORD;
+
+  if (!demoEmail || !demoPassword) {
+    console.warn('demo auth not configured');
+    return NextResponse.json({ error: 'Aanmelden is niet geconfigureerd.' }, { status: 401 });
+  }
 
   if (
     typeof email !== 'string' ||
