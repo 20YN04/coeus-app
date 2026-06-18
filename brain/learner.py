@@ -1,7 +1,9 @@
 from openai import OpenAI
+import openai
 from .config import settings
 from .models import KennisItem
 import json
+import re
 
 class Learner:
     def __init__(self):
@@ -24,25 +26,28 @@ class Learner:
 
         JSON array:"""
 
-        response = self.client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
-            max_tokens=2000
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=2000
+            )
+        except openai.OpenAIError as e:
+            # Gooi een generieke fout — nooit de ruwe OpenAI-fout (met API-key) doorsturen
+            raise RuntimeError(f"OpenAI-aanroep mislukt: {type(e).__name__}") from None
 
         raw = response.choices[0].message.content.strip()
-        # Strip markdown code blocks if present
-        if raw.startswith("```"):
-            raw = raw.split("\n", 1)[1]
-            if raw.endswith("```"):
-                raw = raw[:-3]
+        # Verwijder markdown code-fences met regex (ook varianten als ```json\n)
+        raw = re.sub(r"^```[a-z]*\n", "", raw)
+        raw = raw.rstrip("`").strip()
 
         try:
             items = json.loads(raw)
             return items
-        except json.JSONDecodeError:
-            return [{"title": "Extractie", "category": category_hint or "algemeen", "content": text[:1000]}]
+        except json.JSONDecodeError as e:
+            # Sla geen getrunceerde blob op — gooi zodat /learn een 422/500 teruggeeft
+            raise ValueError(f"GPT gaf geen geldige JSON terug: {e}") from None
 
     def answer_question(self, question: str,
                         context: list[KennisItem]) -> str:
@@ -71,11 +76,14 @@ class Learner:
 
         Antwoord:"""
 
-        response = self.client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.5,
-            max_tokens=1000
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.5,
+                max_tokens=1000
+            )
+        except openai.OpenAIError as e:
+            raise RuntimeError(f"OpenAI-aanroep mislukt: {type(e).__name__}") from None
 
         return response.choices[0].message.content.strip()

@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from brain.memory import Memory
 from brain.learner import Learner
-from brain.models import KennisItem, LearnRequest, AskRequest
+from brain.models import KennisItem, CreateKennisRequest, LearnRequest, AskRequest
 
 app = FastAPI(title="Memora API", description="AI Brein voor bedrijfskennis")
 memory = Memory()
@@ -18,7 +18,8 @@ def list_kennis(category: str = None):
     return memory.get_all(category)
 
 @app.get("/kennis/search")
-def search_kennis(q: str, category: str = None, limit: int = 5):
+def search_kennis(q: str, category: str = None,
+                  limit: int = Query(default=5, ge=1, le=50)):
     # Zoek semantisch in de kennisbank
     return memory.search(q, limit, category)
 
@@ -31,9 +32,12 @@ def get_kennis(item_id: str):
     return item
 
 @app.post("/kennis")
-def add_kennis(item: KennisItem):
-    # Voeg handmatig een kennis-item toe
-    return memory.add(item.title, item.category, item.content, source="manual")
+def add_kennis(item: CreateKennisRequest):
+    # Voeg handmatig een kennis-item toe; clients kunnen geen id/created_at injecteren
+    return memory.add(
+        item.title, item.category, item.content,
+        source=item.source, source_detail=item.source_detail
+    )
 
 @app.put("/kennis/{item_id}")
 def update_kennis(item_id: str, item: KennisItem):
@@ -45,14 +49,24 @@ def update_kennis(item_id: str, item: KennisItem):
 
 @app.delete("/kennis/{item_id}")
 def delete_kennis(item_id: str):
-    # Verwijder een kennis-item
+    # Verwijder een kennis-item; geef 404 als het id niet bestaat
+    if not memory.get(item_id):
+        raise HTTPException(404, "Niet gevonden")
     memory.delete(item_id)
     return {"ok": True}
 
 @app.post("/learn")
 def learn(request: LearnRequest):
     # Leer uit vrije tekst: GPT extraheert kennis, die we opslaan
-    items = learner.extract_knowledge(request.text, request.category)
+    try:
+        items = learner.extract_knowledge(request.text, request.category)
+    except RuntimeError:
+        # OpenAI-verbinding mislukt
+        raise HTTPException(502, "Upstream AI-service niet bereikbaar")
+    except ValueError:
+        # GPT gaf geen parseerbare JSON terug
+        raise HTTPException(422, "GPT gaf geen geldige JSON terug; probeer opnieuw")
+
     saved = []
     for item in items:
         saved.append(memory.add(
@@ -68,7 +82,11 @@ def learn(request: LearnRequest):
 def ask(request: AskRequest):
     # Beantwoord een vraag op basis van de kennisbank
     context = memory.search(request.question, limit=5)
-    answer = learner.answer_question(request.question, context)
+    try:
+        answer = learner.answer_question(request.question, context)
+    except RuntimeError:
+        raise HTTPException(503, "Upstream AI-service niet bereikbaar")
+
     return {
         "antwoord": answer,
         "bronnen": [{"title": c.title, "category": c.category} for c in context]

@@ -1,6 +1,7 @@
 import chromadb
 import uuid
 from datetime import datetime
+from typing import Optional
 from .config import settings
 from .models import KennisItem
 
@@ -13,7 +14,7 @@ class Memory:
         )
 
     def add(self, title: str, category: str, content: str,
-            source: str = "manual", source_detail: str = None) -> KennisItem:
+            source: str = "manual", source_detail: Optional[str] = None) -> KennisItem:
         # Voeg een nieuw kennis-item toe aan de kennisbank
         item_id = str(uuid.uuid4())
         now = datetime.now()
@@ -94,20 +95,34 @@ class Memory:
 
     def update(self, item_id: str, title: str = None,
                content: str = None, category: str = None) -> KennisItem | None:
-        # Werk een item bij; bestaande waarden blijven behouden indien niet meegegeven
+        # Werk een item bij; bestaande waarden blijven behouden indien niet meegegeven.
+        # Gebruik ChromaDB in-place update zodat het id stabiel blijft (geen delete-then-add).
         existing = self.get(item_id)
         if not existing:
             return None
 
-        new_title = title or existing.title
-        new_content = content or existing.content
-        new_category = category or existing.category
+        # Expliciete None-check: lege string is een geldige intentionele waarde
+        new_title = title if title is not None else existing.title
+        new_content = content if content is not None else existing.content
+        new_category = category if category is not None else existing.category
 
-        self.delete(item_id)
-        return self.add(
-            title=new_title, category=new_category,
+        self.collection.update(
+            ids=[item_id],
+            documents=[new_content],
+            metadatas=[{
+                "title": new_title,
+                "category": new_category,
+                "source": existing.source,
+                "source_detail": existing.source_detail or "",
+                "created_at": existing.created_at.isoformat()
+            }]
+        )
+
+        return KennisItem(
+            id=item_id, title=new_title, category=new_category,
             content=new_content, source=existing.source,
-            source_detail=existing.source_detail
+            source_detail=existing.source_detail,
+            created_at=existing.created_at
         )
 
     def delete(self, item_id: str):
