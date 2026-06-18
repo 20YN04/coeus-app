@@ -1,9 +1,24 @@
+import os
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from brain.memory import Memory
 from brain.learner import Learner
 from brain.models import KennisItem, CreateKennisRequest, UpdateKennisRequest, LearnRequest, AskRequest
 
 app = FastAPI(title="Coeus API", description="AI Brein voor bedrijfskennis")
+
+# CORS — de Coeus Kennisbank-frontend doet client-side fetches naar dit brein (cross-origin).
+# Zonder dit blokkeert de browser die calls (geen Access-Control-Allow-Origin) en faalt o.a.
+# de semantische zoek. Specifieke origins i.p.v. "*" want dit is een muterende API.
+# Productie-origins komma-gescheiden via COEUS_CORS_ORIGINS.
+_cors_origins = [o.strip() for o in os.environ.get("COEUS_CORS_ORIGINS", "").split(",") if o.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_cors_origins,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
 memory = Memory()
 learner = Learner()
 
