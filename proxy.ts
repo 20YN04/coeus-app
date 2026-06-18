@@ -5,7 +5,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const SESSION_KEY = 'coeus_session';
-const PUBLIC_PATHS = ['/login'];
+// Public paths must include the auth API routes — otherwise the proxy redirects
+// POST /api/login itself to /login and you can never authenticate.
+const PUBLIC_PATHS = ['/login', '/api/login', '/api/logout'];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

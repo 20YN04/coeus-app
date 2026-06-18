@@ -88,6 +88,11 @@ export async function deleteKennis(id: string): Promise<void> {
   });
 }
 
+// The brein returns categories as objects ([{ name, count }]), not bare strings.
+// Map to names (defensive against either shape) so consumers get string[].
 export async function getCategories(): Promise<string[]> {
-  return req<string[]>('/categories');
+  const cats = await req<Array<{ name: string; count?: number } | string>>('/categories');
+  return (cats ?? [])
+    .map((c) => (typeof c === 'string' ? c : c?.name))
+    .filter((name): name is string => typeof name === 'string' && name.length > 0);
 }
