@@ -103,7 +103,7 @@ export default function InstellingenPage() {
 NEXT_PUBLIC_TENANT_SLUG="uwbedrijf"
 NEXT_PUBLIC_TENANT_LOGO="/logo.svg"
 NEXT_PUBLIC_TENANT_ACCENT="#C2410C"
-NEXT_PUBLIC_BREIN_URL="http://localhost:8010"
+NEXT_PUBLIC_BREIN_URL="http://localhost:8765"
 
 # Demo auth — server-only, never NEXT_PUBLIC_
 DEMO_EMAIL="admin@uwbedrijf.be"

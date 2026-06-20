@@ -11,7 +11,7 @@ const tenant: TenantConfig = {
   slug: process.env.NEXT_PUBLIC_TENANT_SLUG ?? 'demo',
   logo: process.env.NEXT_PUBLIC_TENANT_LOGO ?? undefined,
   accentColor: process.env.NEXT_PUBLIC_TENANT_ACCENT ?? undefined,
-  breinUrl: process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://localhost:8010',
+  breinUrl: process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://localhost:8765',
 };
 
 export default tenant;

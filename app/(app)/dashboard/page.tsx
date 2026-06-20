@@ -83,7 +83,7 @@ export default async function DashboardPage() {
 
       {apiError && (
         <div className="api-error-banner">
-          <span>Brein niet bereikbaar — controleer of de API draait op {process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://localhost:8010'}</span>
+          <span>Brein niet bereikbaar — controleer of de API draait op {process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://localhost:8765'}</span>
         </div>
       )}
 
