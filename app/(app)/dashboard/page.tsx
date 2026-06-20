@@ -1,7 +1,10 @@
-import { listKennis, getCategories } from '@/lib/brein';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { listKennis, getCategories, type KennisItem } from '@/lib/brein';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
+const BREIN_URL = process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://127.0.0.1:8765';
 
 function CategoryIcon({ category }: { category: string }) {
   const key = category.toLowerCase();
@@ -42,16 +45,30 @@ function startOfWeek(): Date {
   return d;
 }
 
-export default async function DashboardPage() {
-  let allItems: Awaited<ReturnType<typeof listKennis>> = [];
-  let categories: string[] = [];
-  let apiError = false;
+export default function DashboardPage() {
+  const [allItems, setAllItems] = useState<KennisItem[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState(false);
 
-  try {
-    [allItems, categories] = await Promise.all([listKennis(), getCategories()]);
-  } catch {
-    apiError = true;
-  }
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const [items, cats] = await Promise.all([listKennis(), getCategories()]);
+        if (!alive) return;
+        setAllItems(items);
+        setCategories(cats);
+      } catch {
+        if (alive) setApiError(true);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const weekStart = startOfWeek();
   const thisWeek = allItems.filter((item) => {
@@ -83,128 +100,134 @@ export default async function DashboardPage() {
 
       {apiError && (
         <div className="api-error-banner">
-          <span>Brein niet bereikbaar — controleer of de API draait op {process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://localhost:8765'}</span>
+          <span>Brein niet bereikbaar — controleer of de lokale brein draait op {BREIN_URL}</span>
         </div>
       )}
 
-      <div className="dashboard-grid">
-        <section className="dashboard-section">
-          <div className="section-header">
-            <p className="section-label">Categorieën</p>
-            <span className="section-count">{categories.length}</span>
-          </div>
+      {loading && !apiError && (
+        <div className="page-loading" role="status">Laden…</div>
+      )}
 
-          {categories.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-state__label">Nog leeg</p>
-              <p className="empty-state__heading">Geen categorieën</p>
+      {!loading && !apiError && (
+        <div className="dashboard-grid">
+          <section className="dashboard-section">
+            <div className="section-header">
+              <p className="section-label">Categorieën</p>
+              <span className="section-count">{categories.length}</span>
             </div>
-          ) : (
-            <div className="category-list">
-              {categoryCounts.map(({ name, count }) => (
-                <Link
-                  key={name}
-                  href={`/kennisbank?categorie=${encodeURIComponent(name)}`}
-                  className="category-row"
-                >
-                  <span className="category-row__icon" aria-hidden="true">
-                    <CategoryIcon category={name} />
-                  </span>
-                  <span className="category-row__name">{name}</span>
-                  <span className="category-row__count">{count}</span>
-                  <span className="category-row__arrow" aria-hidden="true">→</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
 
-        <aside className="dashboard-aside">
-          <div className="week-card">
-            <p className="section-label">Deze week geleerd</p>
-            <span className="week-number">{thisWeek.length}</span>
-            <p className="week-sub">
-              {thisWeek.length === 0
-                ? 'Nog niets toegevoegd'
-                : `${weekAi} via AI · ${weekHandmatig} handmatig`}
-            </p>
-            <div className="week-bar" aria-hidden="true">
-              {thisWeek.length > 0 && (
-                <>
-                  <div
-                    className="week-bar__ai"
-                    style={{ width: `${(weekAi / thisWeek.length) * 100}%` }}
-                  />
-                  <div
-                    className="week-bar__handmatig"
-                    style={{ width: `${(weekHandmatig / thisWeek.length) * 100}%` }}
-                  />
-                </>
-              )}
-              {thisWeek.length === 0 && (
-                <div className="week-bar__empty" style={{ width: '100%' }} />
-              )}
-            </div>
-            <div className="week-legend">
-              <span className="week-legend__ai">AI</span>
-              <span className="week-legend__handmatig">Handmatig</span>
-            </div>
-          </div>
-
-          <div className="stat-pair">
-            <div className="stat-cell">
-              <p className="stat-cell__label">Totaal</p>
-              <span className="stat-cell__value">{allItems.length}</span>
-            </div>
-            <div className="stat-cell">
-              <p className="stat-cell__label">Categorieën</p>
-              <span className="stat-cell__value">{categories.length}</span>
-            </div>
-          </div>
-        </aside>
-
-        <section className="dashboard-section dashboard-section--full">
-          <div className="section-header">
-            <p className="section-label">Recent toegevoegd</p>
-            <Link href="/kennisbank" className="section-link">Alle items →</Link>
-          </div>
-
-          {recent.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-state__label">Leeg</p>
-              <p className="empty-state__heading">Kennisbank leeg</p>
-              <Link href="/nieuw" className="btn-ghost-sm">Eerste item toevoegen →</Link>
-            </div>
-          ) : (
-            <div className="recent-list">
-              {recent.map((item) => (
-                <Link key={item.id} href={`/kennisbank/${item.id}`} className="recent-row">
-                  <span className="recent-row__icon" aria-hidden="true">
-                    <CategoryIcon category={item.category} />
-                  </span>
-                  <span className="recent-row__body">
-                    <span className="recent-row__title">{item.title}</span>
-                    <span className="recent-row__meta">
-                      <span className="recent-row__category">{item.category}</span>
-                      {item.source && (
-                        <span className={`source-badge source-badge--${item.source === 'ai' ? 'ai' : 'handmatig'}`}>
-                          {item.source === 'ai' ? 'AI' : 'Handmatig'}
-                        </span>
-                      )}
-                      {item.created_at && (
-                        <span className="recent-row__date">
-                          {new Date(item.created_at).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
-                        </span>
-                      )}
+            {categories.length === 0 ? (
+              <div className="empty-state">
+                <p className="empty-state__label">Nog leeg</p>
+                <p className="empty-state__heading">Geen categorieën</p>
+              </div>
+            ) : (
+              <div className="category-list">
+                {categoryCounts.map(({ name, count }) => (
+                  <Link
+                    key={name}
+                    href={`/kennisbank?categorie=${encodeURIComponent(name)}`}
+                    className="category-row"
+                  >
+                    <span className="category-row__icon" aria-hidden="true">
+                      <CategoryIcon category={name} />
                     </span>
-                  </span>
-                  <span className="recent-row__arrow" aria-hidden="true">→</span>
-                </Link>
-              ))}
+                    <span className="category-row__name">{name}</span>
+                    <span className="category-row__count">{count}</span>
+                    <span className="category-row__arrow" aria-hidden="true">→</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <aside className="dashboard-aside">
+            <div className="week-card">
+              <p className="section-label">Deze week geleerd</p>
+              <span className="week-number">{thisWeek.length}</span>
+              <p className="week-sub">
+                {thisWeek.length === 0
+                  ? 'Nog niets toegevoegd'
+                  : `${weekAi} via AI · ${weekHandmatig} handmatig`}
+              </p>
+              <div className="week-bar" aria-hidden="true">
+                {thisWeek.length > 0 && (
+                  <>
+                    <div
+                      className="week-bar__ai"
+                      style={{ width: `${(weekAi / thisWeek.length) * 100}%` }}
+                    />
+                    <div
+                      className="week-bar__handmatig"
+                      style={{ width: `${(weekHandmatig / thisWeek.length) * 100}%` }}
+                    />
+                  </>
+                )}
+                {thisWeek.length === 0 && (
+                  <div className="week-bar__empty" style={{ width: '100%' }} />
+                )}
+              </div>
+              <div className="week-legend">
+                <span className="week-legend__ai">AI</span>
+                <span className="week-legend__handmatig">Handmatig</span>
+              </div>
             </div>
-          )}
-        </section>
-      </div>
+
+            <div className="stat-pair">
+              <div className="stat-cell">
+                <p className="stat-cell__label">Totaal</p>
+                <span className="stat-cell__value">{allItems.length}</span>
+              </div>
+              <div className="stat-cell">
+                <p className="stat-cell__label">Categorieën</p>
+                <span className="stat-cell__value">{categories.length}</span>
+              </div>
+            </div>
+          </aside>
+
+          <section className="dashboard-section dashboard-section--full">
+            <div className="section-header">
+              <p className="section-label">Recent toegevoegd</p>
+              <Link href="/kennisbank" className="section-link">Alle items →</Link>
+            </div>
+
+            {recent.length === 0 ? (
+              <div className="empty-state">
+                <p className="empty-state__label">Leeg</p>
+                <p className="empty-state__heading">Kennisbank leeg</p>
+                <Link href="/nieuw" className="btn-ghost-sm">Eerste item toevoegen →</Link>
+              </div>
+            ) : (
+              <div className="recent-list">
+                {recent.map((item) => (
+                  <Link key={item.id} href={`/kennisbank/detail?id=${encodeURIComponent(item.id)}`} className="recent-row">
+                    <span className="recent-row__icon" aria-hidden="true">
+                      <CategoryIcon category={item.category} />
+                    </span>
+                    <span className="recent-row__body">
+                      <span className="recent-row__title">{item.title}</span>
+                      <span className="recent-row__meta">
+                        <span className="recent-row__category">{item.category}</span>
+                        {item.source && (
+                          <span className={`source-badge source-badge--${item.source === 'ai' ? 'ai' : 'handmatig'}`}>
+                            {item.source === 'ai' ? 'AI' : 'Handmatig'}
+                          </span>
+                        )}
+                        {item.created_at && (
+                          <span className="recent-row__date">
+                            {new Date(item.created_at).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
+                          </span>
+                        )}
+                      </span>
+                    </span>
+                    <span className="recent-row__arrow" aria-hidden="true">→</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </>
   );
 }

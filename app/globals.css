@@ -255,19 +255,28 @@ body {
   }
 }
 
-.sidebar__logout {
+.sidebar__footer-mark {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--c-ink-muted);
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  transition: color var(--d-fast) var(--ease-out);
 }
-.sidebar__logout:hover { color: var(--c-ink); }
+
+/* Client-side data loading + boot splash (static SPA, local-first) */
+.page-loading {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-paper-muted);
+  padding: var(--s-12) 0;
+}
+.boot-splash {
+  position: fixed;
+  inset: 0;
+  background: var(--c-field);
+}
 
 /* ─────────────────────────────────────────────────────────────
    Main content area

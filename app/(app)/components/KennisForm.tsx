@@ -49,16 +49,15 @@ export default function KennisForm({ mode, item }: Props) {
           category: effectiveCategory,
           content: content.trim(),
         });
-        router.push(`/kennisbank/${item.id}`);
+        router.push(`/kennisbank/detail?id=${encodeURIComponent(item.id)}`);
       } else {
         const created = await addKennis({
           title: title.trim(),
           category: effectiveCategory,
           content: content.trim(),
         });
-        router.push(`/kennisbank/${created.id}`);
+        router.push(`/kennisbank/detail?id=${encodeURIComponent(created.id)}`);
       }
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Er ging iets mis.');
       setLoading(false);

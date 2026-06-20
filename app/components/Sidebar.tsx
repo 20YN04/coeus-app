@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { logoutSession } from '@/lib/auth';
+import { usePathname } from 'next/navigation';
 
 const NAV = [
   {
@@ -49,13 +48,6 @@ const NAV = [
 
 export default function Sidebar({ tenantName }: { tenantName: string }) {
   const pathname = usePathname();
-  const router = useRouter();
-
-  async function handleLogout() {
-    await logoutSession();
-    router.push('/login');
-    router.refresh();
-  }
 
   return (
     <aside className="sidebar">
@@ -79,9 +71,7 @@ export default function Sidebar({ tenantName }: { tenantName: string }) {
       </nav>
 
       <div className="sidebar__footer">
-        <button className="sidebar__logout" onClick={handleLogout}>
-          Uitloggen
-        </button>
+        <span className="sidebar__footer-mark">Coeus · lokaal</span>
       </div>
     </aside>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { listKennis, searchKennis, type KennisItem } from '@/lib/brein';
+import { listKennis, searchKennis, getCategories, type KennisItem } from '@/lib/brein';
 
 function CategoryIcon({ category }: { category: string }) {
   const key = category.toLowerCase();
@@ -35,20 +35,33 @@ function CategoryIcon({ category }: { category: string }) {
 }
 
 type Props = {
-  initialItems: KennisItem[];
-  categories: string[];
   initialCategory?: string;
   initialQuery?: string;
-  initialApiError?: boolean;
 };
 
-export default function KennisbankClient({ initialItems, categories, initialCategory, initialQuery, initialApiError }: Props) {
+export default function KennisbankClient({ initialCategory, initialQuery }: Props) {
   const [query, setQuery] = useState(initialQuery ?? '');
   const [activeCategory, setActiveCategory] = useState(initialCategory ?? '');
-  const [items, setItems] = useState<KennisItem[]>(initialItems);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(initialApiError ? 'Kan geen verbinding maken met het brein.' : '');
+  const [items, setItems] = useState<KennisItem[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Categories drive the filter chips — fetched once, client-side, from the local brein.
+  useEffect(() => {
+    let alive = true;
+    getCategories()
+      .then((cats) => {
+        if (alive) setCategories(cats);
+      })
+      .catch(() => {
+        /* surfaced via the items fetch below */
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const fetchItems = useCallback(
     async (q: string, cat: string) => {
@@ -152,7 +165,7 @@ export default function KennisbankClient({ initialItems, categories, initialCate
       {items.length > 0 && (
         <div className={`kennis-list${loading ? ' kennis-list--loading' : ''}`}>
           {items.map((item) => (
-            <Link key={item.id} href={`/kennisbank/${item.id}`} className="kennis-row">
+            <Link key={item.id} href={`/kennisbank/detail?id=${encodeURIComponent(item.id)}`} className="kennis-row">
               <span className="kennis-row__icon" aria-hidden="true">
                 <CategoryIcon category={item.category} />
               </span>

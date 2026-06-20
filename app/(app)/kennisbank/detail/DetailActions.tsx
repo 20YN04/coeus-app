@@ -25,7 +25,6 @@ export default function DetailActions({ id, title }: Props) {
     try {
       await deleteKennis(id);
       router.push('/kennisbank');
-      router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Verwijderen mislukt.');
       setLoading(false);

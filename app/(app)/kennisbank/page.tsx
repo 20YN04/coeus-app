@@ -1,28 +1,20 @@
-import { listKennis, getCategories } from '@/lib/brein';
+'use client';
+
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import KennisbankClient from './KennisbankClient';
 
-export const dynamic = 'force-dynamic';
+function KennisbankInner() {
+  const sp = useSearchParams();
+  return (
+    <KennisbankClient
+      initialCategory={sp.get('categorie') ?? undefined}
+      initialQuery={sp.get('q') ?? undefined}
+    />
+  );
+}
 
-type Props = {
-  searchParams: Promise<{ categorie?: string; q?: string }>;
-};
-
-export default async function KennisbankPage({ searchParams }: Props) {
-  const { categorie, q } = await searchParams;
-
-  let initialItems: Awaited<ReturnType<typeof listKennis>> = [];
-  let categories: string[] = [];
-  let apiError = false;
-
-  try {
-    [initialItems, categories] = await Promise.all([
-      listKennis(categorie),
-      getCategories(),
-    ]);
-  } catch {
-    apiError = true;
-  }
-
+export default function KennisbankPage() {
   return (
     <>
       <div className="page-header">
@@ -30,19 +22,10 @@ export default async function KennisbankPage({ searchParams }: Props) {
         <h1 className="page-title">Kennisbank</h1>
       </div>
 
-      {apiError && (
-        <div className="api-error-banner">
-          <span>Kan geen verbinding maken met het brein — controleer of de API bereikbaar is.</span>
-        </div>
-      )}
-
-      <KennisbankClient
-        initialItems={initialItems}
-        categories={categories}
-        initialCategory={categorie}
-        initialQuery={q}
-        initialApiError={apiError}
-      />
+      {/* useSearchParams must sit behind a Suspense boundary in a static export. */}
+      <Suspense fallback={<div className="page-loading" role="status">Laden…</div>}>
+        <KennisbankInner />
+      </Suspense>
     </>
   );
 }

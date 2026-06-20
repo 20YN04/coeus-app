@@ -1,13 +1,10 @@
-import { getKennis } from '@/lib/brein';
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { getKennis, type KennisItem } from '@/lib/brein';
 import DetailActions from './DetailActions';
-
-export const dynamic = 'force-dynamic';
-
-type Props = {
-  params: Promise<{ id: string }>;
-};
 
 function renderBody(content: string) {
   const paragraphs = content
@@ -35,17 +32,44 @@ function renderBody(content: string) {
   });
 }
 
-export default async function KennisDetailPage({ params }: Props) {
-  const { id } = await params;
+function DetailLoader({ id }: { id: string }) {
+  const [item, setItem] = useState<KennisItem | null>(null);
+  const [status, setStatus] = useState<'loading' | 'ok' | 'notfound'>(id ? 'loading' : 'notfound');
 
-  let item: Awaited<ReturnType<typeof getKennis>> | null = null;
-  try {
-    item = await getKennis(id);
-  } catch {
-    notFound();
+  useEffect(() => {
+    if (!id) return;
+    let alive = true;
+    getKennis(id)
+      .then((res) => {
+        if (!alive) return;
+        if (res && res.id) {
+          setItem(res);
+          setStatus('ok');
+        } else {
+          setStatus('notfound');
+        }
+      })
+      .catch(() => {
+        if (alive) setStatus('notfound');
+      });
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+
+  if (status === 'loading') {
+    return <div className="page-loading" role="status">Laden…</div>;
   }
 
-  if (!item) notFound();
+  if (status === 'notfound' || !item) {
+    return (
+      <div className="empty-state">
+        <p className="empty-state__label">Niet gevonden</p>
+        <p className="empty-state__heading">Dit kennisitem bestaat niet</p>
+        <Link href="/kennisbank" className="btn-ghost-sm">← Terug naar kennisbank</Link>
+      </div>
+    );
+  }
 
   const formattedDate = item.created_at
     ? new Date(item.created_at).toLocaleDateString('nl-BE', {
@@ -111,7 +135,7 @@ export default async function KennisDetailPage({ params }: Props) {
           )}
 
           <div className="detail-actions">
-            <Link href={`/kennis/${item.id}/bewerken`} className="btn-outline">
+            <Link href={`/kennisbank/bewerken?id=${encodeURIComponent(item.id)}`} className="btn-outline">
               Bewerken
             </Link>
             <DetailActions id={item.id} title={item.title} />
@@ -119,5 +143,20 @@ export default async function KennisDetailPage({ params }: Props) {
         </aside>
       </div>
     </>
+  );
+}
+
+function DetailInner() {
+  // `key` remounts the loader when the id changes, so its initial state is
+  // always derived correctly from the current id (no setState-in-effect).
+  const id = useSearchParams().get('id') ?? '';
+  return <DetailLoader key={id} id={id} />;
+}
+
+export default function KennisDetailPage() {
+  return (
+    <Suspense fallback={<div className="page-loading" role="status">Laden…</div>}>
+      <DetailInner />
+    </Suspense>
   );
 }

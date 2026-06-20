@@ -2,7 +2,7 @@ import { chromium } from "playwright";
 
 const routes = process.argv.slice(2).length
   ? process.argv.slice(2)
-  : ["/login", "/dashboard", "/kennisbank", "/nieuw", "/instellingen"];
+  : ["/", "/dashboard", "/kennisbank", "/nieuw", "/instellingen"];
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 

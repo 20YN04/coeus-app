@@ -1,5 +1,5 @@
 const BASE_URL =
-  process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://localhost:8765';
+  process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://127.0.0.1:8765';
 
 export type KennisItem = {
   id: string;

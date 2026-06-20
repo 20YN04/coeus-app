@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Tauri (Rust) build tree — not ours to lint.
+    "src-tauri/**",
   ]),
 ]);
 
