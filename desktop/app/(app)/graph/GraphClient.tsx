@@ -6,7 +6,7 @@ import type { KennisGraph } from '@/lib/brein';
 
 // Coeus-palet: indigo eerst, daarna onderscheidende tinten per categorie.
 const PALETTE = [
-  '#7C6CFF', '#3A1DD8', '#2DD4BF', '#F59E0B',
+  '#7C6CFF', '#7A00E6', '#2DD4BF', '#F59E0B',
   '#EC4899', '#38BDF8', '#A3E635', '#FB7185',
 ];
 
