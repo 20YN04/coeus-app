@@ -3,3 +3,7 @@ venv/
 data/chroma/
 __pycache__/
 *.pyc
+
+# PyInstaller build artifacts (de sidecar-bundle is ~200MB)
+build/
+dist/
