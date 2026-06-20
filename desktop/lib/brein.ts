@@ -22,6 +22,10 @@ export type KennisCreateInput = {
 
 export type KennisUpdateInput = Partial<KennisCreateInput>;
 
+export type GraphNode = { id: string; title: string; category: string };
+export type GraphEdge = { source: string; target: string; weight: number };
+export type KennisGraph = { nodes: GraphNode[]; edges: GraphEdge[] };
+
 async function req<T>(
   path: string,
   init?: RequestInit,
@@ -119,4 +123,11 @@ export async function getCategories(): Promise<string[]> {
   return (cats ?? [])
     .map((c) => (typeof c === 'string' ? c : c?.name))
     .filter((name): name is string => typeof name === 'string' && name.length > 0);
+}
+
+// Semantic knowledge graph (nodes per item, edges from embedding similarity).
+// Key-free: the brein builds it from the local ChromaDB embeddings.
+export async function getGraph(neighbors?: number): Promise<KennisGraph> {
+  const qs = neighbors != null ? `?neighbors=${neighbors}` : '';
+  return req<KennisGraph>(`/graph${qs}`);
 }
