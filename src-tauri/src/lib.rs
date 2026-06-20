@@ -93,7 +93,11 @@ fn spawn_brein(app: &tauri::App) {
     match cmd.spawn() {
         Ok(child) => {
             println!("[coeus] brein sidecar started (pid {}) data={data_dir:?}", child.id());
-            app.state::<BreinProcess>().0.lock().unwrap().replace(child);
+            // Recover from a poisoned lock rather than panic — a panic here would
+            // skip killing the child on exit (zombie uvicorn holding the port).
+            let state = app.state::<BreinProcess>();
+            let mut guard = state.0.lock().unwrap_or_else(|p| p.into_inner());
+            guard.replace(child);
         }
         Err(e) => eprintln!("[coeus] failed to start brein sidecar {bin:?}: {e}"),
     }
@@ -129,8 +133,16 @@ pub fn run() {
         .run(|app_handle, event| {
             if let RunEvent::Exit = event {
                 // Don't leave a zombie uvicorn behind when the window closes.
-                if let Some(mut child) = app_handle.state::<BreinProcess>().0.lock().unwrap().take() {
+                // Recover a poisoned lock so a kill still happens; reap the child.
+                let child = app_handle
+                    .state::<BreinProcess>()
+                    .0
+                    .lock()
+                    .unwrap_or_else(|p| p.into_inner())
+                    .take();
+                if let Some(mut child) = child {
                     let _ = child.kill();
+                    let _ = child.wait();
                 }
             }
         });

@@ -51,13 +51,18 @@ async function req<T>(
 // the first dashboard/list load survives that boot window instead of flashing
 // an error banner. Resolves true once ready, false on timeout (caller then
 // surfaces the normal error path).
-export async function waitForBrein(timeoutMs = 60000): Promise<boolean> {
+export async function waitForBrein(
+  timeoutMs = 90000,
+  signal?: AbortSignal,
+): Promise<boolean> {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
+    if (signal?.aborted) return false;
     try {
-      const res = await fetch(`${BASE_URL}/`, { cache: 'no-store' });
+      const res = await fetch(`${BASE_URL}/`, { cache: 'no-store', signal });
       if (res.ok) return true;
     } catch {
+      if (signal?.aborted) return false;
       /* sidecar not listening yet */
     }
     await new Promise((r) => setTimeout(r, 600));

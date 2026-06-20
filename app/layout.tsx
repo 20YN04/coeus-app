@@ -18,7 +18,10 @@ function accentStyle(): string | null {
   const accent = tenant.accentColor?.trim();
   if (!accent) return null;
   if (accent.toLowerCase() === DEFAULT_ACCENT) return null;
-  if (!/^(#[0-9a-fA-F]{3,8}|rgb\([^)]*\)|hsl\([^)]*\))$/.test(accent)) return null;
+  // Hex only — the documented contract (docs/per-client-build.md). Rejecting
+  // rgb()/hsl() forms removes any room for CSS injection via the value, even
+  // though it's a build-time constant.
+  if (!/^#[0-9a-fA-F]{3,8}$/.test(accent)) return null;
   return [
     ':root{',
     `--c-field:${accent};`,

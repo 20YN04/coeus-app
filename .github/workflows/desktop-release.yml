@@ -66,6 +66,19 @@ jobs:
           mkdir -p src-tauri/binaries
           cp -R coeus-app/dist/coeus-brein src-tauri/binaries/coeus-brein
 
+      - name: Assert sidecar binary is staged
+        shell: bash
+        # Without this, a failed/empty copy would silently produce an installer
+        # whose app falls back to "dev brein on :8765" and never starts a backend.
+        run: |
+          bin=$(ls src-tauri/binaries/coeus-brein/coeus-brein* 2>/dev/null | head -1)
+          if [ -z "$bin" ] || [ ! -s "$bin" ]; then
+            echo "::error::brein sidecar missing or empty in src-tauri/binaries/coeus-brein"
+            ls -la src-tauri/binaries/coeus-brein || true
+            exit 1
+          fi
+          echo "sidecar staged: $bin ($(du -h "$bin" | cut -f1))"
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:

@@ -53,9 +53,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     let alive = true;
+    const ctrl = new AbortController();
     (async () => {
       try {
-        await waitForBrein();
+        await waitForBrein(undefined, ctrl.signal);
         const [items, cats] = await Promise.all([listKennis(), getCategories()]);
         if (!alive) return;
         setAllItems(items);
@@ -68,6 +69,7 @@ export default function DashboardPage() {
     })();
     return () => {
       alive = false;
+      ctrl.abort();
     };
   }, []);
 

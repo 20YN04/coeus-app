@@ -52,11 +52,15 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
   // Wait for the local brein sidecar to boot before the first load.
   useEffect(() => {
     let alive = true;
-    waitForBrein().finally(() => {
-      if (alive) setReady(true);
+    const ctrl = new AbortController();
+    waitForBrein(undefined, ctrl.signal).then((ok) => {
+      if (!alive) return;
+      setReady(true);
+      if (!ok) setError('Brein niet bereikbaar — controleer of de lokale brein draait.');
     });
     return () => {
       alive = false;
+      ctrl.abort();
     };
   }, []);
 
