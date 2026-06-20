@@ -38,15 +38,18 @@
    Design tokens — Coeus indigo-violet palette
    ───────────────────────────────────────────────────────────── */
 :root {
-  --c-field:        #3A1DD8;
-  --c-field-deep:   #2410A0;
-  --c-ink:          #F4F2FB;
-  --c-ink-muted:    #C5BFEE;
-  --c-paper:        #FAFAF8;
-  --c-paper-ink:    #2D14B8;
-  --c-paper-muted:  #6B5CC4;
-  --c-border:       rgba(244, 242, 251, 0.12);
-  --c-border-paper: rgba(45, 20, 184, 0.13);
+  /* Inverted from the coeus-site palette: the site is purple-field / off-white
+     ink (dark theme); the app is the reverse — off-white field / purple ink
+     (light theme). Same two brand colours (#7A00E6 + #F5F5F5), roles swapped. */
+  --c-field:        #F5F2FB;   /* off-white field — primary bg (was the site's ink) */
+  --c-field-deep:   #ECE5F9;   /* light lavender — sidebar / deeper surface */
+  --c-ink:          #7A00E6;   /* vivid purple — primary text + brand (was the site's field) */
+  --c-ink-muted:    #524766;   /* muted purple-grey — secondary text on field */
+  --c-paper:        #7A00E6;   /* purple — inverted accent panel bg */
+  --c-paper-ink:    #F5F5F5;   /* off-white — text on purple panels */
+  --c-paper-muted:  #D2BCF2;   /* muted lavender — secondary on purple panels */
+  --c-border:       rgba(122, 0, 230, 0.18);   /* purple hairline on the light field */
+  --c-border-paper: rgba(245, 245, 245, 0.20); /* light hairline on purple panels */
 
   --spine-x: 4.5rem;
 
@@ -207,12 +210,12 @@ body {
 }
 .sidebar__link:hover {
   color: var(--c-ink);
-  background: rgba(244, 242, 251, 0.05);
-  border-left-color: rgba(244, 242, 251, 0.2);
+  background: rgba(122, 0, 230, 0.05);
+  border-left-color: rgba(122, 0, 230, 0.2);
 }
 .sidebar__link[data-active="true"] {
   color: var(--c-ink);
-  background: rgba(244, 242, 251, 0.08);
+  background: rgba(122, 0, 230, 0.08);
   border-left-color: var(--c-ink);
 }
 @media (max-width: 56rem) {
@@ -269,7 +272,7 @@ body {
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--c-paper-muted);
+  color: var(--c-ink-muted);
   padding: var(--s-12) 0;
 }
 .boot-splash {
@@ -314,14 +317,14 @@ body {
   display: flex;
   align-items: center;
   gap: var(--s-3);
-  background: rgba(244, 242, 251, 0.06);
+  background: rgba(122, 0, 230, 0.06);
   border: 1px solid var(--c-border);
   padding: 0.625rem var(--s-4);
   transition: border-color var(--d-fast) var(--ease-out), background var(--d-fast) var(--ease-out);
 }
 .topbar__search:focus-within {
-  border-color: rgba(244, 242, 251, 0.3);
-  background: rgba(244, 242, 251, 0.09);
+  border-color: rgba(122, 0, 230, 0.3);
+  background: rgba(122, 0, 230, 0.09);
 }
 
 .topbar__search-icon {
@@ -468,7 +471,7 @@ body {
 }
 
 .form-input {
-  background: rgba(244, 242, 251, 0.06);
+  background: rgba(122, 0, 230, 0.06);
   border: 1px solid var(--c-border);
   padding: 0.75rem var(--s-4);
   font-family: var(--font-mono);
@@ -480,8 +483,8 @@ body {
   width: 100%;
 }
 .form-input:focus {
-  border-color: rgba(244, 242, 251, 0.4);
-  background: rgba(244, 242, 251, 0.09);
+  border-color: rgba(122, 0, 230, 0.4);
+  background: rgba(122, 0, 230, 0.09);
 }
 .form-input::placeholder {
   color: var(--c-ink-muted);
@@ -538,7 +541,7 @@ body {
   cursor: pointer;
 }
 .kennis-card:hover {
-  background: rgba(244, 242, 251, 0.04);
+  background: rgba(122, 0, 230, 0.04);
 }
 
 .kennis-card__category {
@@ -702,7 +705,7 @@ body {
   color: var(--c-ink);
 }
 .category-row:last-child { border-bottom: none; }
-.category-row:hover { background: rgba(244, 242, 251, 0.04); }
+.category-row:hover { background: rgba(122, 0, 230, 0.04); }
 
 .category-row__icon {
   display: flex;
@@ -727,7 +730,7 @@ body {
   font-size: 0.625rem;
   letter-spacing: 0.1em;
   color: var(--c-ink-muted);
-  background: rgba(244, 242, 251, 0.08);
+  background: rgba(122, 0, 230, 0.08);
   padding: 0.25rem 0.625rem;
   min-width: 2rem;
   text-align: center;
@@ -742,7 +745,7 @@ body {
 .category-row:hover .category-row__arrow { color: var(--c-ink); transform: translateX(2px); }
 
 .week-card {
-  background: rgba(244, 242, 251, 0.04);
+  background: rgba(122, 0, 230, 0.04);
   border: 1px solid var(--c-border);
   padding: var(--s-6);
   display: flex;
@@ -788,7 +791,7 @@ body {
 }
 
 .week-bar__empty {
-  background: rgba(244, 242, 251, 0.15);
+  background: rgba(122, 0, 230, 0.15);
   height: 100%;
 }
 
@@ -874,7 +877,7 @@ body {
   transition: background var(--d-fast) var(--ease-out);
 }
 .recent-row:last-child { border-bottom: none; }
-.recent-row:hover { background: rgba(244, 242, 251, 0.04); }
+.recent-row:hover { background: rgba(122, 0, 230, 0.04); }
 
 .recent-row__icon {
   display: flex;
@@ -950,13 +953,13 @@ body {
 }
 
 .source-badge--ai {
-  background: rgba(58, 29, 216, 0.25);
+  background: rgba(122, 0, 230, 0.25);
   color: var(--c-ink-muted);
-  border: 1px solid rgba(58, 29, 216, 0.4);
+  border: 1px solid rgba(122, 0, 230, 0.4);
 }
 
 .source-badge--handmatig {
-  background: rgba(244, 242, 251, 0.06);
+  background: rgba(122, 0, 230, 0.06);
   color: var(--c-ink-muted);
   border: 1px solid var(--c-border);
 }
@@ -976,14 +979,14 @@ body {
   display: flex;
   align-items: center;
   gap: var(--s-3);
-  background: rgba(244, 242, 251, 0.06);
+  background: rgba(122, 0, 230, 0.06);
   border: 1px solid var(--c-border);
   padding: 0.625rem var(--s-4);
   transition: border-color var(--d-fast) var(--ease-out), background var(--d-fast) var(--ease-out);
 }
 .kb-search:focus-within {
-  border-color: rgba(244, 242, 251, 0.3);
-  background: rgba(244, 242, 251, 0.09);
+  border-color: rgba(122, 0, 230, 0.3);
+  background: rgba(122, 0, 230, 0.09);
 }
 
 .kb-search__icon {
@@ -1051,7 +1054,7 @@ body {
   width: 0.75rem;
   height: 0.75rem;
 }
-.filter-chip:hover { color: var(--c-ink); border-color: rgba(244, 242, 251, 0.2); }
+.filter-chip:hover { color: var(--c-ink); border-color: rgba(122, 0, 230, 0.2); }
 .filter-chip[data-active="true"] {
   color: var(--c-field);
   background: var(--c-ink);
@@ -1081,7 +1084,7 @@ body {
   transition: background var(--d-fast) var(--ease-out);
 }
 .kennis-row:last-child { border-bottom: none; }
-.kennis-row:hover { background: rgba(244, 242, 251, 0.04); }
+.kennis-row:hover { background: rgba(122, 0, 230, 0.04); }
 
 .kennis-row__icon {
   display: flex;
@@ -1183,7 +1186,7 @@ body {
   border: 1px solid var(--c-border);
   padding: 0.4375rem var(--s-3);
 }
-.detail-back:hover { color: var(--c-ink); border-color: rgba(244, 242, 251, 0.25); }
+.detail-back:hover { color: var(--c-ink); border-color: rgba(122, 0, 230, 0.25); }
 
 .detail-body {
   max-width: 64ch;
@@ -1368,7 +1371,7 @@ body {
   align-items: center;
   transition: border-color var(--d-fast) var(--ease-out), background var(--d-fast) var(--ease-out);
 }
-.btn-outline:hover { border-color: rgba(244, 242, 251, 0.3); background: rgba(244, 242, 251, 0.04); }
+.btn-outline:hover { border-color: rgba(122, 0, 230, 0.3); background: rgba(122, 0, 230, 0.04); }
 
 .btn-ghost {
   font-family: var(--font-mono);
@@ -1398,7 +1401,7 @@ body {
   border: 1px solid var(--c-border);
   padding: 0.5rem var(--s-4);
 }
-.btn-ghost-sm:hover { color: var(--c-ink); border-color: rgba(244, 242, 251, 0.3); }
+.btn-ghost-sm:hover { color: var(--c-ink); border-color: rgba(122, 0, 230, 0.3); }
 
 .btn-danger {
   font-family: var(--font-mono);
@@ -1506,7 +1509,7 @@ body {
 .code-inline {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  background: rgba(244, 242, 251, 0.08);
+  background: rgba(122, 0, 230, 0.08);
   padding: 0.1em 0.4em;
   color: var(--c-ink);
 }
@@ -1538,7 +1541,7 @@ body {
   letter-spacing: 0.02em;
   line-height: 1.8;
   color: var(--c-ink-muted);
-  background: rgba(244, 242, 251, 0.04);
+  background: rgba(122, 0, 230, 0.04);
   border: 1px solid var(--c-border);
   padding: var(--s-6);
   margin: 0;
@@ -1608,12 +1611,14 @@ body {
   pointer-events: none;
 }
 
+/* The graph overlay UI sits on the dark viz canvas regardless of app theme —
+   keep its text light explicitly (don't follow the inverted light tokens). */
 .graph-legend__title {
   font-family: var(--font-mono);
   font-size: 0.6rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--c-ink-muted);
+  color: #C5BFEE;
   margin-bottom: 0.2rem;
 }
 
@@ -1623,7 +1628,7 @@ body {
   gap: 0.5rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--c-ink);
+  color: #F4F2FB;
 }
 
 .graph-legend__dot {
@@ -1636,10 +1641,10 @@ body {
 .graph-legend__meta {
   margin-top: 0.4rem;
   padding-top: 0.4rem;
-  border-top: 1px solid var(--c-border);
+  border-top: 1px solid rgba(245, 245, 245, 0.14);
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: var(--c-ink-muted);
+  color: #C5BFEE;
 }
 
 .graph-toggle {
@@ -1651,7 +1656,7 @@ body {
   gap: 0.2rem;
   padding: 0.2rem;
   background: rgba(14, 8, 51, 0.78);
-  border: 1px solid var(--c-border);
+  border: 1px solid rgba(245, 245, 245, 0.14);
   border-radius: 0.4rem;
   backdrop-filter: blur(6px);
 }
@@ -1664,13 +1669,13 @@ body {
   border: none;
   border-radius: 0.25rem;
   background: transparent;
-  color: var(--c-ink-muted);
+  color: #C5BFEE;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
-.graph-toggle__btn:hover { color: var(--c-ink); }
+.graph-toggle__btn:hover { color: #F4F2FB; }
 .graph-toggle__btn.is-active {
-  background: #3A1DD8;
+  background: #7A00E6;
   color: #F4F2FB;
 }
 
@@ -1746,12 +1751,12 @@ body {
   gap: var(--s-3);
   padding: var(--s-6);
   border: 1px solid var(--c-border);
-  background: rgba(244, 242, 251, 0.02);
+  background: rgba(122, 0, 230, 0.02);
   cursor: not-allowed;
   transition: border-color var(--d-fast) var(--ease-out);
 }
 .automation-card:hover {
-  border-color: rgba(244, 242, 251, 0.22);
+  border-color: rgba(122, 0, 230, 0.22);
 }
 
 .automation-card__top {
