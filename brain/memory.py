@@ -1,4 +1,5 @@
 import chromadb
+import os
 import uuid
 from datetime import datetime
 from typing import Optional
@@ -7,7 +8,10 @@ from .models import KennisItem
 
 class Memory:
     def __init__(self):
-        # Persistente ChromaDB-client; data wordt op schijf bewaard
+        # Persistente ChromaDB-client; data wordt op schijf bewaard.
+        # Maak het pad aan als het nog niet bestaat (COEUS_DATA_DIR kan naar een
+        # nog-niet-bestaande OS app-data dir wijzen op een verse installatie).
+        os.makedirs(settings.chroma_db_path, exist_ok=True)
         self.client = chromadb.PersistentClient(path=settings.chroma_db_path)
         self.collection = self.client.get_or_create_collection(
             name=f"coeus_{settings.coeus_tenant}"
