@@ -26,6 +26,16 @@ const NAV = [
     ),
   },
   {
+    href: '/overzicht',
+    label: 'Overzicht',
+    icon: (
+      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
+        <rect x="1.5" y="2.5" width="13" height="11" />
+        <path d="M1.5 6h13M1.5 9.5h13M6 6v7.5" />
+      </svg>
+    ),
+  },
+  {
     href: '/graph',
     label: 'Graph',
     icon: (
