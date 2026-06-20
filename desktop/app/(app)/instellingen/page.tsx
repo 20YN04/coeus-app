@@ -54,7 +54,7 @@ export default function InstellingenPage() {
           <div className="config-table">
             <ConfigRow
               label="Primaire kleur"
-              value={tenant.accentColor ?? 'Standaard (#008C38)'}
+              value={tenant.accentColor ?? 'Standaard (#006B2B)'}
               envKey="NEXT_PUBLIC_TENANT_ACCENT"
             />
           </div>
@@ -72,11 +72,11 @@ export default function InstellingenPage() {
             <div className="accent-preview">
               <div
                 className="accent-swatch"
-                style={{ background: '#008C38' }}
+                style={{ background: '#006B2B' }}
                 aria-label="Standaard Coeus blauw"
               />
               <span className="accent-swatch__label">
-                #008C38 <span className="meta-value--muted">(standaard)</span>
+                #006B2B <span className="meta-value--muted">(standaard)</span>
               </span>
             </div>
           )}
