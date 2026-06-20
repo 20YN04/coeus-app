@@ -27,7 +27,7 @@
     ],
     "resources": [
       "binaries/coeus-brein/**/*",
-      "seed/*.json"
+      "seed/*"
     ],
     "android": {
       "debugApplicationIdSuffix": ".debug"
