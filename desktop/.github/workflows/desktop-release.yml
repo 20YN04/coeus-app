@@ -1,0 +1,112 @@
+name: desktop-release
+
+# Build the local-first Coeus desktop installers (macOS + Windows) and attach
+# them to a draft GitHub Release. Each installer bundles the static kennisbank
+# UI + the PyInstaller brein sidecar (built per-OS from the coeus-app repo).
+#
+# Trigger: push a tag like `v0.1.0`, or run manually.
+#
+# Required repo secret:  COEUS_APP_TOKEN  — a read-only token for 20YN04/coeus-app
+#                        (separate private repo holding the brein backend).
+# Optional repo variables (per-client white-label; unset → default Coeus):
+#   COEUS_TENANT_NAME, COEUS_TENANT_SLUG, COEUS_TENANT_ACCENT
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write # create the release + upload installers
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest # Apple Silicon (arm64)
+          - os: windows-latest # x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - name: Checkout kennisbank
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Checkout brein backend (coeus-app)
+        uses: actions/checkout@v4
+        with:
+          repository: 20YN04/coeus-app
+          token: ${{ secrets.COEUS_APP_TOKEN }}
+          path: coeus-app
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build brein sidecar (PyInstaller)
+        working-directory: coeus-app
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+          python build_sidecar.py
+
+      - name: Stage sidecar into Tauri resources
+        shell: bash
+        run: |
+          mkdir -p src-tauri/binaries
+          cp -R coeus-app/dist/coeus-brein src-tauri/binaries/coeus-brein
+
+      - name: Assert sidecar binary is staged
+        shell: bash
+        # Without this, a failed/empty copy would silently produce an installer
+        # whose app falls back to "dev brein on :8765" and never starts a backend.
+        run: |
+          bin=$(ls src-tauri/binaries/coeus-brein/coeus-brein* 2>/dev/null | head -1)
+          if [ -z "$bin" ] || [ ! -s "$bin" ]; then
+            echo "::error::brein sidecar missing or empty in src-tauri/binaries/coeus-brein"
+            ls -la src-tauri/binaries/coeus-brein || true
+            exit 1
+          fi
+          echo "sidecar staged: $bin ($(du -h "$bin" | cut -f1))"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install JS deps
+        run: npm ci
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Build + draft release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Baked into the static export (per-client white-label; defaults if unset).
+          NEXT_PUBLIC_BREIN_URL: http://127.0.0.1:8765
+          NEXT_PUBLIC_TENANT_NAME: ${{ vars.COEUS_TENANT_NAME }}
+          NEXT_PUBLIC_TENANT_SLUG: ${{ vars.COEUS_TENANT_SLUG }}
+          NEXT_PUBLIC_TENANT_ACCENT: ${{ vars.COEUS_TENANT_ACCENT }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Coeus ${{ github.ref_name }}"
+          releaseDraft: true
+          prerelease: false
