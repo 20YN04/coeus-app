@@ -1,5 +1,6 @@
 import tenant from '@/config/tenant';
 import UpdateCheck from './UpdateCheck';
+import DataBeheer from './DataBeheer';
 
 export default function InstellingenPage() {
   return (
@@ -53,7 +54,7 @@ export default function InstellingenPage() {
           <div className="config-table">
             <ConfigRow
               label="Primaire kleur"
-              value={tenant.accentColor ?? 'Standaard (#7A00E6)'}
+              value={tenant.accentColor ?? 'Standaard (#008C38)'}
               envKey="NEXT_PUBLIC_TENANT_ACCENT"
             />
           </div>
@@ -71,11 +72,11 @@ export default function InstellingenPage() {
             <div className="accent-preview">
               <div
                 className="accent-swatch"
-                style={{ background: '#7A00E6' }}
+                style={{ background: '#008C38' }}
                 aria-label="Standaard Coeus blauw"
               />
               <span className="accent-swatch__label">
-                #7A00E6 <span className="meta-value--muted">(standaard)</span>
+                #008C38 <span className="meta-value--muted">(standaard)</span>
               </span>
             </div>
           )}
@@ -93,6 +94,8 @@ export default function InstellingenPage() {
 
           <UpdateCheck />
         </section>
+
+        <DataBeheer />
 
         <section className="settings-section">
           <div className="settings-section__header">
