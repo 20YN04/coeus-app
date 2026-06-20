@@ -7,11 +7,23 @@ import re
 
 class Learner:
     def __init__(self):
-        # OpenAI-compatibele client (DeepSeek by default) voor kennisextractie en vragen
-        self.client = OpenAI(
-            api_key=settings.llm_api_key,
-            base_url=settings.llm_base_url,
-        )
+        # Lazy client: de lokale app draait volledig offline (zoeken/graph/CRUD via
+        # ChromaDB, géén key). Alleen /learn en /ask hebben een LLM nodig. De OpenAI-
+        # client pas bouwen bij gebruik — anders crasht de gebundelde sidecar bij het
+        # opstarten zodra er geen OPENAI_API_KEY/DEEPSEEK_API_KEY gezet is.
+        self._client = None
+
+    def _get_client(self):
+        # Bouw (en cache) de OpenAI-compatibele client (DeepSeek by default).
+        # Geen key → RuntimeError, die /learn en /ask omzetten naar 502/503.
+        if self._client is None:
+            if not settings.llm_api_key:
+                raise RuntimeError("Geen LLM-key geconfigureerd (offline modus)")
+            self._client = OpenAI(
+                api_key=settings.llm_api_key,
+                base_url=settings.llm_base_url,
+            )
+        return self._client
 
     def extract_knowledge(self, text: str,
                           category_hint: str = None) -> list[dict]:
@@ -30,7 +42,7 @@ class Learner:
         JSON array:"""
 
         try:
-            response = self.client.chat.completions.create(
+            response = self._get_client().chat.completions.create(
                 model=settings.llm_model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
@@ -84,7 +96,7 @@ class Learner:
         Antwoord:"""
 
         try:
-            response = self.client.chat.completions.create(
+            response = self._get_client().chat.completions.create(
                 model=settings.llm_model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
