@@ -92,6 +92,13 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Updater signing — signs the installers, emits each artifact's `.sig`
+          # plus the `latest.json` manifest, and uploads them to the release so
+          # installed apps can verify + self-update. Keypair generated locally with
+          # `npx @tauri-apps/cli signer generate`; the matching PUBLIC key is in
+          # desktop/src-tauri/tauri.conf.json under plugins.updater.pubkey.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           # Baked into the static export (per-client white-label; defaults if unset).
           NEXT_PUBLIC_BREIN_URL: http://127.0.0.1:8765
           NEXT_PUBLIC_TENANT_NAME: ${{ vars.COEUS_TENANT_NAME }}

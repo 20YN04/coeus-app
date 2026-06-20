@@ -8,3 +8,8 @@
 
 # Per-client seed payloads (white-label) — never committed
 /seed/*.json
+
+# Updater signing keys — the PRIVATE key must never be committed.
+# Only the .pub is safe; the matching public key is embedded in tauri.conf.json
+# and the private key + password are CI secrets (TAURI_SIGNING_PRIVATE_KEY*).
+/.tauri/

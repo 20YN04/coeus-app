@@ -1547,6 +1547,32 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   Updater — "Controleer op updates" (desktop-only, hidden on web)
+   ───────────────────────────────────────────────────────────── */
+.update-check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.btn-outline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.update-check__status {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: var(--c-ink-muted);
+  margin: 0;
+}
+.update-check__status--ok { color: var(--c-ink); }
+.update-check__status--error { color: #e07070; }
+
+/* ─────────────────────────────────────────────────────────────
    Graph view (force-directed 2D/3D, force-graph lib)
    ───────────────────────────────────────────────────────────── */
 .graph-wrap {

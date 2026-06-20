@@ -64,6 +64,25 @@ Output: `src-tauri/target/release/bundle/` → `.dmg` (macOS) / `.msi`+`.exe`
 (Windows). The first launch boots the sidecar (~6–20s cold start); the UI shows
 a loading state until the brein answers (`waitForBrein`).
 
+## Auto-update
+
+The installed app self-updates (Tauri v2 updater). It checks
+`https://github.com/20YN04/coeus-app/releases/latest/download/latest.json`; the
+**Controleer op updates** button in Instellingen runs check → download → install →
+relaunch. The button is hidden in the plain web/SSG build (it has no meaning
+there) and only renders inside the Tauri webview.
+
+To cut a self-updating release the CI needs two secrets (see `SECURITY.md` →
+Auto-update): `TAURI_SIGNING_PRIVATE_KEY` and
+`TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. The matching public key is already embedded
+in `src-tauri/tauri.conf.json` (`plugins.updater.pubkey`); the private key lives
+in `src-tauri/.tauri/` and is `.gitignore`d.
+
+> **Per-client note:** all white-label builds currently share one updater keypair
+> and one `endpoints` URL, so every client install updates from the same
+> `20YN04/coeus-app` releases. If a client needs an isolated update channel, give
+> that build its own keypair + endpoint before shipping.
+
 ## Env-var contract (shell → brein)
 
 | Var | Set by | Meaning |
