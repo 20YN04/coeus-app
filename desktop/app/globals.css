@@ -622,6 +622,44 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   Importeren (onboarding-motor)
+   ───────────────────────────────────────────────────────────── */
+.import-intro {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  color: var(--c-ink-muted);
+  max-width: 42rem;
+  margin: 0 0 var(--s-6);
+}
+
+.import-optional {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+}
+
+.import-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+  padding: var(--s-4) var(--s-6);
+  border: 1px solid var(--c-border);
+  background: rgba(122, 0, 230, 0.06);
+}
+
+.import-result__count {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+  color: var(--c-ink);
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
    Dashboard
    ───────────────────────────────────────────────────────────── */
 .dashboard-grid {

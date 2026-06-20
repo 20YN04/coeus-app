@@ -38,6 +38,16 @@ const NAV = [
     ),
   },
   {
+    href: '/importeren',
+    label: 'Importeren',
+    icon: (
+      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
+        <path d="M8 1.5v7M5 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M2 10.5v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
     href: '/automatisaties',
     label: 'Automatisaties',
     icon: (
