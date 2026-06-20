@@ -7,3 +7,4 @@ __pycache__/
 # PyInstaller build artifacts (de sidecar-bundle is ~200MB)
 build/
 dist/
+*.spec
