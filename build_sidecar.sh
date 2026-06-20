@@ -25,6 +25,7 @@ venv/bin/pyinstaller --noconfirm --name coeus-brein \
   --collect-all onnxruntime \
   --collect-all tokenizers \
   --add-data "${MODEL_DIR}:onnx_models/all-MiniLM-L6-v2" \
+  --add-data "seed:seed" \
   --hidden-import uvicorn.logging \
   --hidden-import uvicorn.loops.auto \
   --hidden-import uvicorn.loops.asyncio \

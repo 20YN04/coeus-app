@@ -1,7 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
 from PyInstaller.utils.hooks import collect_all
 
-datas = []
+# Resolve the embedding-model cache per-user so this spec builds on any machine /
+# CI runner (macOS + Windows) where the model has been warmed into ~/.cache.
+_model_dir = os.path.expanduser('~/.cache/chroma/onnx_models/all-MiniLM-L6-v2')
+
+datas = [
+    (_model_dir, 'onnx_models/all-MiniLM-L6-v2'),
+    ('seed', 'seed'),
+]
 binaries = []
 hiddenimports = ['uvicorn.logging', 'uvicorn.loops.auto', 'uvicorn.loops.asyncio', 'uvicorn.protocols.http.auto', 'uvicorn.protocols.http.h11_impl', 'uvicorn.protocols.websockets.auto', 'uvicorn.lifespan.on', 'main']
 tmp_ret = collect_all('chromadb')
