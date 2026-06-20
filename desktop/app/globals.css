@@ -1830,3 +1830,270 @@ body {
   text-transform: uppercase;
   color: var(--c-ink-muted);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Overzicht — sortable table view + document download
+
+   Theme-agnostic: only design tokens (--c-*, --s-*, fonts) and
+   token-derived color-mix() tints. No hardcoded hex/rgba so the
+   palette can be recoloured without touching this block.
+   ───────────────────────────────────────────────────────────── */
+.ovz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.ovz-controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+
+.ovz-controls__left {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-6);
+}
+
+.ovz-controls__right {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.ovz-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.ovz-filter__label {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-ink-muted);
+}
+
+.ovz-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ovz-select__input {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--c-ink);
+  background: color-mix(in srgb, var(--c-ink) 6%, transparent);
+  border: 1px solid var(--c-border);
+  padding: 0.5rem var(--s-8) 0.5rem var(--s-3);
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--d-fast) var(--ease-out), background var(--d-fast) var(--ease-out);
+}
+.ovz-select__input:hover,
+.ovz-select__input:focus-visible {
+  border-color: color-mix(in srgb, var(--c-ink) 30%, transparent);
+  background: color-mix(in srgb, var(--c-ink) 9%, transparent);
+}
+
+.ovz-select__chevron {
+  position: absolute;
+  right: var(--s-3);
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--c-ink-muted);
+  pointer-events: none;
+}
+
+.ovz-count {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-ink-muted);
+  padding-bottom: 0.625rem;
+}
+
+.ovz-table-wrap {
+  border: 1px solid var(--c-border);
+  overflow-x: auto;
+}
+
+.ovz-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+}
+
+.ovz-table__caption {
+  /* Visually hidden on screen; restored white-on-page for print. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ovz-table thead th {
+  text-align: left;
+  background: color-mix(in srgb, var(--c-ink) 4%, transparent);
+  border-bottom: 1px solid var(--c-border);
+  padding: 0;
+}
+
+.ovz-th__btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-ink-muted);
+  background: none;
+  border: none;
+  padding: 0.75rem var(--s-4);
+  cursor: pointer;
+  transition: color var(--d-fast) var(--ease-out);
+}
+.ovz-th__btn:hover { color: var(--c-ink); }
+.ovz-th__btn[data-active="true"] { color: var(--c-ink); }
+
+.ovz-th__sort {
+  font-size: 0.6875rem;
+  opacity: 0.7;
+}
+
+.ovz-row {
+  cursor: pointer;
+  border-bottom: 1px solid var(--c-border);
+  transition: background var(--d-fast) var(--ease-out);
+}
+.ovz-table tbody tr:last-child { border-bottom: none; }
+.ovz-row:hover { background: color-mix(in srgb, var(--c-ink) 4%, transparent); }
+.ovz-row:focus-visible {
+  outline: none;
+  background: color-mix(in srgb, var(--c-ink) 7%, transparent);
+  box-shadow: inset 2px 0 0 var(--c-ink);
+}
+
+.ovz-cell {
+  padding: 0.875rem var(--s-4);
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+  color: var(--c-ink-muted);
+  vertical-align: middle;
+}
+
+.ovz-cell--title {
+  font-family: var(--font-serif);
+  font-size: 0.9375rem;
+  font-weight: 300;
+  color: var(--c-ink);
+  line-height: 1.2;
+}
+
+.ovz-cell__category {
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-ink-muted);
+}
+
+.ovz-cell__muted { color: var(--c-ink-muted); opacity: 0.6; }
+
+.ovz-cell--date {
+  white-space: nowrap;
+  font-size: 0.6875rem;
+}
+
+@media (max-width: 720px) {
+  .ovz-controls { align-items: stretch; }
+  .ovz-controls__left { flex-direction: column; align-items: flex-start; gap: var(--s-3); }
+  .ovz-count { padding-bottom: 0; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Print — strip the app chrome, print the table only on white.
+   In the Tauri webview window.print() opens the native
+   "Save as PDF" dialog, so this is the PDF layout too.
+   ───────────────────────────────────────────────────────────── */
+@media print {
+  .sidebar,
+  .topbar,
+  .ovz-controls,
+  .api-error-banner {
+    display: none !important;
+  }
+
+  .shell,
+  .main,
+  .page-content {
+    display: block !important;
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body { background: #fff !important; }
+
+  .page-header {
+    margin-bottom: var(--s-6);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid #000;
+  }
+  .page-eyebrow,
+  .page-title { color: #000 !important; }
+
+  .ovz-table-wrap {
+    border: 1px solid #000;
+    overflow: visible !important;
+  }
+
+  .ovz-table__caption {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    margin: 0 0 var(--s-3);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: left;
+    color: #000;
+  }
+
+  .ovz-table thead th { background: transparent; border-bottom: 1px solid #000; }
+  .ovz-th__btn { color: #000 !important; }
+  .ovz-th__sort { display: none; }
+
+  .ovz-row { border-bottom: 1px solid #999; }
+  .ovz-cell,
+  .ovz-cell--title,
+  .ovz-cell__category { color: #000 !important; }
+
+  .source-badge {
+    border: 1px solid #000 !important;
+    background: transparent !important;
+    color: #000 !important;
+  }
+
+  .ovz-row { break-inside: avoid; }
+}
