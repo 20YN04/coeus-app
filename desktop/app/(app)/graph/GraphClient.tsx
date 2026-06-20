@@ -37,6 +37,14 @@ interface FG2DInstance {
   _destructor(): void;
 }
 
+// Minimale shape van de three.js EffectComposer die 3d-force-graph teruggeeft,
+// plus de passes-array waar we onze bloom-pass aan toevoegen.
+type ThreePass = { dispose?: () => void };
+interface ThreeComposer {
+  passes: ThreePass[];
+  addPass(pass: ThreePass): void;
+}
+
 interface FG3DInstance {
   width(n: number): FG3DInstance;
   height(n: number): FG3DInstance;
@@ -52,9 +60,15 @@ interface FG3DInstance {
   linkColor(fn: (l: FGLink) => string): FG3DInstance;
   linkWidth(fn: (l: FGLink) => number): FG3DInstance;
   linkOpacity(n: number): FG3DInstance;
+  linkDirectionalParticles(fn: (l: FGLink) => number): FG3DInstance;
+  linkDirectionalParticleSpeed(fn: (l: FGLink) => number): FG3DInstance;
+  linkDirectionalParticleWidth(n: number): FG3DInstance;
+  linkDirectionalParticleColor(fn: (l: FGLink) => string): FG3DInstance;
   onNodeHover(fn: (n: FGNode | null) => void): FG3DInstance;
   onNodeClick(fn: (n: FGNode) => void): FG3DInstance;
   zoomToFit(ms?: number, px?: number): FG3DInstance;
+  postProcessingComposer(): ThreeComposer;
+  scene(): { add(obj: unknown): void };
   _destructor(): void;
 }
 
@@ -93,6 +107,7 @@ export default function GraphClient({ graph, categories }: Props) {
     let disposed = false;
     let fg: FGCommon | null = null;
     let onResize: (() => void) | null = null;
+    let extraCleanup: (() => void) | null = null;
     const cleanupTimers: ReturnType<typeof setTimeout>[] = [];
 
     (async () => {
@@ -118,28 +133,44 @@ export default function GraphClient({ graph, categories }: Props) {
       const valFor = (id: string) => 1 + (degree.get(id) ?? 0);
       const idOf = (end: string | { id?: string }) => (typeof end === 'object' ? end.id : end);
 
-      // ── 3D-pad (three.js, lazy) ──────────────────────────────────
+      // ── 3D-pad (three.js, lazy) — holografische "neuraal netwerk in de ruimte" ──
       if (mode === '3d') {
-        const ForceGraph3D = (await import('3d-force-graph')).default;
+        const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }] = await Promise.all([
+          import('3d-force-graph'),
+          import('three'),
+          import('three/examples/jsm/postprocessing/UnrealBloomPass.js'),
+        ]);
         if (disposed || !containerRef.current) return;
         const container = containerRef.current;
+
+        // Iets dieper, bijna-zwart blauwpaars zodat de neon-bloom maximaal pop heeft.
+        const SPACE_BG = '#070425';
 
         const g = new ForceGraph3D(container) as unknown as FG3DInstance;
         g
           .width(container.clientWidth)
           .height(container.clientHeight)
-          .backgroundColor(BG)
+          .backgroundColor(SPACE_BG)
           .cooldownTime(4000)
           .graphData(data)
           .nodeId('id')
           .nodeLabel((n) => n.title)
           .nodeColor((n) => colorFor(n.category))
           .nodeVal((n) => valFor(n.id))
-          .nodeOpacity(0.92)
-          .nodeResolution(16)
-          .linkColor(() => 'rgba(124, 108, 255, 0.5)')
-          .linkWidth((l) => 0.3 + l.weight * 1.6)
-          .linkOpacity(0.45)
+          // Helderdere, bijna lichtgevende bollen — hogere opacity + resolutie zodat
+          // de bloom-pass ze tot zachte gloed-orbs vervaagt.
+          .nodeOpacity(1)
+          .nodeResolution(20)
+          // Neon-links: dun en fel, lage opacity zodat de bloom ze tot strepen trekt.
+          .linkColor(() => 'rgba(124, 108, 255, 0.85)')
+          .linkWidth((l) => 0.2 + l.weight * 0.8)
+          .linkOpacity(0.35)
+          // Data die door het netwerk pulseert: deeltjes die langs de links stromen,
+          // aantal en snelheid gewogen naar de verbindingssterkte.
+          .linkDirectionalParticles((l) => 2 + Math.round(l.weight * 3))
+          .linkDirectionalParticleSpeed((l) => 0.004 + l.weight * 0.006)
+          .linkDirectionalParticleWidth(1.4)
+          .linkDirectionalParticleColor(() => '#2DD4BF')
           .onNodeHover((n) => {
             container.style.cursor = n ? 'pointer' : 'grab';
           })
@@ -147,6 +178,37 @@ export default function GraphClient({ graph, categories }: Props) {
             router.push(`/kennisbank/detail?id=${encodeURIComponent(n.id)}`);
           });
         fg = g as unknown as FGCommon;
+
+        // ── Bloom / glow: de grootste sci-fi-winst ────────────────────
+        // UnrealBloomPass op de composer van de instance, getuned voor neon-gloed.
+        const composer = g.postProcessingComposer();
+        const bloom = new UnrealBloomPass(
+          new THREE.Vector2(container.clientWidth, container.clientHeight),
+          2.2, // strength — felle gloed
+          0.85, // radius — zachte halo
+          0.05, // threshold — laag, zodat ook de mid-tints gloeien
+        );
+        composer.addPass(bloom);
+
+        // ── Sterrenveld-backdrop (goedkoop: één Points-cloud) ─────────
+        const STAR_COUNT = 1400;
+        const starPos = new Float32Array(STAR_COUNT * 3);
+        for (let i = 0; i < STAR_COUNT * 3; i++) {
+          // Ver buiten de graph zodat sterren niet met de nodes botsen.
+          starPos[i] = (Math.random() - 0.5) * 4000;
+        }
+        const starGeo = new THREE.BufferGeometry();
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starMat = new THREE.PointsMaterial({
+          color: 0xa7b6ff,
+          size: 1.6,
+          sizeAttenuation: true,
+          transparent: true,
+          opacity: 0.55,
+          depthWrite: false,
+        });
+        const starfield = new THREE.Points(starGeo, starMat);
+        g.scene().add(starfield);
 
         const fit = () => g.zoomToFit(600, 80);
         const fitTimer = setTimeout(fit, 1200);
@@ -156,8 +218,16 @@ export default function GraphClient({ graph, categories }: Props) {
           if (!containerRef.current) return;
           g.width(containerRef.current.clientWidth);
           g.height(containerRef.current.clientHeight);
+          bloom.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
         };
         window.addEventListener('resize', onResize);
+
+        // Eigen cleanup bovenop _destructor: dispose bloom + sterrenveld.
+        extraCleanup = () => {
+          bloom.dispose();
+          starGeo.dispose();
+          starMat.dispose();
+        };
         return;
       }
 
@@ -238,6 +308,7 @@ export default function GraphClient({ graph, categories }: Props) {
       disposed = true;
       cleanupTimers.forEach(clearTimeout);
       if (onResize) window.removeEventListener('resize', onResize);
+      extraCleanup?.();
       fg?._destructor();
       if (el) el.innerHTML = '';
     };
