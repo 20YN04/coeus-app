@@ -38,6 +38,17 @@ const NAV = [
     ),
   },
   {
+    href: '/automatisaties',
+    label: 'Automatisaties',
+    icon: (
+      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
+        <circle cx="4" cy="8" r="2" />
+        <circle cx="12" cy="8" r="2" />
+        <path d="M6 8h4M2 4.5h2M2 11.5h2M12 4.5h2M12 11.5h2" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
     href: '/nieuw',
     label: 'Nieuw',
     icon: (
