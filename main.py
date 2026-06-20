@@ -1,11 +1,26 @@
 import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from brain.memory import Memory
 from brain.learner import Learner
+from brain.seed import seed_if_empty
 from brain.models import KennisItem, CreateKennisRequest, UpdateKennisRequest, LearnRequest, AskRequest
 
-app = FastAPI(title="Coeus API", description="AI Brein voor bedrijfskennis")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # First-run seed: vul een lege kennisbank uit seed/default.json (of COEUS_SEED_FILE)
+    # zodat een verse installatie niet blanco is. Faalt nooit hard — zie brain/seed.py.
+    seed_if_empty(memory)
+    yield
+
+
+app = FastAPI(
+    title="Coeus API",
+    description="AI Brein voor bedrijfskennis",
+    lifespan=lifespan,
+)
 
 # CORS — de Coeus Kennisbank-frontend doet client-side fetches naar dit brein (cross-origin).
 # Zonder dit blokkeert de browser die calls (geen Access-Control-Allow-Origin) en faalt o.a.

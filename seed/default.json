@@ -1,0 +1,401 @@
+[
+  {
+    "title": "Bandenwissel",
+    "category": "prijs",
+    "content": "Een bandenwissel kost 45 euro per band, inclusief uitbalanceren en ventielcontrole. Duurt ongeveer 30 minuten.",
+    "source": "manual",
+    "source_detail": ""
+  },
+  {
+    "title": "Openingsuren",
+    "category": "proces",
+    "content": "Open maandag tot vrijdag 8u-18u, zaterdag 9u-12u. Zondag gesloten.",
+    "source": "manual",
+    "source_detail": ""
+  },
+  {
+    "title": "APK keuring",
+    "category": "dienst",
+    "content": "Wij doen technische keuringen type 1 voor 35 euro, enkel op afspraak.",
+    "source": "manual",
+    "source_detail": ""
+  },
+  {
+    "title": "Kleine versus grote beurt",
+    "category": "onderhoud",
+    "content": "Een kleine onderhoudsbeurt omvat doorgaans het verversen van de motorolie en het oliefilter, plus een controle van de vloeistofpeilen, banden, remmen en verlichting. Bij een grote onderhoudsbeurt vervangen we daarnaast de bijkomende filters (lucht-, cabine- en eventueel brandstoffilter) en voeren we extra controles uit volgens het schema van de fabrikant. Welke beurt uw wagen nodig heeft, hangt af van de kilometerstand en het onderhoudsschema. Vraag gerust een gratis prijsbestek vooraf.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Olie en oliefilter",
+    "category": "onderhoud",
+    "content": "Bij elke onderhoudsbeurt verversen we de motorolie en vervangen we standaard het oliefilter, want oude olie verliest zijn smerende eigenschappen en raakt vervuild. We gebruiken altijd een olie met de juiste specificatie voor uw motor, bijvoorbeeld een longlife-olie bij veel VW-groep modellen. Afhankelijk van motor en gebruik ligt het interval meestal tussen 15.000 en 30.000 km of jaarlijks. De exacte prijs vindt u op onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Lucht-, cabine- en brandstoffilter",
+    "category": "onderhoud",
+    "content": "De luchtfilter houdt de aangezogen motorlucht zuiver, de cabinefilter (pollenfilter) filtert de lucht die de wagen binnenkomt en de brandstoffilter beschermt het inspuitsysteem. Een vervuilde luchtfilter verhoogt het verbruik, een verzadigde cabinefilter geeft beslagen ruiten en muffe geuren. Wij vervangen deze filters volgens het fabrikantschema, meestal bij de grote onderhoudsbeurt. Vraag een gratis prijsbestek voor uw model.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Distributieriem of -ketting",
+    "category": "onderhoud",
+    "content": "Een distributieriem moet preventief vervangen worden, doorgaans elke 90.000 tot 160.000 km of na 5 tot 7 jaar, afhankelijk van het merk; breekt de riem, dan loopt de motor zware schade op. Een distributieketting gaat in principe een motorleven mee, maar kan bij bepaalde motoren, onder meer in de VW-groep, toch slijten en aandacht vereisen. Wij controleren altijd welk systeem uw wagen heeft en welk interval geldt. U krijgt op voorhand een vast prijsbestek.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Bougies vervangen",
+    "category": "onderhoud",
+    "content": "Bougies zorgen voor de ontsteking in een benzinemotor; versleten bougies geven moeilijk starten, een onregelmatig stationair toerental en een hoger verbruik. Het interval verschilt per type: gewone bougies meestal rond de 30.000 tot 60.000 km, platina- of iridiumbougies tot 90.000 km of meer. We vervangen ze volgens het schema van uw fabrikant. De prijs hangt af van het type en aantal bougies en staat op onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Rem- en koelvloeistof verversen",
+    "category": "onderhoud",
+    "content": "Remvloeistof neemt na verloop van tijd vocht op, wat het kookpunt verlaagt en de remwerking kan verzwakken; daarom verversen we ze doorgaans om de 2 jaar. Koelvloeistof beschermt tegen oververhitting en bevriezing en moet eveneens periodiek vervangen worden volgens het fabrikantschema. Beide verversingen nemen we mee tijdens een onderhoudsbeurt. Vraag een gratis prijsbestek voor uw wagen.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Intervallen en serviceboek",
+    "category": "onderhoud",
+    "content": "Een fabrikant bepaalt het onderhoudsinterval op twee manieren: na een aantal kilometers of na een aantal maanden, waarbij telt wat het eerst bereikt wordt. Rijdt u weinig, dan is de tijdslimiet, vaak jaarlijks of tweejaarlijks, dus even belangrijk als de kilometerstand. Wij houden elk onderhoud bij in het digitale serviceboek van uw merk, zodat uw historiek in orde blijft en uw fabrieksgarantie behouden blijft. Zo houdt de wagen ook zijn waarde bij verkoop.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Seizoenswissel zomer en winter",
+    "category": "banden",
+    "content": "Wij monteren en wisselen uw zomer-, winter- of all-seasonbanden in onze werkplaats. Een wissel van een complete set op velg duurt doorgaans ongeveer een half uur; banden die los van de velg gemonteerd moeten worden vragen wat meer tijd. Plan uw winterwissel best in oktober-november en uw zomerwissel rond maart-april, want dan is het bij ons drukker. Voor de prijs verwijzen we u graag naar onze prijslijst of vraagt u een gratis prijsbestek.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Bandenhotel voor opslag",
+    "category": "banden",
+    "content": "Heeft u twee sets banden, zomer en winter, dan slaan wij uw tweede set voor u op in ons bandenhotel. U hoeft de banden dus niet thuis te stockeren en bij elke seizoenswissel halen wij de juiste set gewoon uit ons magazijn. De banden worden correct gemerkt per wagen en per positie, en bij ophalen gecontroleerd op profiel en schade. De jaarprijs voor opslag vindt u op onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Wielen uitlijnen",
+    "category": "banden",
+    "content": "Bij het uitlijnen (sporen) stellen we de wielgeometrie van uw wagen opnieuw correct af volgens de fabrieksspecificaties. Dit is aangeraden na het monteren van nieuwe banden, na werk aan de ophanging, of wanneer uw wagen naar links of rechts trekt of de banden langs één kant verslijten. Een correcte uitlijning bespaart u op termijn banden en zorgt voor stabieler rijgedrag. De prijs staat op onze prijslijst of vraag een gratis prijsbestek.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Wielen balanceren",
+    "category": "banden",
+    "content": "Bij het balanceren zorgen we met kleine tegengewichten dat elk wiel gelijkmatig draait, zodat u geen trillingen voelt in het stuur of de carrosserie. Wij balanceren standaard bij elke nieuwe bandenmontage, maar het is ook nodig wanneer u trillingen merkt bij een bepaalde snelheid of na het verliezen van een balanceergewicht. Balanceren verschilt van uitlijnen: balanceren gaat over de draaiing van het wiel, uitlijnen over de stand van de wielen. Voor de kostprijs verwijzen we naar onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Bandenspanning en TPMS",
+    "category": "banden",
+    "content": "De juiste bandenspanning vindt u meestal op een sticker in de deurstijl aan bestuurderszijde of in het tankklepje; wij controleren en corrigeren ze graag voor u. Wagens met een TPMS-systeem geven via een waarschuwingslampje aan wanneer een band te weinig spanning heeft. Wij kunnen TPMS-sensoren uitlezen, opnieuw aanleren na een bandenwissel en defecte sensoren vervangen. Rijd nooit lang door met een brandend TPMS-lampje, want te lage spanning verhoogt het verbruik en de kans op bandschade.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Wettelijke profieldiepte",
+    "category": "banden",
+    "content": "In België is de wettelijke minimum profieldiepte 1,6 mm over de volledige omtrek en breedte van het loopvlak. Wij raden u echter aan om al vanaf 3 mm aan vervanging te denken, want bij minder profiel neemt de grip op een nat wegdek sterk af en wordt de remafstand langer. Bij elk werk aan uw banden meten wij de profieldiepte en melden we u tijdig wanneer vervanging in zicht komt. Zo voorkomt u afkeur bij de keuring en rijdt u veilig.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Lekke band herstellen",
+    "category": "banden",
+    "content": "Een lekke band repareren we waar het veilig en toegelaten is met een professionele herstelling van binnenuit (paddenstoelplug), niet enkel met een uitwendige plug. Dat kan alleen wanneer de schade in het loopvlak zit en beperkt is; schade aan de zijwand of een te grote scheur is niet herstelbaar en vraagt een nieuwe band. Wij beoordelen de band altijd eerst van binnen op verborgen schade voor we herstellen. De kostprijs van een herstelling vindt u op onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Wanneer banden vervangen",
+    "category": "banden",
+    "content": "Banden vervangt u niet alleen op profiel, maar ook op ouderdom: rubber veroudert en wordt harder, ook bij weinig kilometers. Vanaf ongeveer 6 jaar controleren we ze extra en rond 10 jaar, te tellen vanaf de DOT-productiedatum op de zijwand, raden we vervanging aan, ongeacht het profiel. Let ook op haarscheurtjes, bulten of vervormingen in de zijwand, want dat zijn tekenen dat de band niet meer veilig is. Twijfelt u, breng de wagen langs en wij beoordelen uw banden gratis.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Gratis remcontrole",
+    "category": "remmen-ophanging",
+    "content": "Remmen zijn veiligheidskritisch, daarom bieden wij een gratis remcontrole aan. We meten de dikte van uw remblokken en remschijven, controleren het remvloeistofpeil en het remgevoel, en geven u meteen een eerlijk advies of er iets vervangen moet worden. Twijfelt u over uw remmen of merkt u een verandering bij het remmen? Bel ons op 011 12 34 56 of breng uw wagen gerust binnen tijdens de openingsuren.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Remblokken en remschijven",
+    "category": "remmen-ophanging",
+    "content": "Remblokken zijn slijtdelen en gaan gemiddeld 30.000 tot 70.000 km mee, afhankelijk van uw rijstijl; de remschijven volgen meestal na een of twee setjes blokken. Wij vervangen voor- en achterremmen voor alle merken, met extra expertise in de VW-groep en Volvo, en monteren onderdelen van degelijke kwaliteit. Op de uitgevoerde herstelling en de gemonteerde onderdelen geldt 12 maanden garantie. Vraag vooraf een gratis prijsbestek of bekijk onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Remvloeistof verversen",
+    "category": "remmen-ophanging",
+    "content": "Remvloeistof neemt na verloop van tijd vocht op uit de lucht, waardoor het kookpunt daalt en uw remmen bij fel of langdurig remmen kunnen wegvallen. Daarom adviseren wij om de remvloeistof om de 2 jaar te verversen, ongeacht de kilometerstand. Wij meten het vochtgehalte en verversen de volledige kring volgens de voorschriften van de constructeur. Vraag een gratis prijsbestek of raadpleeg onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Piepende of trillende remmen",
+    "category": "remmen-ophanging",
+    "content": "Een hoog piepgeluid bij het remmen wijst meestal op versleten remblokken of een slijtage-indicator die contact maakt, terwijl trillingen in het stuur of rempedaal vaak duiden op vervormde, kromme remschijven. Beide laat u best snel nakijken, want het zijn signalen dat uw remsysteem aandacht nodig heeft. Kom langs voor onze gratis remcontrole, dan stellen we de oorzaak vast en geven we u een prijsbestek vooraf.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Schokdempers controleren",
+    "category": "remmen-ophanging",
+    "content": "Versleten schokdempers herkent u aan een schokkerige of deinende wagen, een langere remafstand en ongelijke bandenslijtage; ze gaan gemiddeld zo'n 80.000 km mee. Wij controleren de schokdempers en vervangen ze steeds per as, dus links en rechts samen, voor een stabiel en veilig weggedrag. Op de herstelling en de gemonteerde onderdelen krijgt u 12 maanden garantie. Vraag vrijblijvend een gratis prijsbestek.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Draagarmen en silentblocks",
+    "category": "remmen-ophanging",
+    "content": "Draagarmen, kogelgewrichten en silentblocks vormen de scharnierpunten van uw ophanging; zijn ze versleten, dan merkt u dat aan tikkende geluiden over hobbels, een onrustig stuur of speling. Een versleten silentblock kan vaak apart vervangen worden, soms is een volledige draagarm nodig. Wij stellen de juiste oorzaak vast en bespreken de meest economische oplossing met u. Bekijk onze prijslijst of vraag een gratis prijsbestek.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Veren en ongelijke slijtage",
+    "category": "remmen-ophanging",
+    "content": "Een gebroken of verzakte schroefveer zorgt voor een scheef wegliggende wagen, slechter weggedrag en ongelijke bandenslijtage. Wij controleren de veren samen met de rest van de ophanging en vervangen ze per as om de wagen recht en in balans te houden. Merkt u dat uw auto langs een kant lager hangt of ongelijk slijt? Laat het nakijken tijdens onze gratis controle, met prijsbestek vooraf.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Voorrijcontrole keuring",
+    "category": "keuring",
+    "content": "Met onze voorrijcontrole kijken onze technici uw wagen vooraf na op alle punten die het keuringscentrum controleert, zodat u in één keer slaagt en geen tweede rit hoeft te maken. Vinden we een gebrek, dan herstellen we dat na uw akkoord en bezorgen we u vooraf een gratis prijsbestek. De keuring zelf gebeurt bij een extern erkend keuringscentrum. De tarieven van de voorrijcontrole vindt u in onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Wat is een autokeuring",
+    "category": "keuring",
+    "content": "De autokeuring is de wettelijk verplichte technische controle van uw wagen bij een erkend keuringscentrum. Bij Garage Vermeulen voeren wij zelf geen keuring uit, maar wel de voorrijcontrole en het herstel van afkeurpunten, zodat u in één keer slaagt bij het externe keuringscentrum. U brengt uw wagen langs in onze werkplaats aan de Industrieweg 14 te Hasselt voor we u naar de keuring laten gaan.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Periodieke keuring intervallen",
+    "category": "keuring",
+    "content": "Een personenwagen moet voor het eerst gekeurd worden vanaf 4 jaar na de eerste inschrijving. Vanaf 6 jaar wordt de keuring jaarlijks verplicht. Wij raden aan om ongeveer een week voor de vervaldatum langs te komen voor onze voorrijcontrole, zodat we eventuele gebreken nog tijdig kunnen herstellen. Zo vermijdt u een afkeuring en een tweede rit naar het keuringscentrum.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Keuring bij verkoop",
+    "category": "keuring",
+    "content": "Wanneer u uw wagen verkoopt aan een particulier, is een keuring ter gelegenheid van de verkoop wettelijk verplicht. Naast de gewone controle voert het keuringscentrum dan ook een identificatie en een aanvullende controle uit, met als resultaat een geldig keuringsbewijs van minder dan twee maanden oud. Wij doen graag de voorrijcontrole zodat de wagen verkoopsklaar is en de koper niet voor verrassingen komt te staan.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Wat wordt gecontroleerd",
+    "category": "keuring",
+    "content": "Bij de keuring worden onder andere de remmen, de verlichting en signalisatie, de ophanging en stuurinrichting, de banden, de carrosserie en het chassis nagekeken. Ook de uitlaatgassen worden gemeten, en bij dieselwagens gebeurt er een roetmeting of deeltjesmeting. Tijdens onze voorrijcontrole lopen wij al deze punten met u na zodat er geen verrassingen zijn.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Veelvoorkomende afkeurpunten",
+    "category": "keuring",
+    "content": "De meest voorkomende redenen voor afkeur zijn versleten remblokken of remschijven, defecte of slecht afgestelde verlichting, te diepe of ongelijke bandenslijtage, speling op de ophanging en stuurkogels, en een te hoge roetuitstoot bij dieselwagens. Ook kleine zaken zoals een gescheurde voorruit in het gezichtsveld of een lekkende uitlaat leiden vaak tot afkeur. Onze voorrijcontrole haalt deze punten er vooraf uit zodat u meteen slaagt.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Herkeuring binnen de termijn",
+    "category": "keuring",
+    "content": "Wordt uw wagen afgekeurd, dan krijgt u doorgaans 15 dagen de tijd om de gebreken te laten herstellen en de wagen opnieuw aan te bieden voor een herkeuring. Komt u binnen die termijn terug, dan worden enkel de afgekeurde punten gecontroleerd. Bezorg ons het keuringsbewijs met de afkeurpunten, dan herstellen wij ze tijdig zodat u binnen de termijn terug kunt voor de herkeuring.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Documenten meebrengen",
+    "category": "keuring",
+    "content": "Breng voor de keuring steeds het inschrijvingsbewijs (deel I en II), het gelijkvormigheidsattest of COC en het vorige keuringsbewijs mee. Bij een keuring voor verkoop is bovendien een geldig identiteitsbewijs nodig. Geeft u uw wagen bij ons af voor de voorrijcontrole, leg deze documenten dan in het handschoenkastje, dan zijn ze meteen bij de hand voor het keuringscentrum.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Foutcodes uitlezen via OBD",
+    "category": "diagnose",
+    "content": "Wanneer een waarschuwingslampje brandt, lezen wij uw wagen uit via de OBD-II-poort met professionele diagnoseapparatuur. Zo zien we de exacte foutcodes en kunnen we gericht de oorzaak opsporen in plaats van zomaar onderdelen te vervangen. U krijgt vooraf een gratis prijsbestek voor de diagnose en de herstelling; zie onze prijslijst voor het tarief van een uitlezing. Maak gerust een afspraak via 011 12 34 56 of info@garagevermeulen.be.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Oranje motorlampje brandt",
+    "category": "diagnose",
+    "content": "Het oranje motorlampje (check engine) betekent dat de motorsturing een afwijking registreert; dit kan gaan van een lambdasonde of EGR-klep tot een losse tankdop. Blijf niet lang doorrijden wanneer het lampje knippert, want dan kan de katalysator schade oplopen. Wij lezen de foutcode uit en bezorgen u een gratis prijsbestek voor de herstelling. Bel ons of rijd langs tijdens de openingsuren, maandag tot vrijdag van 08:00 tot 18:00 en zaterdag van 09:00 tot 13:00.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "ABS- en airbaglampje",
+    "category": "diagnose",
+    "content": "Een brandend ABS-lampje wijst meestal op een defecte wielsnelheidssensor of een storing in de ABS-pomp; uw gewone remmen blijven werken, maar het antiblokkeersysteem schakelt uit. Een airbaglampje wijst op een fout in het veiligheidssysteem en moet altijd nagekeken worden, want bij een aanrijding kan de airbag dan weigeren. Beide systemen lezen wij elektronisch uit om de juiste sensor of module te bepalen. Vraag een gratis prijsbestek; tarieven vindt u op onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Accu testen en vervangen",
+    "category": "diagnose",
+    "content": "Start uw wagen moeilijk, zeker in de winter, dan testen wij de accu en het laadsysteem met een belastingstest. Een autoaccu gaat gemiddeld 4 tot 6 jaar mee; bij een zwakke accu vervangen we ze door een passend exemplaar met de juiste capaciteit (Ah) en koudstartstroom (EN/CCA). Bij start-stopwagens registreren we de nieuwe AGM- of EFB-accu ook in de boordcomputer. Zie onze prijslijst of vraag een gratis prijsbestek.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Alternator en startmotor",
+    "category": "diagnose",
+    "content": "Als de accu blijft leeglopen of het laadlampje brandt, ligt het vaak aan de alternator of dynamo die onvoldoende laadt. Hoort u enkel een klik bij het starten terwijl de accu vol is, dan wijst dat meestal op een defecte startmotor of het magneetschakelaartje. Wij meten de laadspanning en de stroomopname door om te bepalen welk onderdeel vervangen moet worden. Op uitgevoerde herstellingen en gemonteerde onderdelen geldt 12 maanden garantie.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Airco bijvullen en ontsmetten",
+    "category": "diagnose",
+    "content": "Een airco verliest jaarlijks koelmiddel, dus laat het systeem best om de twee jaar bijvullen en ontsmetten. Bij het onderhoud vullen wij het koelgas en de olie bij, ontsmetten we de verdamper tegen schimmel en muffe geurtjes, en vervangen we indien nodig de cabinefilter. Koelt uw airco helemaal niet meer, dan voeren we eerst een lekzoektest uit voor we bijvullen. Zie onze prijslijst of vraag een gratis prijsbestek.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Verlichting en LED-ombouw",
+    "category": "diagnose",
+    "content": "Een defecte lamp, een storingsmelding van de verlichting of een knipperlicht dat te snel pinkt, kijken wij na en herstellen we. Een LED-ombouw van bestaande halogeenlampen is mogelijk, maar moet correct gebeuren: zonder de juiste CANbus-adapters geeft de boordcomputer een lampfoutmelding, en de ombouw is bovendien niet altijd toegelaten voor de keuring. Wij adviseren u eerlijk wat homologeerbaar is. Vraag een gratis prijsbestek; tarieven staan op onze prijslijst.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Software-update boordcomputer",
+    "category": "diagnose",
+    "content": "Sommige problemen los je niet op met een onderdeel maar met een software-update van een regelmodule, bijvoorbeeld na een terugroepactie of een gekend fabrieksprobleem. Door onze extra expertise in de VW-groep (Volkswagen, Audi, Škoda, SEAT) en Volvo kunnen wij voor die merken vaak gericht updaten en aangepaste parameters wegschrijven. Wij controleren eerst of er een relevante update beschikbaar is voor uw model. Vraag een gratis prijsbestek of bel 011 12 34 56.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Kleine en grote beurt",
+    "category": "prijzen",
+    "content": "Een kleine onderhoudsbeurt met olie verversen, oliefilter, inspectie en vloeistoffen bijvullen doen we vanaf 149 euro incl. btw. Een grote onderhoudsbeurt komt daar bovenop met luchtfilter, brandstoffilter en cabinefilter en start vanaf 299 euro incl. btw. De exacte prijs hangt af van uw merk, model en het type olie dat de fabrikant voorschrijft. U krijgt altijd vooraf een gratis prijsbestek zodat u nooit voor verrassingen staat.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Olieverversing los",
+    "category": "prijzen",
+    "content": "Een losse olieverversing met nieuwe oliefilter en het bijvullen van motorolie kost vanaf 89 euro incl. btw. De prijs varieert volgens de hoeveelheid en het type olie, bijvoorbeeld 5W-30 longlife voor de VW-groep of Volvo. Wij resetten ook het onderhoudsinterval in de boordcomputer. Vraag gerust vooraf een gratis prijsbestek voor uw specifieke wagen.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Bandenmontage en wissel",
+    "category": "prijzen",
+    "content": "Een band monteren, balanceren en het oude rubber afvoeren kost vanaf 20 euro per band incl. btw. Een volledige seizoenswissel van 4 banden, van zomer naar winter of omgekeerd, doen we vanaf 60 euro incl. btw. Heeft u uw banden op aparte velgen, dan ligt de prijs lager omdat er niet hoeft te worden omgemonteerd. Stalling van uw seizoensbanden kan op aanvraag; vraag vooraf uw gratis prijsbestek.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Uitlijnen voorwielen",
+    "category": "prijzen",
+    "content": "Het uitlijnen of sporen gebeurt op onze computergestuurde uitlijnbank en kost vanaf 69 euro incl. btw. We raden uitlijnen aan na het monteren van nieuwe banden, na werk aan de ophanging of bij onregelmatige bandenslijtage. Bij wagens waar ook de achteras instelbaar is, kan de prijs hoger liggen. U krijgt altijd een meetrapport van voor en na de afstelling.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Remblokken per as",
+    "category": "prijzen",
+    "content": "Remblokken vervangen kost vanaf 99 euro per as incl. btw, inclusief onderdelen en arbeid. Zijn ook de remschijven aan vervanging toe, dan rekenen we dat apart aan en bespreken we dat altijd eerst met u. De juiste prijs hangt af van uw merk en model en of het om de voor- of achteras gaat. We geven 12 maanden garantie op de uitgevoerde herstelling en de gemonteerde onderdelen.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Airco bijvullen",
+    "category": "prijzen",
+    "content": "Uw airco bijvullen met nieuw koelmiddel kost vanaf 79 euro incl. btw. Bij voertuigen op het nieuwere koelgas R1234yf ligt de prijs hoger omdat dit koelmiddel duurder is. Merkt u dat de airco minder goed koelt, dan kan er sprake zijn van een lek; we kunnen dan eerst een lekdetectie uitvoeren. Vraag vooraf een gratis prijsbestek voor uw wagen.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Diagnose en uurtarief",
+    "category": "prijzen",
+    "content": "Een diagnose-uitlezing van de boordcomputer met onze diagnoseapparatuur kost vanaf 49 euro incl. btw; dat bedrag verrekenen we in de herstelling wanneer u die bij ons laat uitvoeren. Het uurtarief van onze werkplaats bedraagt vanaf 65 euro per uur incl. btw. Voor uitgebreider arbeid maken we altijd vooraf een gratis prijsbestek op. Zo weet u op voorhand wat de herstelling kost.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Voorrijcontrole en vervangwagen",
+    "category": "prijzen",
+    "content": "Een voorrijcontrole vóór de technische keuring kost vanaf 39 euro incl. btw; we lopen uw wagen na op afkeurpunten en herstellen die zo nodig in overleg. De keuring zelf gebeurt bij een extern keuringscentrum en zit niet in deze prijs. Een vervangwagen kan op reservatie en kost vanaf 25 euro per dag incl. btw. Een gratis prijsbestek vooraf kan altijd, en de exacte prijs hangt af van uw merk en model.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Onze openingstijden",
+    "category": "praktisch",
+    "content": "Garage Vermeulen is open van maandag tot vrijdag van 08:00 tot 18:00 en op zaterdag van 09:00 tot 13:00. Op zon- en feestdagen zijn wij gesloten. Hou er rekening mee dat onze werkplaats de laatste wagen aanneemt tot 17:00, op zaterdag tot 12:00, dus plan uw afgifte tijdig in.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Een afspraak maken",
+    "category": "praktisch",
+    "content": "U kunt een afspraak maken via telefoon op 011 12 34 56, per e-mail naar info@garagevermeulen.be of online via www.garagevermeulen.be. Geef bij uw aanvraag best uw merk, model en de aard van het werk door, zodat wij voldoende tijd kunnen voorzien. Wij bevestigen uw afspraak en bezorgen u vooraf een gratis prijsbestek.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Vervangwagen reserveren",
+    "category": "praktisch",
+    "content": "Wij stellen een vervangwagen ter beschikking, maar uitsluitend op reservatie. Vermeld bij het maken van uw afspraak dat u een vervangwagen nodig heeft, zodat wij er een voor u kunnen vastleggen. Omdat ons aantal vervangwagens beperkt is, raden wij aan dit zo vroeg mogelijk aan te vragen.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Betaalmogelijkheden",
+    "category": "praktisch",
+    "content": "U kunt bij ons betalen met cash, Bancontact of Payconiq. Bedrijfsklanten kunnen op factuur betalen met een betaaltermijn van 14 dagen. De betaling gebeurt na afronding van de werken, bij het ophalen van uw wagen.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "12 maanden garantie",
+    "category": "praktisch",
+    "content": "Op alle door ons uitgevoerde herstellingen en gemonteerde onderdelen geven wij 12 maanden garantie. Komt hetzelfde probleem binnen die periode terug door een fout in onze herstelling of een defect onderdeel, dan brengen wij dit kosteloos in orde. Bewaar uw factuur als garantiebewijs en neem bij een klacht contact op via 011 12 34 56 of info@garagevermeulen.be.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Ophaal- en brengservice",
+    "category": "praktisch",
+    "content": "Voor klanten in groot-Hasselt bieden wij een ophaal- en brengservice aan: wij halen uw wagen op en brengen hem na de werken terug. Spreek dit op voorhand af bij het maken van uw afspraak, zodat wij een ophaalmoment kunnen inplannen. Zo hoeft u zelf niet langs te komen voor de afgifte.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Locatie en parking",
+    "category": "praktisch",
+    "content": "U vindt ons aan de Industrieweg 14 in 3500 Hasselt. Vlak voor onze werkplaats is er parkeergelegenheid waar u uw wagen kunt achterlaten. Bij vragen over de route belt u ons gerust op 011 12 34 56 of mailt u naar info@garagevermeulen.be.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  },
+  {
+    "title": "Wat meebrengen voor onderhoud",
+    "category": "praktisch",
+    "content": "Breng voor een onderhoud altijd alle sleutels van de wagen mee, inclusief een eventuele reservesleutel. Neem ook het serviceboekje mee zodat wij het uitgevoerde onderhoud correct kunnen afstempelen; bij een digitaal onderhoudsplan registreren wij dit elektronisch. Heeft u specifieke opmerkingen of klachten over de wagen, meld die dan best vooraf, zodat onze technici er gericht naar kunnen kijken.",
+    "source": "manual",
+    "source_detail": "garage-demo-seed"
+  }
+]
