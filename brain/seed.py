@@ -58,6 +58,16 @@ def seed_if_empty(memory) -> int:
         logger.info("No seed file found — starting with an empty store.")
         return 0
 
+    # COEUS_SEED_FILE is shell-set to a trusted bundled resource, but it's still
+    # a plain env var — cap the size so a stray/huge path can't hang or OOM boot.
+    try:
+        if seed_path.stat().st_size > 16 * 1024 * 1024:
+            logger.warning("Seed file %s too large (>16MB), skipping seed.", seed_path)
+            return 0
+    except OSError as e:
+        logger.warning("Seed file %s not statable, skipping seed: %s", seed_path, e)
+        return 0
+
     try:
         with open(seed_path, "r", encoding="utf-8") as f:
             data = json.load(f)

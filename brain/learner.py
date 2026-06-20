@@ -7,22 +7,23 @@ import re
 
 class Learner:
     def __init__(self):
-        # Lazy client: de lokale app draait volledig offline (zoeken/graph/CRUD via
-        # ChromaDB, géén key). Alleen /learn en /ask hebben een LLM nodig. De OpenAI-
-        # client pas bouwen bij gebruik — anders crasht de gebundelde sidecar bij het
-        # opstarten zodra er geen OPENAI_API_KEY/DEEPSEEK_API_KEY gezet is.
+        # De lokale app draait volledig offline (zoeken/graph/CRUD via ChromaDB,
+        # géén key). Alleen /learn en /ask hebben een LLM nodig. Bouw de OpenAI-
+        # client enkel als er een key is — zo crasht de gebundelde sidecar niet bij
+        # het opstarten zonder key, én is er geen race tussen gelijktijdige
+        # /learn|/ask-calls (FastAPI draait sync routes in een threadpool): de
+        # client bestaat al vóór de eerste request, niet lui per-call.
         self._client = None
-
-    def _get_client(self):
-        # Bouw (en cache) de OpenAI-compatibele client (DeepSeek by default).
-        # Geen key → RuntimeError, die /learn en /ask omzetten naar 502/503.
-        if self._client is None:
-            if not settings.llm_api_key:
-                raise RuntimeError("Geen LLM-key geconfigureerd (offline modus)")
+        if settings.llm_api_key:
             self._client = OpenAI(
                 api_key=settings.llm_api_key,
                 base_url=settings.llm_base_url,
             )
+
+    def _get_client(self):
+        # Geen key → RuntimeError, die /learn en /ask omzetten naar 502/503.
+        if self._client is None:
+            raise RuntimeError("Geen LLM-key geconfigureerd (offline modus)")
         return self._client
 
     def extract_knowledge(self, text: str,
