@@ -1576,6 +1576,26 @@ body {
 .update-check__status--error { color: #e07070; }
 
 /* ─────────────────────────────────────────────────────────────
+   Back-up & migratie — export/import van de kennisbank
+   ───────────────────────────────────────────────────────────── */
+.data-beheer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.data-beheer__action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.data-beheer__file {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
    Graph view (force-directed 2D/3D, force-graph lib)
    ───────────────────────────────────────────────────────────── */
 .graph-wrap {
