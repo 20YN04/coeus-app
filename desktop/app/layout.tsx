@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: `De Coeus kennisbank voor ${tenant.name}.`,
 };
 
-const DEFAULT_ACCENT = '#008c38';
+const DEFAULT_ACCENT = '#006b2b';
 
 // White-label theming: a per-client build sets NEXT_PUBLIC_TENANT_ACCENT. In the
 // light theme the brand colour is the *ink/accent* (purple) on an off-white

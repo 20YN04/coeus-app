@@ -40,15 +40,15 @@
 :root {
   /* Inverted from the coeus-site palette: the site is green-field / off-white
      ink (dark theme); the app is the reverse — off-white field / green ink
-     (light theme). Same two brand colours (#008C38 + #F5F5F5), roles swapped. */
+     (light theme). Same two brand colours (#006B2B deep emerald + #F5F5F5), roles swapped. */
   --c-field:        #F1FAF4;   /* off-white mint — primary bg (was the site's ink) */
   --c-field-deep:   #E1F3E8;   /* light mint — sidebar / deeper surface */
-  --c-ink:          #008C38;   /* vivid green — primary text + brand (was the site's field) */
+  --c-ink:          #006B2B;   /* vivid green — primary text + brand (was the site's field) */
   --c-ink-muted:    #3F5A48;   /* muted green-grey — secondary text on field */
-  --c-paper:        #008C38;   /* green — inverted accent panel bg */
+  --c-paper:        #006B2B;   /* green — inverted accent panel bg */
   --c-paper-ink:    #F5F5F5;   /* off-white — text on green panels */
   --c-paper-muted:  #B7E4C7;   /* muted mint — secondary on green panels */
-  --c-border:       rgba(0, 140, 56, 0.18);    /* green hairline on the light field */
+  --c-border:       rgba(0, 107, 43, 0.18);    /* green hairline on the light field */
   --c-border-paper: rgba(245, 245, 245, 0.20); /* light hairline on green panels */
 
   --spine-x: 4.5rem;
@@ -210,12 +210,12 @@ body {
 }
 .sidebar__link:hover {
   color: var(--c-ink);
-  background: rgba(0, 140, 56, 0.05);
-  border-left-color: rgba(0, 140, 56, 0.2);
+  background: rgba(0, 107, 43, 0.05);
+  border-left-color: rgba(0, 107, 43, 0.2);
 }
 .sidebar__link[data-active="true"] {
   color: var(--c-ink);
-  background: rgba(0, 140, 56, 0.08);
+  background: rgba(0, 107, 43, 0.08);
   border-left-color: var(--c-ink);
 }
 @media (max-width: 56rem) {
@@ -317,14 +317,14 @@ body {
   display: flex;
   align-items: center;
   gap: var(--s-3);
-  background: rgba(0, 140, 56, 0.06);
+  background: rgba(0, 107, 43, 0.06);
   border: 1px solid var(--c-border);
   padding: 0.625rem var(--s-4);
   transition: border-color var(--d-fast) var(--ease-out), background var(--d-fast) var(--ease-out);
 }
 .topbar__search:focus-within {
-  border-color: rgba(0, 140, 56, 0.3);
-  background: rgba(0, 140, 56, 0.09);
+  border-color: rgba(0, 107, 43, 0.3);
+  background: rgba(0, 107, 43, 0.09);
 }
 
 .topbar__search-icon {
@@ -471,7 +471,7 @@ body {
 }
 
 .form-input {
-  background: rgba(0, 140, 56, 0.06);
+  background: rgba(0, 107, 43, 0.06);
   border: 1px solid var(--c-border);
   padding: 0.75rem var(--s-4);
   font-family: var(--font-mono);
@@ -483,8 +483,8 @@ body {
   width: 100%;
 }
 .form-input:focus {
-  border-color: rgba(0, 140, 56, 0.4);
-  background: rgba(0, 140, 56, 0.09);
+  border-color: rgba(0, 107, 43, 0.4);
+  background: rgba(0, 107, 43, 0.09);
 }
 .form-input::placeholder {
   color: var(--c-ink-muted);
@@ -541,7 +541,7 @@ body {
   cursor: pointer;
 }
 .kennis-card:hover {
-  background: rgba(0, 140, 56, 0.04);
+  background: rgba(0, 107, 43, 0.04);
 }
 
 .kennis-card__category {
@@ -648,7 +648,7 @@ body {
   flex-wrap: wrap;
   padding: var(--s-4) var(--s-6);
   border: 1px solid var(--c-border);
-  background: rgba(0, 140, 56, 0.06);
+  background: rgba(0, 107, 43, 0.06);
 }
 
 .import-result__count {
@@ -797,7 +797,7 @@ body {
   color: var(--c-ink);
 }
 .category-row:last-child { border-bottom: none; }
-.category-row:hover { background: rgba(0, 140, 56, 0.04); }
+.category-row:hover { background: rgba(0, 107, 43, 0.04); }
 
 .category-row__icon {
   display: flex;
@@ -822,7 +822,7 @@ body {
   font-size: 0.625rem;
   letter-spacing: 0.1em;
   color: var(--c-ink-muted);
-  background: rgba(0, 140, 56, 0.08);
+  background: rgba(0, 107, 43, 0.08);
   padding: 0.25rem 0.625rem;
   min-width: 2rem;
   text-align: center;
@@ -837,7 +837,7 @@ body {
 .category-row:hover .category-row__arrow { color: var(--c-ink); transform: translateX(2px); }
 
 .week-card {
-  background: rgba(0, 140, 56, 0.04);
+  background: rgba(0, 107, 43, 0.04);
   border: 1px solid var(--c-border);
   padding: var(--s-6);
   display: flex;
@@ -883,7 +883,7 @@ body {
 }
 
 .week-bar__empty {
-  background: rgba(0, 140, 56, 0.15);
+  background: rgba(0, 107, 43, 0.15);
   height: 100%;
 }
 
@@ -969,7 +969,7 @@ body {
   transition: background var(--d-fast) var(--ease-out);
 }
 .recent-row:last-child { border-bottom: none; }
-.recent-row:hover { background: rgba(0, 140, 56, 0.04); }
+.recent-row:hover { background: rgba(0, 107, 43, 0.04); }
 
 .recent-row__icon {
   display: flex;
@@ -1045,13 +1045,13 @@ body {
 }
 
 .source-badge--ai {
-  background: rgba(0, 140, 56, 0.25);
+  background: rgba(0, 107, 43, 0.25);
   color: var(--c-ink-muted);
-  border: 1px solid rgba(0, 140, 56, 0.4);
+  border: 1px solid rgba(0, 107, 43, 0.4);
 }
 
 .source-badge--handmatig {
-  background: rgba(0, 140, 56, 0.06);
+  background: rgba(0, 107, 43, 0.06);
   color: var(--c-ink-muted);
   border: 1px solid var(--c-border);
 }
@@ -1071,14 +1071,14 @@ body {
   display: flex;
   align-items: center;
   gap: var(--s-3);
-  background: rgba(0, 140, 56, 0.06);
+  background: rgba(0, 107, 43, 0.06);
   border: 1px solid var(--c-border);
   padding: 0.625rem var(--s-4);
   transition: border-color var(--d-fast) var(--ease-out), background var(--d-fast) var(--ease-out);
 }
 .kb-search:focus-within {
-  border-color: rgba(0, 140, 56, 0.3);
-  background: rgba(0, 140, 56, 0.09);
+  border-color: rgba(0, 107, 43, 0.3);
+  background: rgba(0, 107, 43, 0.09);
 }
 
 .kb-search__icon {
@@ -1146,7 +1146,7 @@ body {
   width: 0.75rem;
   height: 0.75rem;
 }
-.filter-chip:hover { color: var(--c-ink); border-color: rgba(0, 140, 56, 0.2); }
+.filter-chip:hover { color: var(--c-ink); border-color: rgba(0, 107, 43, 0.2); }
 .filter-chip[data-active="true"] {
   color: var(--c-field);
   background: var(--c-ink);
@@ -1176,7 +1176,7 @@ body {
   transition: background var(--d-fast) var(--ease-out);
 }
 .kennis-row:last-child { border-bottom: none; }
-.kennis-row:hover { background: rgba(0, 140, 56, 0.04); }
+.kennis-row:hover { background: rgba(0, 107, 43, 0.04); }
 
 .kennis-row__icon {
   display: flex;
@@ -1278,7 +1278,7 @@ body {
   border: 1px solid var(--c-border);
   padding: 0.4375rem var(--s-3);
 }
-.detail-back:hover { color: var(--c-ink); border-color: rgba(0, 140, 56, 0.25); }
+.detail-back:hover { color: var(--c-ink); border-color: rgba(0, 107, 43, 0.25); }
 
 .detail-body {
   max-width: 64ch;
@@ -1463,7 +1463,7 @@ body {
   align-items: center;
   transition: border-color var(--d-fast) var(--ease-out), background var(--d-fast) var(--ease-out);
 }
-.btn-outline:hover { border-color: rgba(0, 140, 56, 0.3); background: rgba(0, 140, 56, 0.04); }
+.btn-outline:hover { border-color: rgba(0, 107, 43, 0.3); background: rgba(0, 107, 43, 0.04); }
 
 .btn-ghost {
   font-family: var(--font-mono);
@@ -1493,7 +1493,7 @@ body {
   border: 1px solid var(--c-border);
   padding: 0.5rem var(--s-4);
 }
-.btn-ghost-sm:hover { color: var(--c-ink); border-color: rgba(0, 140, 56, 0.3); }
+.btn-ghost-sm:hover { color: var(--c-ink); border-color: rgba(0, 107, 43, 0.3); }
 
 .btn-danger {
   font-family: var(--font-mono);
@@ -1601,7 +1601,7 @@ body {
 .code-inline {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  background: rgba(0, 140, 56, 0.08);
+  background: rgba(0, 107, 43, 0.08);
   padding: 0.1em 0.4em;
   color: var(--c-ink);
 }
@@ -1633,7 +1633,7 @@ body {
   letter-spacing: 0.02em;
   line-height: 1.8;
   color: var(--c-ink-muted);
-  background: rgba(0, 140, 56, 0.04);
+  background: rgba(0, 107, 43, 0.04);
   border: 1px solid var(--c-border);
   padding: var(--s-6);
   margin: 0;
@@ -1787,7 +1787,7 @@ body {
 }
 .graph-toggle__btn:hover { color: #F4F2FB; }
 .graph-toggle__btn.is-active {
-  background: #008C38;
+  background: #006B2B;
   color: #F4F2FB;
 }
 
@@ -1863,12 +1863,12 @@ body {
   gap: var(--s-3);
   padding: var(--s-6);
   border: 1px solid var(--c-border);
-  background: rgba(0, 140, 56, 0.02);
+  background: rgba(0, 107, 43, 0.02);
   cursor: not-allowed;
   transition: border-color var(--d-fast) var(--ease-out);
 }
 .automation-card:hover {
-  border-color: rgba(0, 140, 56, 0.22);
+  border-color: rgba(0, 107, 43, 0.22);
 }
 
 .automation-card__top {
