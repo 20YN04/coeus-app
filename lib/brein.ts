@@ -46,6 +46,25 @@ async function req<T>(
   return res.json() as Promise<T>;
 }
 
+// The Tauri shell launches the brein sidecar at app start; ChromaDB + the
+// embedding model take a few seconds to come up. Poll `/` until it answers so
+// the first dashboard/list load survives that boot window instead of flashing
+// an error banner. Resolves true once ready, false on timeout (caller then
+// surfaces the normal error path).
+export async function waitForBrein(timeoutMs = 60000): Promise<boolean> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const res = await fetch(`${BASE_URL}/`, { cache: 'no-store' });
+      if (res.ok) return true;
+    } catch {
+      /* sidecar not listening yet */
+    }
+    await new Promise((r) => setTimeout(r, 600));
+  }
+  return false;
+}
+
 export async function listKennis(category?: string): Promise<KennisItem[]> {
   const qs = category ? `?category=${encodeURIComponent(category)}` : '';
   return req<KennisItem[]>(`/kennis${qs}`);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { listKennis, getCategories, type KennisItem } from '@/lib/brein';
+import { listKennis, getCategories, waitForBrein, type KennisItem } from '@/lib/brein';
 import Link from 'next/link';
 
 const BREIN_URL = process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://127.0.0.1:8765';
@@ -55,6 +55,7 @@ export default function DashboardPage() {
     let alive = true;
     (async () => {
       try {
+        await waitForBrein();
         const [items, cats] = await Promise.all([listKennis(), getCategories()]);
         if (!alive) return;
         setAllItems(items);

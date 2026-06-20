@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { listKennis, searchKennis, getCategories, type KennisItem } from '@/lib/brein';
+import { listKennis, searchKennis, getCategories, waitForBrein, type KennisItem } from '@/lib/brein';
 
 function CategoryIcon({ category }: { category: string }) {
   const key = category.toLowerCase();
@@ -46,10 +46,23 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [ready, setReady] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Categories drive the filter chips — fetched once, client-side, from the local brein.
+  // Wait for the local brein sidecar to boot before the first load.
   useEffect(() => {
+    let alive = true;
+    waitForBrein().finally(() => {
+      if (alive) setReady(true);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // Categories drive the filter chips — fetched client-side once the brein is up.
+  useEffect(() => {
+    if (!ready) return;
     let alive = true;
     getCategories()
       .then((cats) => {
@@ -61,7 +74,7 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
     return () => {
       alive = false;
     };
-  }, []);
+  }, [ready]);
 
   const fetchItems = useCallback(
     async (q: string, cat: string) => {
@@ -82,6 +95,7 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
   );
 
   useEffect(() => {
+    if (!ready) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       fetchItems(query, activeCategory);
@@ -89,7 +103,7 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query, activeCategory, fetchItems]);
+  }, [ready, query, activeCategory, fetchItems]);
 
   return (
     <>
