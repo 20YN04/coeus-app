@@ -75,6 +75,11 @@ jobs:
   # surface findings without blocking merges. The real gate is ci.yml.
   codeql:
     name: CodeQL
+    # CodeQL needs GitHub Advanced Security, which a private repo lacks by default
+    # — it publishes its own failing check-run regardless of continue-on-error.
+    # Gated off so the board is green; set repo variable ENABLE_CODEQL=true after
+    # enabling GHAS to turn it on.
+    if: ${{ vars.ENABLE_CODEQL == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
