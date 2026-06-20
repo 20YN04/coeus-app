@@ -6,7 +6,8 @@ externe key. Wordt gebruikt door /ingest/text en /ingest/url in main.py.
 """
 
 import re
-from typing import Optional
+from typing import Iterator, Optional
+from urllib.parse import urljoin, urldefrag, urlparse
 
 # Per kennis-item cappen we de inhoud zodat één gigantische paragraaf niet als
 # één onleesbaar item belandt. ~1500 tekens is ongeveer een schermvullende alinea.
@@ -117,3 +118,86 @@ def html_to_text(html: str) -> str:
             cleaned.append('')
             blank = True
     return '\n'.join(cleaned).strip()
+
+
+# Bestandsextensies die we tijdens een crawl overslaan: assets en downloads zijn
+# geen leesbare HTML-pagina's (en zouden de crawl onnodig vertragen).
+_SKIP_EXTENSIONS = (
+    '.pdf', '.zip', '.rar', '.gz', '.tar', '.dmg', '.exe',
+    '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.ico', '.bmp', '.avif',
+    '.mp4', '.webm', '.mov', '.mp3', '.wav', '.ogg',
+    '.css', '.js', '.json', '.xml', '.rss', '.woff', '.woff2', '.ttf', '.eot',
+    '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.csv',
+)
+
+
+def _is_crawlable(url: str) -> bool:
+    # Sla mailto:/tel:/javascript: en asset-/download-links over; alleen http(s)
+    # naar een echte pagina is zinnig om te crawlen.
+    parsed = urlparse(url)
+    if parsed.scheme not in ('http', 'https'):
+        return False
+    path = parsed.path.lower()
+    return not path.endswith(_SKIP_EXTENSIONS)
+
+
+def _extract_links(html: str, base_url: str, host: str) -> list[str]:
+    # Haal interne <a href> links op dezelfde host uit een pagina, absoluut
+    # gemaakt en zonder fragment. Dedupe gebeurt bij de aanroeper.
+    from bs4 import BeautifulSoup
+
+    soup = BeautifulSoup(html, 'html.parser')
+    links: list[str] = []
+    for a in soup.find_all('a', href=True):
+        href = a['href'].strip()
+        if not href or href.startswith(('#', 'mailto:', 'tel:', 'javascript:')):
+            continue
+        absolute, _ = urldefrag(urljoin(base_url, href))
+        if urlparse(absolute).netloc != host:
+            continue  # alleen dezelfde host
+        if _is_crawlable(absolute):
+            links.append(absolute)
+    return links
+
+
+def crawl_site(start_url: str, max_pages: int = 15) -> Iterator[tuple[str, str]]:
+    """Crawl pagina's op dezelfde host vanaf start_url (BFS), key-free.
+
+    Yield per pagina een (url, text)-paar met de leesbare tekst. Breadth-first:
+    haal een pagina op, extraheer interne links op dezelfde host, zet onbekende
+    in de wachtrij, dedupe, cap op max_pages. Per-pagina 15s timeout, beleefd
+    (één request tegelijk). Resilient: een pagina die faalt wordt overgeslagen,
+    de crawl crasht nooit. De eerste pagina (start_url) wordt door de aanroeper
+    apart opgehaald/gevalideerd; deze generator herstart vanaf die response.
+    """
+    import requests
+
+    host = urlparse(start_url).netloc
+    seen: set[str] = set()
+    queue: list[str] = [urldefrag(start_url)[0]]
+    headers = {"User-Agent": "Coeus-Onboarding/1.0 (+kennisbank-import)"}
+
+    while queue and len(seen) < max_pages:
+        url = queue.pop(0)
+        if url in seen:
+            continue
+        seen.add(url)
+
+        try:
+            resp = requests.get(url, timeout=15, headers=headers)
+            resp.raise_for_status()
+        except requests.exceptions.RequestException:
+            continue  # onbereikbare pagina: overslaan, niet crashen
+
+        content_type = resp.headers.get("content-type", "")
+        if "html" not in content_type and "text" not in content_type:
+            continue  # geen leesbare HTML
+
+        # Wachtrij aanvullen met nieuwe interne links voor we de tekst yielden.
+        for link in _extract_links(resp.text, url, host):
+            if link not in seen and link not in queue:
+                queue.append(link)
+
+        text = html_to_text(resp.text)
+        if text.strip():
+            yield url, text
