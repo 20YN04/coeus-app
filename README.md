@@ -1,8 +1,29 @@
-# Coeus — AI Brein Core
+# Coeus
+
+**Coeus** is a local-first, white-label company knowledge base — an "eigen
+Obsidian voor bedrijven" — shipped as an installable desktop app. A product of
+Ynarchive.
+
+This is the **monorepo**: one installer is built from both parts here.
+
+| Path | What |
+|---|---|
+| **`/` (repo root)** | The **brein** — Python FastAPI + ChromaDB backend. Runs as a sidecar on a loopback port; fully offline (all-MiniLM ONNX embeddings). Docs below. |
+| **`desktop/`** | The **desktop app** — static Next.js kennisbank UI + the Tauri (Rust) shell that bundles the brein sidecar and launches it. See [`desktop/README.md`](desktop/README.md) and [`desktop/docs/per-client-build.md`](desktop/docs/per-client-build.md). |
+
+The desktop release pipeline (`.github/workflows/desktop-release.yml`) builds the
+brein sidecar at the root and bundles it into the Tauri app under `desktop/` — no
+cross-repo checkout. Build locally with `(cd .. && ./build_sidecar.sh)` then
+`cd desktop && npm run desktop:build`.
+
+> `coeus-site` (the marketing site) stays a separate repo. The standalone brein
+> backend repo (`coeus-kennisbank` is now folded in here under `desktop/`).
+
+---
+
+## Brein (repo root)
 
 The Python core of **Coeus**: an AI brain that learns a business's knowledge and answers questions about it. It stores knowledge in a ChromaDB vector store and uses GPT (via the OpenAI API) to extract structured knowledge from free text and to answer questions grounded in that knowledge base.
-
-Coeus is a product of Ynarchive.
 
 ## Architecture
 

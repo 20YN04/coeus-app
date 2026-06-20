@@ -24,17 +24,19 @@ inlined into `out/`):
 
 ## 2. Brein sidecar (one per OS)
 
-The sidecar is built from `../coeus-app` and dropped at
-`src-tauri/binaries/coeus-brein/` (a folder; `.gitignore`d — never committed).
+The brein lives at the **repo root** (one level up from `desktop/`). Build it and
+drop the output at `desktop/src-tauri/binaries/coeus-brein/` (a folder;
+`.gitignore`d — never committed).
 
-macOS / Linux:
+macOS / Linux (run from `desktop/`):
 
 ```bash
-cd ../coeus-app && ./build_sidecar.sh          # → coeus-app/dist/coeus-brein/
-cp -R ../coeus-app/dist/coeus-brein src-tauri/binaries/coeus-brein
+(cd .. && ./build_sidecar.sh)                  # → <repo-root>/dist/coeus-brein/
+cp -R ../dist/coeus-brein src-tauri/binaries/coeus-brein
 ```
 
-Windows is built on a Windows runner (see `.github/workflows/desktop-release.yml`).
+Windows is built on a Windows runner (see the repo-root
+`.github/workflows/desktop-release.yml`, which builds `build_sidecar.py`).
 
 The brein bundles the `all-MiniLM` ONNX model, so semantic search/graph/CRUD run
 **fully offline**. `/learn` and `/ask` need an LLM key and are online-optional.
