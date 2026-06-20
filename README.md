@@ -16,8 +16,12 @@ brein sidecar at the root and bundles it into the Tauri app under `desktop/` —
 cross-repo checkout. Build locally with `(cd .. && ./build_sidecar.sh)` then
 `cd desktop && npm run desktop:build`.
 
-> `coeus-site` (the marketing site) stays a separate repo. The standalone brein
-> backend repo (`coeus-kennisbank` is now folded in here under `desktop/`).
+> `coeus-site` (the marketing site) stays a separate repo. The former
+> `coeus-kennisbank` repo (the desktop UI) has been folded in here under
+> `desktop/` and deleted. Two earlier branches that never hit its `main` were
+> rescued onto this repo: `recovered/graph-view-frontend` (the `/graph` view, to
+> port into the static SPA) and `recovered/desktop-ci` (`security.yml` +
+> `dependabot.yml` + `SECURITY.md`, to port into this repo's CI).
 
 ---
 
