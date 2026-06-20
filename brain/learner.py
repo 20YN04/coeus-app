@@ -7,8 +7,11 @@ import re
 
 class Learner:
     def __init__(self):
-        # OpenAI-client voor kennisextractie en het beantwoorden van vragen
-        self.client = OpenAI(api_key=settings.openai_api_key)
+        # OpenAI-compatibele client (DeepSeek by default) voor kennisextractie en vragen
+        self.client = OpenAI(
+            api_key=settings.llm_api_key,
+            base_url=settings.llm_base_url,
+        )
 
     def extract_knowledge(self, text: str,
                           category_hint: str = None) -> list[dict]:
@@ -28,7 +31,7 @@ class Learner:
 
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=settings.llm_model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
                 max_tokens=2000
@@ -82,7 +85,7 @@ class Learner:
 
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=settings.llm_model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
                 max_tokens=1000
