@@ -32,3 +32,16 @@ class LearnRequest(BaseModel):
 
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=1000)
+
+class IngestTextRequest(BaseModel):
+    # Onboarding-motor: vrije tekst in stukken hakken en als kennis-items opslaan
+    # (key-free, geen LLM). source_url is optioneel — herkomst van de tekst.
+    text: str = Field(..., min_length=1, max_length=200000)
+    category: Optional[str] = None
+    source_url: Optional[str] = None
+
+class IngestUrlRequest(BaseModel):
+    # Onboarding-motor: een webpagina server-side ophalen, leesbare tekst eruit
+    # halen en in stukken hakken (key-free, geen LLM).
+    url: str = Field(..., min_length=1, max_length=2000)
+    category: Optional[str] = None

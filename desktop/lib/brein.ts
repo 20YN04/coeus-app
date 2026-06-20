@@ -125,6 +125,39 @@ export async function getCategories(): Promise<string[]> {
     .filter((name): name is string => typeof name === 'string' && name.length > 0);
 }
 
+export type IngestResult = { toegevoegd: number };
+
+// Onboarding-motor: hak vrije tekst in stukken en sla ze key-free op als
+// kennis-items (geen LLM). Geeft het aantal toegevoegde items terug.
+export async function ingestText(
+  text: string,
+  opts?: { category?: string; sourceUrl?: string },
+): Promise<IngestResult> {
+  return req<IngestResult>('/ingest/text', {
+    method: 'POST',
+    body: JSON.stringify({
+      text,
+      category: opts?.category || undefined,
+      source_url: opts?.sourceUrl || undefined,
+    }),
+  });
+}
+
+// Onboarding-motor: haal een webpagina server-side op, extraheer leesbare tekst
+// en sla die key-free op als kennis-items. Geeft het aantal toegevoegde items terug.
+export async function ingestUrl(
+  url: string,
+  opts?: { category?: string },
+): Promise<IngestResult> {
+  return req<IngestResult>('/ingest/url', {
+    method: 'POST',
+    body: JSON.stringify({
+      url,
+      category: opts?.category || undefined,
+    }),
+  });
+}
+
 // Semantic knowledge graph (nodes per item, edges from embedding similarity).
 // Key-free: the brein builds it from the local ChromaDB embeddings.
 export async function getGraph(neighbors?: number): Promise<KennisGraph> {

@@ -2,10 +2,15 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+import requests
 from brain.memory import Memory
 from brain.learner import Learner
 from brain.seed import seed_if_empty
-from brain.models import KennisItem, CreateKennisRequest, UpdateKennisRequest, LearnRequest, AskRequest
+from brain.ingest import chunk_text, derive_title, html_to_text
+from brain.models import (
+    KennisItem, CreateKennisRequest, UpdateKennisRequest,
+    LearnRequest, AskRequest, IngestTextRequest, IngestUrlRequest,
+)
 
 
 @asynccontextmanager
@@ -126,6 +131,65 @@ def ask(request: AskRequest):
         "antwoord": answer,
         "bronnen": [{"title": c.title, "category": c.category} for c in context]
     }
+
+def _ingest_chunks(text: str, category: str | None, source_detail: str) -> int:
+    # Gedeelde kern van /ingest/text en /ingest/url: tekst hakken, titel afleiden,
+    # elk stuk als kennis-item opslaan met source="import". Key-free, geen LLM.
+    chunks = chunk_text(text)
+    cat = (category or "").strip() or "import"
+    added = 0
+    for chunk in chunks:
+        memory.add(
+            title=derive_title(chunk),
+            category=cat,
+            content=chunk,
+            source="import",
+            source_detail=source_detail,
+        )
+        added += 1
+    return added
+
+
+@app.post("/ingest/text")
+def ingest_text(request: IngestTextRequest):
+    # Onboarding-motor: vrije tekst (of geplakte website-tekst) in stukken hakken
+    # en als kennis-items opslaan. source_detail = de meegegeven URL of "tekst-import".
+    source_detail = (request.source_url or "").strip() or "tekst-import"
+    added = _ingest_chunks(request.text, request.category, source_detail)
+    return {"toegevoegd": added}
+
+
+@app.post("/ingest/url")
+def ingest_url(request: IngestUrlRequest):
+    # Onboarding-motor: een webpagina server-side ophalen, leesbare tekst extraheren
+    # en in stukken hakken. Resilient: bad/unreachable URL → nette 4xx/5xx, nooit crash.
+    url = request.url.strip()
+    if not url.lower().startswith(("http://", "https://")):
+        raise HTTPException(422, "Ongeldige URL — gebruik http:// of https://")
+
+    try:
+        resp = requests.get(
+            url,
+            timeout=15,
+            headers={"User-Agent": "Coeus-Onboarding/1.0 (+kennisbank-import)"},
+        )
+        resp.raise_for_status()
+    except requests.exceptions.Timeout:
+        raise HTTPException(502, "De website reageerde niet op tijd")
+    except requests.exceptions.RequestException:
+        raise HTTPException(502, "Kon de website niet ophalen")
+
+    content_type = resp.headers.get("content-type", "")
+    if "html" not in content_type and "text" not in content_type:
+        raise HTTPException(422, "De URL bevat geen leesbare tekst (geen HTML)")
+
+    text = html_to_text(resp.text)
+    if not text.strip():
+        raise HTTPException(422, "Geen leesbare tekst gevonden op deze pagina")
+
+    added = _ingest_chunks(text, request.category, url)
+    return {"toegevoegd": added}
+
 
 @app.get("/categories")
 def categories():
