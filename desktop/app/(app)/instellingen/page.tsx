@@ -1,5 +1,6 @@
 import tenant from '@/config/tenant';
 import UpdateCheck from './UpdateCheck';
+import DataBeheer from './DataBeheer';
 
 export default function InstellingenPage() {
   return (
@@ -93,6 +94,8 @@ export default function InstellingenPage() {
 
           <UpdateCheck />
         </section>
+
+        <DataBeheer />
 
         <section className="settings-section">
           <div className="settings-section__header">
