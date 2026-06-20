@@ -26,7 +26,8 @@
       "icons/icon.ico"
     ],
     "resources": [
-      "binaries/coeus-brein/**/*"
+      "binaries/coeus-brein/**/*",
+      "seed/*.json"
     ],
     "android": {
       "debugApplicationIdSuffix": ".debug"

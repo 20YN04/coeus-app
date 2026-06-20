@@ -75,6 +75,17 @@ fn spawn_brein(app: &tauri::App) {
     cmd.env("COEUS_DATA_DIR", &data_dir)
         .env("COEUS_PORT", BREIN_PORT)
         .env("COEUS_CORS_ORIGINS", BREIN_CORS_ORIGINS);
+
+    // Per-client seed: a white-label build can drop a `seed/client-seed.json`
+    // resource. When present, point the brein at it (overrides the brein's own
+    // bundled garage demo); absent → the default seed ships.
+    if let Ok(resource_dir) = app.path().resource_dir() {
+        let client_seed = resource_dir.join("seed/client-seed.json");
+        if client_seed.exists() {
+            cmd.env("COEUS_SEED_FILE", &client_seed);
+        }
+    }
+
     if let Some(parent) = bin.parent() {
         cmd.current_dir(parent);
     }

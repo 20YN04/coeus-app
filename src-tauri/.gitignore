@@ -5,3 +5,6 @@
 
 # Brein sidecar (built by PyInstaller, bundled as a Tauri resource — never committed)
 /binaries/
+
+# Per-client seed payloads (white-label) — never committed
+/seed/*.json
