@@ -45,3 +45,11 @@ class IngestUrlRequest(BaseModel):
     # halen en in stukken hakken (key-free, geen LLM).
     url: str = Field(..., min_length=1, max_length=2000)
     category: Optional[str] = None
+
+class IngestCrawlRequest(BaseModel):
+    # Onboarding-motor: meerdere pagina's op dezelfde host crawlen vanaf url (BFS),
+    # leesbare tekst per pagina in stukken hakken (key-free, geen LLM). max_pages
+    # is gecapt zodat een crawl bounded blijft en niet eindeloos doorloopt.
+    url: str = Field(..., min_length=1, max_length=2000)
+    max_pages: int = Field(default=15, ge=1, le=50)
+    category: Optional[str] = None

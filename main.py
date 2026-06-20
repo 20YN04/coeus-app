@@ -1,15 +1,16 @@
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 from brain.memory import Memory
 from brain.learner import Learner
 from brain.seed import seed_if_empty
-from brain.ingest import chunk_text, derive_title, html_to_text
+from brain.ingest import chunk_text, derive_title, html_to_text, crawl_site
 from brain.models import (
     KennisItem, CreateKennisRequest, UpdateKennisRequest,
     LearnRequest, AskRequest, IngestTextRequest, IngestUrlRequest,
+    IngestCrawlRequest,
 )
 
 
@@ -189,6 +190,99 @@ def ingest_url(request: IngestUrlRequest):
 
     added = _ingest_chunks(text, request.category, url)
     return {"toegevoegd": added}
+
+
+@app.post("/ingest/crawl")
+def ingest_crawl(request: IngestCrawlRequest):
+    # Onboarding-motor: hele site crawlen vanaf url (BFS, dezelfde host), per pagina
+    # leesbare tekst extraheren en in stukken hakken. Resilient: onbereikbare
+    # start → 502, niet-HTML start → 422, en losse pagina's die falen worden
+    # tijdens de crawl stilletjes overgeslagen (zie crawl_site).
+    url = request.url.strip()
+    if not url.lower().startswith(("http://", "https://")):
+        raise HTTPException(422, "Ongeldige URL — gebruik http:// of https://")
+
+    # Valideer de startpagina expliciet zodat een dode/niet-HTML URL een nette
+    # foutmelding geeft i.p.v. een lege crawl (de generator slaat fouten stil over).
+    try:
+        resp = requests.get(
+            url,
+            timeout=15,
+            headers={"User-Agent": "Coeus-Onboarding/1.0 (+kennisbank-import)"},
+        )
+        resp.raise_for_status()
+    except requests.exceptions.Timeout:
+        raise HTTPException(502, "De website reageerde niet op tijd")
+    except requests.exceptions.RequestException:
+        raise HTTPException(502, "Kon de website niet ophalen")
+
+    content_type = resp.headers.get("content-type", "")
+    if "html" not in content_type and "text" not in content_type:
+        raise HTTPException(422, "De URL bevat geen leesbare tekst (geen HTML)")
+
+    added = 0
+    pages = 0
+    for page_url, text in crawl_site(url, request.max_pages):
+        added += _ingest_chunks(text, request.category, page_url)
+        pages += 1
+
+    return {"toegevoegd": added, "paginas": pages}
+
+
+# Toegestane upload-types en een ruime maximumgrootte (~10MB) zodat één bestand
+# het brein niet kan platleggen. PDF gaat door pypdf, .md/.txt als UTF-8-tekst.
+_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+_TEXT_SUFFIXES = (".md", ".markdown", ".txt")
+
+
+def _pdf_to_text(data: bytes) -> str:
+    # Extraheer tekst per pagina uit een PDF met pypdf. Onleesbare/lege pagina's
+    # leveren gewoon niets op; een corrupte PDF geeft een nette 422 (zie caller).
+    import io
+    from pypdf import PdfReader
+
+    reader = PdfReader(io.BytesIO(data))
+    pages = []
+    for page in reader.pages:
+        extracted = page.extract_text() or ""
+        if extracted.strip():
+            pages.append(extracted.strip())
+    return "\n\n".join(pages)
+
+
+@app.post("/ingest/file")
+async def ingest_file(file: UploadFile = File(...), category: str | None = Form(default=None)):
+    # Onboarding-motor: een geüpload bestand (.pdf / .md / .markdown / .txt) inlezen,
+    # tekst extraheren, in stukken hakken en key-free opslaan. source_detail =
+    # de bestandsnaam. Resilient: verkeerd type / te groot / onleesbaar → nette 4xx.
+    name = (file.filename or "").strip() or "upload"
+    lower = name.lower()
+
+    data = await file.read()
+    if len(data) > _MAX_UPLOAD_BYTES:
+        raise HTTPException(422, "Bestand is te groot (max 10MB)")
+    if not data:
+        raise HTTPException(422, "Het bestand is leeg")
+
+    if lower.endswith(".pdf"):
+        try:
+            text = _pdf_to_text(data)
+        except Exception:
+            raise HTTPException(422, "Kon de PDF niet lezen — is het een geldig PDF-bestand?")
+    elif lower.endswith(_TEXT_SUFFIXES):
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            # Val terug op een tolerante decode i.p.v. te crashen op rare bytes.
+            text = data.decode("utf-8", errors="replace")
+    else:
+        raise HTTPException(422, "Niet-ondersteund bestandstype — gebruik .pdf, .md, .markdown of .txt")
+
+    if not text.strip():
+        raise HTTPException(422, "Geen leesbare tekst gevonden in dit bestand")
+
+    added = _ingest_chunks(text, category, name)
+    return {"toegevoegd": added, "bestand": name}
 
 
 @app.get("/categories")

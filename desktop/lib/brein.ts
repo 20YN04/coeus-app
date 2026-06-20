@@ -126,6 +126,8 @@ export async function getCategories(): Promise<string[]> {
 }
 
 export type IngestResult = { toegevoegd: number };
+export type CrawlResult = { toegevoegd: number; paginas: number };
+export type FileResult = { toegevoegd: number; bestand: string };
 
 // Onboarding-motor: hak vrije tekst in stukken en sla ze key-free op als
 // kennis-items (geen LLM). Geeft het aantal toegevoegde items terug.
@@ -156,6 +158,45 @@ export async function ingestUrl(
       category: opts?.category || undefined,
     }),
   });
+}
+
+// Onboarding-motor: crawl een hele site (BFS, dezelfde host) vanaf een URL,
+// extraheer per pagina leesbare tekst en sla die key-free op. Geeft het aantal
+// toegevoegde items én het aantal bezochte pagina's terug.
+export async function ingestCrawl(
+  url: string,
+  opts?: { category?: string; maxPages?: number },
+): Promise<CrawlResult> {
+  return req<CrawlResult>('/ingest/crawl', {
+    method: 'POST',
+    body: JSON.stringify({
+      url,
+      category: opts?.category || undefined,
+      max_pages: opts?.maxPages || undefined,
+    }),
+  });
+}
+
+// Onboarding-motor: upload een bestand (.pdf / .md / .markdown / .txt), extraheer
+// de tekst server-side en sla die key-free op. FormData-upload: géén handmatige
+// Content-Type zetten — de browser bepaalt de multipart-boundary zelf (de gedeelde
+// `req`-helper forceert application/json, dus hier een eigen fetch).
+export async function ingestFile(
+  file: File,
+  opts?: { category?: string },
+): Promise<FileResult> {
+  const form = new FormData();
+  form.append('file', file);
+  if (opts?.category) form.append('category', opts.category);
+
+  const res = await fetch(`${BASE_URL}/ingest/file`, {
+    method: 'POST',
+    body: form,
+  });
+  if (!res.ok) {
+    throw new Error(`Brein API ${res.status}: ${res.statusText} — /ingest/file`);
+  }
+  return res.json() as Promise<FileResult>;
 }
 
 // Semantic knowledge graph (nodes per item, edges from embedding similarity).
