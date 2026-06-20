@@ -106,6 +106,8 @@ fn spawn_brein(app: &tauri::App) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .manage(BreinProcess(Mutex::new(None)))
         .setup(|app| {
             if cfg!(debug_assertions) {

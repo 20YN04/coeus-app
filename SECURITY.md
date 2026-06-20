@@ -18,6 +18,19 @@ The desktop app is **local-first**: each installer bundles the static kennisbank
 2. Tag and push: `git tag v0.1.0 && git push origin v0.1.0`.
 3. `desktop-release.yml` builds the brein sidecar per-OS, bundles it into the Tauri app, and creates a **draft** GitHub Release with the macOS (arm64) `.dmg` + Windows `.exe`/`.msi` attached. Review, then publish.
 
+## Auto-update
+
+The desktop app self-updates via Tauri v2's official updater (`tauri-plugin-updater`). Each installer is signed with a minisign keypair; the app ships the **public** key (embedded in `desktop/src-tauri/tauri.conf.json` → `plugins.updater.pubkey`) and verifies every downloaded update against it, so a release can only be installed if it was signed with the matching private key.
+
+**Flow:** push to `main` → tag `vX.Y.Z` → `desktop-release.yml` builds + signs the installers, emits each artifact's `.sig` and a `latest.json` manifest, and uploads them to the GitHub Release. The installed app polls `https://github.com/20YN04/coeus-app/releases/latest/download/latest.json`; the user clicks **Controleer op updates** in Instellingen → `check()` → `downloadAndInstall()` → `relaunch()`.
+
+**Required CI secrets** (Settings → Secrets and variables → Actions → Secrets):
+
+- `TAURI_SIGNING_PRIVATE_KEY` — the full contents of the minisign private key file generated with `npx @tauri-apps/cli signer generate`.
+- `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` — the password chosen when generating the key (empty string if the key was generated without one).
+
+The private key is **never committed** (`desktop/src-tauri/.tauri/` is gitignored). If it is lost, generate a new keypair, replace `plugins.updater.pubkey`, and ship a new release — older installs signed with the old key can no longer auto-update and must be reinstalled manually.
+
 ## Code signing (optional — builds are unsigned until configured)
 
 ### macOS notarisation

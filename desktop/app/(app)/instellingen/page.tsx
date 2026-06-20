@@ -1,4 +1,5 @@
 import tenant from '@/config/tenant';
+import UpdateCheck from './UpdateCheck';
 
 export default function InstellingenPage() {
   return (
@@ -89,6 +90,8 @@ export default function InstellingenPage() {
             <ConfigRow label="App" value="0.1.0" />
             <ConfigRow label="Stack" value="Next.js 16 · React 19 · Tailwind 4" />
           </div>
+
+          <UpdateCheck />
         </section>
 
         <section className="settings-section">
