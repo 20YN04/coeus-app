@@ -3,6 +3,7 @@ import UpdateCheck from './UpdateCheck';
 import DataBeheer from './DataBeheer';
 import BackupBeheer from './BackupBeheer';
 import Opschonen from './Opschonen';
+import AiSleutel from './AiSleutel';
 
 export default function InstellingenPage() {
   return (
@@ -96,6 +97,8 @@ export default function InstellingenPage() {
 
           <UpdateCheck />
         </section>
+
+        <AiSleutel />
 
         <DataBeheer />
 

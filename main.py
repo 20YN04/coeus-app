@@ -7,10 +7,11 @@ from brain.memory import Memory
 from brain.learner import Learner
 from brain.seed import seed_if_empty
 from brain.ingest import chunk_text, derive_title, html_to_text, crawl_site
+from brain.config import settings
 from brain.models import (
     KennisItem, CreateKennisRequest, UpdateKennisRequest,
     LearnRequest, AskRequest, IngestTextRequest, IngestUrlRequest,
-    IngestCrawlRequest, CleanupApplyRequest,
+    IngestCrawlRequest, CleanupApplyRequest, LlmKeyRequest, LlmStatus,
 )
 
 # Auto-opschonen: standaard embedding-afstand waaronder twee items als duplicaat
@@ -136,8 +137,65 @@ def ask(request: AskRequest):
 
     return {
         "antwoord": answer,
-        "bronnen": [{"title": c.title, "category": c.category} for c in context]
+        # id meegeven zodat de frontend per bron naar /kennisbank/detail kan linken.
+        "bronnen": [
+            {"id": c.id, "title": c.title, "category": c.category} for c in context
+        ],
     }
+
+
+@app.get("/config/llm-status", response_model=LlmStatus)
+def llm_status():
+    # Of er een LLM-key beschikbaar is (env óf lokaal bestand) en welke provider.
+    # Geeft NOOIT de key zelf terug — alleen booleans + provider/model.
+    configured = bool(settings.llm_api_key)
+    return LlmStatus(
+        configured=configured,
+        provider=settings.llm_provider,
+        model=settings.llm_model if configured else None,
+    )
+
+
+@app.post("/config/llm-key")
+def set_llm_key(request: LlmKeyRequest):
+    # Schrijf de LLM-key naar een lokaal bestand in de data-map. Loopback-only brein,
+    # dus dit accepteren we lokaal. De key komt zo NOOIT in de JS-bundle terecht en
+    # de Learner herleest hem per call → de volgende /ask|/learn werkt direct.
+    key = request.key.strip()
+    if not key:
+        raise HTTPException(422, "Lege sleutel")
+
+    path = settings.llm_key_path
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(key)
+        # Best-effort restrictieve rechten op unix (eigenaar lezen/schrijven).
+        # Faalt stil op platforms zonder chmod-semantiek (bv. Windows).
+        try:
+            os.chmod(path, 0o600)
+        except OSError:
+            pass
+    except OSError:
+        raise HTTPException(500, "Kon de sleutel niet opslaan")
+
+    return {"ok": True, "configured": True}
+
+
+@app.delete("/config/llm-key")
+def delete_llm_key():
+    # Verwijder het lokale key-bestand. Idempotent: bestaat het al niet, dan is de
+    # uitkomst nog steeds "niet geconfigureerd". Env-keys raken we niet aan — die
+    # leven niet in dit bestand. configured weerspiegelt de actuele situatie.
+    path = settings.llm_key_path
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+    except OSError:
+        raise HTTPException(500, "Kon de sleutel niet verwijderen")
+
+    return {"configured": bool(settings.llm_api_key)}
 
 def _ingest_chunks(text: str, category: str | None, source_detail: str) -> int:
     # Gedeelde kern van /ingest/text en /ingest/url: tekst hakken, titel afleiden,

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ingestText,
+  learnText,
   ingestUrl,
   ingestCrawl,
   ingestFile,
@@ -24,6 +25,9 @@ export default function ImporterenPage() {
   const [maxPages, setMaxPages] = useState(15);
   const [file, setFile] = useState<File | null>(null);
   const [category, setCategory] = useState('');
+  // AI-extractie: laat de LLM gestructureerde kennis uit de tekst halen i.p.v.
+  // het key-free hakken. Vereist een ingestelde AI-sleutel (zie Instellingen → AI).
+  const [useAi, setUseAi] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -75,8 +79,13 @@ export default function ImporterenPage() {
     setLoading(true);
     try {
       if (mode === 'tekst') {
-        const res = await ingestText(text.trim(), { category: cat });
-        setResult(`${res.toegevoegd} ${res.toegevoegd === 1 ? 'item toegevoegd' : 'items toegevoegd'}`);
+        if (useAi) {
+          const res = await learnText(text.trim(), cat);
+          setResult(`${res.geleerd} ${res.geleerd === 1 ? 'item geleerd' : 'items geleerd'}`);
+        } else {
+          const res = await ingestText(text.trim(), { category: cat });
+          setResult(`${res.toegevoegd} ${res.toegevoegd === 1 ? 'item toegevoegd' : 'items toegevoegd'}`);
+        }
         setText('');
       } else if (mode === 'website') {
         if (webMode === 'crawl') {
@@ -95,7 +104,16 @@ export default function ImporterenPage() {
         setFile(null);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Er ging iets mis bij het importeren.');
+      const message =
+        err instanceof Error ? err.message : 'Er ging iets mis bij het importeren.';
+      // 502/503 bij AI-extractie = geen LLM-sleutel ingesteld.
+      if (mode === 'tekst' && useAi && /\b50[23]\b/.test(message)) {
+        setError(
+          'AI-extractie vereist een AI-sleutel — stel die in bij Instellingen → AI, of zet AI-extractie uit voor key-vrij importeren.',
+        );
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -104,7 +122,9 @@ export default function ImporterenPage() {
   const submitLabel = loading
     ? 'Importeren…'
     : mode === 'tekst'
-      ? 'Tekst importeren'
+      ? useAi
+        ? 'Tekst leren (AI)'
+        : 'Tekst importeren'
       : mode === 'website'
         ? webMode === 'crawl'
           ? 'Site crawlen'
@@ -178,6 +198,16 @@ export default function ImporterenPage() {
               onChange={(e) => setText(e.target.value)}
               rows={14}
             />
+            <label className="import-ai-toggle">
+              <input
+                type="checkbox"
+                checked={useAi}
+                onChange={(e) => setUseAi(e.target.checked)}
+              />
+              <span>
+                AI-extractie (slimmer) <span className="import-optional">— vereist een AI-sleutel</span>
+              </span>
+            </label>
           </div>
         )}
 

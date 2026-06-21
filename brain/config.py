@@ -1,5 +1,12 @@
 import os
+from typing import Optional
 from pydantic_settings import BaseSettings
+
+# Naam van het lokale key-bestand in de data-map. Plain text, één regel: de LLM-key.
+# Wordt door POST /config/llm-key geschreven en hier (per call) heringelezen, zodat
+# een net ingestelde key direct werkt zonder rebuild/herstart van de sidecar.
+LLM_KEY_FILENAME = ".llm-key"
+
 
 class Settings(BaseSettings):
     openai_api_key: str = ""
@@ -7,9 +14,13 @@ class Settings(BaseSettings):
     coeus_tenant: str = "default"
     chroma_db_path: str = "./data/chroma"
 
-    # LLM-provider: DeepSeek is OpenAI-compatibel, dus alleen base_url + model verschillen
+    # LLM-provider: DeepSeek is OpenAI-compatibel, dus alleen base_url + model verschillen.
+    # Per-endpoint model: /ask is grounded RAG (context meegegeven) → het snelle/goedkope
+    # flash volstaat ruim; /learn structureert kennis (extractie) → daar telt kwaliteit,
+    # dus het krachtigere pro. Beide via env (LLM_MODEL / LLM_MODEL_LEARN) overschrijfbaar.
     llm_base_url: str = "https://api.deepseek.com"
-    llm_model: str = "deepseek-chat"
+    llm_model: str = "deepseek-v4-flash"        # /ask
+    llm_model_learn: str = "deepseek-v4-pro"    # /learn
 
     # extra="ignore": een onbekende env-var op de machine van een klant mag de
     # gedistribueerde app nooit laten crashen (was de oorzaak van een opstartcrash).
@@ -26,8 +37,44 @@ class Settings(BaseSettings):
             self.chroma_db_path = os.path.join(data_dir, "chroma")
 
     @property
+    def data_dir(self) -> str:
+        # De schrijfbare data-map: COEUS_DATA_DIR indien gezet, anders de ouder van
+        # chroma_db_path (dev-default ./data). Hier leeft o.a. het lokale key-bestand.
+        env_dir = os.environ.get("COEUS_DATA_DIR", "").strip()
+        if env_dir:
+            return env_dir
+        return os.path.dirname(os.path.abspath(self.chroma_db_path))
+
+    @property
+    def llm_key_path(self) -> str:
+        # Absoluut pad naar het lokale key-bestand in de data-map.
+        return os.path.join(self.data_dir, LLM_KEY_FILENAME)
+
+    def _file_key(self) -> str:
+        # Lees de key uit het lokale bestand (indien aanwezig). Faalt nooit hard:
+        # een onleesbaar bestand levert gewoon een lege key op (→ offline modus).
+        path = self.llm_key_path
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read().strip()
+        except OSError:
+            return ""
+
+    @property
     def llm_api_key(self) -> str:
-        # DeepSeek-key heeft voorrang; val terug op OpenAI als die gezet is
-        return self.deepseek_api_key or self.openai_api_key
+        # Volgorde: env DEEPSEEK_API_KEY → env OPENAI_API_KEY → lokaal key-bestand.
+        # Env wint zodat een dev/CI-omgeving expliciet stuurt; het bestand is het
+        # runtime-kanaal voor de gedistribueerde klant-app (gezet via /config/llm-key).
+        # Per call ingelezen: een net geschreven bestand werkt direct, geen herstart.
+        return self.deepseek_api_key or self.openai_api_key or self._file_key()
+
+    @property
+    def llm_provider(self) -> Optional[str]:
+        # Welke provider wordt er gebruikt, puur informatief voor /config/llm-status.
+        # Leid af uit de base_url; geen key → None. Nooit de key zelf teruggeven.
+        if not self.llm_api_key:
+            return None
+        return "openai" if "openai.com" in self.llm_base_url else "deepseek"
+
 
 settings = Settings()

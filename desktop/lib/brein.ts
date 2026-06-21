@@ -199,6 +199,70 @@ export async function ingestFile(
   return res.json() as Promise<FileResult>;
 }
 
+// AI-laag — /ask en /learn hebben een LLM-key nodig (env óf het lokale
+// key-bestand in de data-map, gezet via setLlmKey). Zonder key geeft het brein
+// een nette 502/503 terug, die de UI als "AI nog niet geconfigureerd" toont.
+
+export type AskBron = { id?: string; title: string; category: string };
+export type AskResult = { antwoord: string; bronnen: AskBron[] };
+
+// Stel een vraag aan de kennisbank: het brein zoekt relevante items en laat de
+// LLM daarop een antwoord baseren. Geeft het antwoord + de gebruikte bronnen terug.
+export async function ask(question: string): Promise<AskResult> {
+  return req<AskResult>('/ask', {
+    method: 'POST',
+    body: JSON.stringify({ question }),
+  });
+}
+
+export type LearnResult = {
+  geleerd: number;
+  overgeslagen: number;
+  items: KennisItem[];
+};
+
+// AI-extractie: laat de LLM gestructureerde kennis uit vrije tekst halen en die
+// als kennis-items opslaan (in tegenstelling tot ingestText, dat key-free hakt).
+export async function learnText(
+  text: string,
+  category?: string,
+): Promise<LearnResult> {
+  return req<LearnResult>('/learn', {
+    method: 'POST',
+    body: JSON.stringify({ text, category: category || undefined }),
+  });
+}
+
+export type LlmStatus = {
+  configured: boolean;
+  provider?: 'deepseek' | 'openai' | null;
+  model?: string | null;
+};
+
+// Of er een LLM-key beschikbaar is, en welke provider. Geeft NOOIT de key zelf terug.
+export async function getLlmStatus(): Promise<LlmStatus> {
+  return req<LlmStatus>('/config/llm-status');
+}
+
+// Sla de LLM-key lokaal op (in de data-map, niet in de JS-bundle). Het brein
+// herleest de key per call, dus de volgende /ask werkt direct — geen herstart.
+export async function setLlmKey(
+  key: string,
+): Promise<{ ok: boolean; configured: boolean }> {
+  return req<{ ok: boolean; configured: boolean }>('/config/llm-key', {
+    method: 'POST',
+    body: JSON.stringify({ key }),
+  });
+}
+
+// Verwijder het lokale key-bestand. configured weerspiegelt de actuele situatie
+// (een env-key blijft staan; die leeft niet in dit bestand).
+export async function deleteLlmKey(): Promise<{ configured: boolean }> {
+  return req<{ configured: boolean }>('/config/llm-key', {
+    method: 'DELETE',
+  });
+}
+
 // Semantic knowledge graph (nodes per item, edges from embedding similarity).
 // Key-free: the brein builds it from the local ChromaDB embeddings.
 export async function getGraph(neighbors?: number): Promise<KennisGraph> {
