@@ -53,6 +53,19 @@ class CleanupApplyRequest(BaseModel):
     # gebruikt zijn eigen sensible default als die niet meegegeven wordt.
     threshold: Optional[float] = Field(default=None, ge=0.0, le=2.0)
 
+class LlmKeyRequest(BaseModel):
+    # POST /config/llm-key — de klant (of Ynarchive bij oplevering) zet de LLM-key.
+    # Wordt naar een lokaal bestand in de data-map geschreven, nooit in de JS-bundle.
+    key: str = Field(..., min_length=1, max_length=500)
+
+
+class LlmStatus(BaseModel):
+    # GET /config/llm-status — geeft NOOIT de key zelf terug, alleen of er één is.
+    configured: bool
+    provider: Optional[str] = None
+    model: Optional[str] = None
+
+
 class IngestCrawlRequest(BaseModel):
     # Onboarding-motor: meerdere pagina's op dezelfde host crawlen vanaf url (BFS),
     # leesbare tekst per pagina in stukken hakken (key-free, geen LLM). max_pages

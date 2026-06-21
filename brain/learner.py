@@ -8,22 +8,33 @@ import re
 class Learner:
     def __init__(self):
         # De lokale app draait volledig offline (zoeken/graph/CRUD via ChromaDB,
-        # géén key). Alleen /learn en /ask hebben een LLM nodig. Bouw de OpenAI-
-        # client enkel als er een key is — zo crasht de gebundelde sidecar niet bij
-        # het opstarten zonder key, én is er geen race tussen gelijktijdige
-        # /learn|/ask-calls (FastAPI draait sync routes in een threadpool): de
-        # client bestaat al vóór de eerste request, niet lui per-call.
+        # géén key). Alleen /learn en /ask hebben een LLM nodig.
+        #
+        # De key kan op twee manieren binnenkomen: via env (.env, dev/CI) óf via een
+        # lokaal key-bestand dat Ynarchive bij oplevering schrijft, en dat de klant
+        # zelf kan (her)zetten via POST /config/llm-key. Dat bestand kan dus ná het
+        # opstarten van de sidecar veranderen. Daarom bouwen we de client niet één
+        # keer in __init__, maar her-evalueren we de key per call en cachen we de
+        # client op (key, base_url): zo werkt een net ingestelde key direct, zonder
+        # herstart, en bouwen we niet bij elke request een nieuwe HTTP-client.
         self._client = None
-        if settings.llm_api_key:
-            self._client = OpenAI(
-                api_key=settings.llm_api_key,
-                base_url=settings.llm_base_url,
-            )
+        self._client_signature: tuple[str, str] | None = None
 
     def _get_client(self):
-        # Geen key → RuntimeError, die /learn en /ask omzetten naar 502/503.
-        if self._client is None:
+        # Lees de actuele key (env → lokaal bestand). Geen key → RuntimeError, die
+        # /learn en /ask omzetten naar 502/503.
+        api_key = settings.llm_api_key
+        if not api_key:
+            # Reset een eventueel eerder gebouwde client zodat een verwijderde key
+            # (DELETE /config/llm-key) niet stiekem actief blijft.
+            self._client = None
+            self._client_signature = None
             raise RuntimeError("Geen LLM-key geconfigureerd (offline modus)")
+
+        signature = (api_key, settings.llm_base_url)
+        if self._client is None or self._client_signature != signature:
+            self._client = OpenAI(api_key=api_key, base_url=settings.llm_base_url)
+            self._client_signature = signature
         return self._client
 
     def extract_knowledge(self, text: str,
