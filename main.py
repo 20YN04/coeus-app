@@ -10,8 +10,14 @@ from brain.ingest import chunk_text, derive_title, html_to_text, crawl_site
 from brain.models import (
     KennisItem, CreateKennisRequest, UpdateKennisRequest,
     LearnRequest, AskRequest, IngestTextRequest, IngestUrlRequest,
-    IngestCrawlRequest,
+    IngestCrawlRequest, CleanupApplyRequest,
 )
+
+# Auto-opschonen: standaard embedding-afstand waaronder twee items als duplicaat
+# gelden. Empirisch getuned op de default embedding (all-MiniLM, cosine-afstand):
+# near-identieke tekst zit < ~0.03, items in dezelfde categorie maar inhoudelijk
+# verschillend ruim > 0.1. 0.05 vangt echte duplicaten zonder die false positives.
+CLEANUP_DEFAULT_THRESHOLD = 0.05
 
 
 @asynccontextmanager
@@ -294,3 +300,36 @@ def categories():
 def graph(neighbors: int = Query(default=4, ge=1, le=20)):
     # Semantische kennis-graph: nodes + edges op basis van embedding-gelijkenis
     return memory.build_graph(neighbors)
+
+
+@app.get("/cleanup/preview")
+def cleanup_preview(
+    threshold: float = Query(default=CLEANUP_DEFAULT_THRESHOLD, ge=0.0, le=2.0),
+):
+    # Auto-opschonen (read-only): vind near-duplicate kennis-items via de bestaande
+    # embeddings (key-free, geen LLM) zodat de UI "X duplicaten in Y groepen" kan
+    # tonen vóór het verwijderen. Crasht nooit op een lege kennisbank (→ 0/0).
+    clusters = memory.find_duplicates(threshold)
+    duplicaten = sum(len(c["remove"]) for c in clusters)
+    return {
+        "groepen": len(clusters),
+        "duplicaten": duplicaten,
+        # Per groep de keeper-titel + een paar voorbeeld-titels van wat zou
+        # verdwijnen, zodat de UI context kan tonen zonder alle content te laden.
+        "clusters": [
+            {
+                "keep": c["keep"]["title"],
+                "remove": [r["title"] for r in c["remove"]],
+            }
+            for c in clusters
+        ],
+    }
+
+
+@app.post("/cleanup/apply")
+def cleanup_apply(request: CleanupApplyRequest):
+    # Auto-opschonen (muterend): vind near-duplicates en verwijder per groep alles
+    # behalve de keeper. Geeft het aantal verwijderde items terug.
+    threshold = request.threshold if request.threshold is not None else CLEANUP_DEFAULT_THRESHOLD
+    removed = memory.dedupe(threshold)
+    return {"verwijderd": removed}

@@ -175,6 +175,98 @@ class Memory:
         ]
         return {"nodes": nodes, "edges": edges}
 
+    def find_duplicates(self, threshold: float = 0.05) -> list[dict]:
+        # Vind near-duplicate kennis-items via de bestaande embeddings (key-free,
+        # geen LLM). Voor elk item zoeken we de dichtstbijzijnde buren — net als
+        # build_graph — en behandelen we een paar als duplicaat zodra de embedding-
+        # AFSTAND < threshold (zeer gelijkend). Transitief gegroepeerd met union-find,
+        # zodat A~B en B~C één cluster {A,B,C} vormen.
+        #
+        # Read-only: deze methode verwijdert niets. Per cluster van ≥2 kiezen we
+        # ÉÉN keeper (langste content, gelijkspel → oudste created_at) en geven de
+        # rest terug als verwijderbaar.
+        result = self.collection.get(include=["metadatas", "documents", "embeddings"])
+        ids = result["ids"]
+        if not ids:
+            return []
+
+        index = {item_id: i for i, item_id in enumerate(ids)}
+
+        # Union-find over de item-ids.
+        parent = {item_id: item_id for item_id in ids}
+
+        def find(x: str) -> str:
+            root = x
+            while parent[root] != root:
+                root = parent[root]
+            # Padcompressie
+            while parent[x] != root:
+                parent[x], x = root, parent[x]
+            return root
+
+        def union(a: str, b: str):
+            ra, rb = find(a), find(b)
+            if ra != rb:
+                parent[ra] = rb
+
+        embeddings = result["embeddings"]
+        # +1 want het item zelf zit altijd in zijn eigen buren-uitslag.
+        n_query = min(2, len(ids)) + 1
+        for i, item_id in enumerate(ids):
+            res = self.collection.query(
+                query_embeddings=[list(embeddings[i])],
+                n_results=min(n_query, len(ids)),
+            )
+            for nbr_id, dist in zip(res["ids"][0], res["distances"][0]):
+                if nbr_id == item_id:
+                    continue
+                if float(dist) < threshold:
+                    union(item_id, nbr_id)
+
+        # Groepeer items per union-find-root.
+        groups: dict[str, list[str]] = {}
+        for item_id in ids:
+            groups.setdefault(find(item_id), []).append(item_id)
+
+        clusters = []
+        for member_ids in groups.values():
+            if len(member_ids) < 2:
+                continue
+            metas = [result["metadatas"][index[m]] for m in member_ids]
+            docs = [result["documents"][index[m]] for m in member_ids]
+
+            # Keeper: langste content, gelijkspel → oudste created_at.
+            def sort_key(m: str):
+                meta = result["metadatas"][index[m]]
+                doc = result["documents"][index[m]] or ""
+                return (-len(doc), meta.get("created_at", ""))
+
+            ordered = sorted(member_ids, key=sort_key)
+            keeper = ordered[0]
+            removable = ordered[1:]
+
+            def brief(m: str) -> dict:
+                meta = result["metadatas"][index[m]]
+                return {"id": m, "title": meta["title"]}
+
+            clusters.append({
+                "keep": brief(keeper),
+                "remove": [brief(m) for m in removable],
+            })
+
+        return clusters
+
+    def dedupe(self, threshold: float = 0.05) -> int:
+        # Vind near-duplicates en verwijder elke "removable" uit elke cluster.
+        # De keeper per cluster blijft staan. Geeft het aantal verwijderde items terug.
+        clusters = self.find_duplicates(threshold)
+        removed = 0
+        for cluster in clusters:
+            for item in cluster["remove"]:
+                self.delete(item["id"])
+                removed += 1
+        return removed
+
     def get_categories(self) -> list[dict]:
         # Geef alle categorieën terug met het aantal items per categorie
         result = self.collection.get()
