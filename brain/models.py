@@ -46,6 +46,13 @@ class IngestUrlRequest(BaseModel):
     url: str = Field(..., min_length=1, max_length=2000)
     category: Optional[str] = None
 
+class CleanupApplyRequest(BaseModel):
+    # Auto-opschonen: verwijder near-duplicate kennis-items via de bestaande
+    # embeddings (key-free, geen LLM). threshold is de embedding-afstand waaronder
+    # twee items als duplicaat gelden — lager = strenger. Optioneel: het brein
+    # gebruikt zijn eigen sensible default als die niet meegegeven wordt.
+    threshold: Optional[float] = Field(default=None, ge=0.0, le=2.0)
+
 class IngestCrawlRequest(BaseModel):
     # Onboarding-motor: meerdere pagina's op dezelfde host crawlen vanaf url (BFS),
     # leesbare tekst per pagina in stukken hakken (key-free, geen LLM). max_pages
