@@ -55,7 +55,7 @@ class Learner:
 
         try:
             response = self._get_client().chat.completions.create(
-                model=settings.llm_model,
+                model=settings.llm_model_learn,  # /learn → pro (kwaliteit van extractie)
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
                 max_tokens=2000

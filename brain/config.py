@@ -14,9 +14,13 @@ class Settings(BaseSettings):
     coeus_tenant: str = "default"
     chroma_db_path: str = "./data/chroma"
 
-    # LLM-provider: DeepSeek is OpenAI-compatibel, dus alleen base_url + model verschillen
+    # LLM-provider: DeepSeek is OpenAI-compatibel, dus alleen base_url + model verschillen.
+    # Per-endpoint model: /ask is grounded RAG (context meegegeven) → het snelle/goedkope
+    # flash volstaat ruim; /learn structureert kennis (extractie) → daar telt kwaliteit,
+    # dus het krachtigere pro. Beide via env (LLM_MODEL / LLM_MODEL_LEARN) overschrijfbaar.
     llm_base_url: str = "https://api.deepseek.com"
-    llm_model: str = "deepseek-chat"
+    llm_model: str = "deepseek-v4-flash"        # /ask
+    llm_model_learn: str = "deepseek-v4-pro"    # /learn
 
     # extra="ignore": een onbekende env-var op de machine van een klant mag de
     # gedistribueerde app nooit laten crashen (was de oorzaak van een opstartcrash).
