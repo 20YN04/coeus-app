@@ -1688,6 +1688,64 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   Automatische back-up — lokale snapshots van de kennisbank
+   ───────────────────────────────────────────────────────────── */
+.backup-beheer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.backup-beheer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.backup-beheer__empty {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: var(--c-ink-muted);
+  margin: 0;
+}
+
+.backup-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--c-border);
+}
+
+.backup-list__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--c-border);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+}
+
+.backup-list__row:last-child {
+  border-bottom: none;
+}
+
+.backup-list__name {
+  color: var(--c-ink);
+  overflow-wrap: anywhere;
+}
+
+.backup-list__meta {
+  color: var(--c-ink-muted);
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────────────────────────
    Graph view (force-directed 2D/3D, force-graph lib)
    ───────────────────────────────────────────────────────────── */
 .graph-wrap {
