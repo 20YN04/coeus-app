@@ -2209,3 +2209,40 @@ body {
 
   .ovz-row { break-inside: avoid; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Auto-update banner (checked on app start; non-intrusive)
+   ───────────────────────────────────────────────────────────── */
+.auto-update {
+  position: fixed;
+  bottom: var(--s-6);
+  right: var(--s-6);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  background: var(--c-paper);
+  color: var(--c-paper-ink);
+  border: 1px solid var(--c-border-paper);
+  border-radius: 0.4rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  max-width: 26rem;
+}
+.auto-update__text { line-height: 1.4; }
+.auto-update__text--error { color: var(--c-paper-muted); }
+.auto-update__dismiss {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-paper-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color var(--d-fast) var(--ease-out);
+}
+.auto-update__dismiss:hover { color: var(--c-paper-ink); }
