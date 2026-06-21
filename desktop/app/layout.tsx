@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import tenant from '@/config/tenant';
+import AutoUpdate from './AutoUpdate';
 
 export const metadata: Metadata = {
   title: `Kennisbank — ${tenant.name}`,
@@ -40,6 +41,7 @@ export default function RootLayout({
       <body>
         {accent && <style dangerouslySetInnerHTML={{ __html: accent }} />}
         {children}
+        <AutoUpdate />
       </body>
     </html>
   );
