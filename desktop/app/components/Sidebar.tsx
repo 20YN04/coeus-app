@@ -17,6 +17,17 @@ const NAV = [
     ),
   },
   {
+    href: '/vraag',
+    label: 'Vraag',
+    icon: (
+      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
+        <path d="M2 3.5h12v7H7l-3 3v-3H2z" strokeLinejoin="round" />
+        <path d="M6 6.25a2 2 0 1 1 2.4 1.96c-.4.1-.65.45-.65.86V9.4" strokeLinecap="round" />
+        <path d="M7.75 11h.01" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
     href: '/kennisbank',
     label: 'Kennisbank',
     icon: (
