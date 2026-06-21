@@ -205,3 +205,31 @@ export async function getGraph(neighbors?: number): Promise<KennisGraph> {
   const qs = neighbors != null ? `?neighbors=${neighbors}` : '';
   return req<KennisGraph>(`/graph${qs}`);
 }
+
+// Auto-opschonen: clusters van near-duplicate kennis-items, gevonden via de
+// bestaande embeddings (key-free, geen LLM). Per cluster blijft één keeper staan
+// en zijn de overige titels verwijderbaar.
+export type CleanupCluster = { keep: string; remove: string[] };
+export type CleanupPreview = {
+  groepen: number;
+  duplicaten: number;
+  clusters: CleanupCluster[];
+};
+export type CleanupApplyResult = { verwijderd: number };
+
+// Read-only voorbeeld: hoeveel duplicaten in hoeveel groepen, vóór verwijderen.
+export async function cleanupPreview(threshold?: number): Promise<CleanupPreview> {
+  const qs = threshold != null ? `?threshold=${threshold}` : '';
+  return req<CleanupPreview>(`/cleanup/preview${qs}`);
+}
+
+// Muterend: verwijder per groep alles behalve de keeper. Geeft het aantal
+// verwijderde items terug.
+export async function cleanupApply(
+  threshold?: number,
+): Promise<CleanupApplyResult> {
+  return req<CleanupApplyResult>('/cleanup/apply', {
+    method: 'POST',
+    body: JSON.stringify(threshold != null ? { threshold } : {}),
+  });
+}

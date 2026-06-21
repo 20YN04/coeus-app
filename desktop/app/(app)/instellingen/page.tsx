@@ -1,6 +1,7 @@
 import tenant from '@/config/tenant';
 import UpdateCheck from './UpdateCheck';
 import DataBeheer from './DataBeheer';
+import Opschonen from './Opschonen';
 
 export default function InstellingenPage() {
   return (
@@ -96,6 +97,8 @@ export default function InstellingenPage() {
         </section>
 
         <DataBeheer />
+
+        <Opschonen />
 
         <section className="settings-section">
           <div className="settings-section__header">
