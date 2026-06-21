@@ -19,8 +19,8 @@
     "@tauri-apps/plugin-updater": "^2",
     "force-graph": "^1.51.4",
     "next": "16.2.9",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "three": "^0.184.0"
   },
   "devDependencies": {
@@ -34,6 +34,6 @@
     "eslint-config-next": "16.2.9",
     "playwright": "^1.61.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^6"
   }
 }
