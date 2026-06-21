@@ -1,6 +1,7 @@
 import tenant from '@/config/tenant';
 import UpdateCheck from './UpdateCheck';
 import DataBeheer from './DataBeheer';
+import BackupBeheer from './BackupBeheer';
 import Opschonen from './Opschonen';
 
 export default function InstellingenPage() {
@@ -97,6 +98,8 @@ export default function InstellingenPage() {
         </section>
 
         <DataBeheer />
+
+        <BackupBeheer />
 
         <Opschonen />
 
