@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     coeus_tenant: str = "default"
     chroma_db_path: str = "./data/chroma"
 
+    # Embedding-model voor de semantische zoek/RAG. Meertalig (sterk op NL) i.p.v.
+    # chroma's Engels-centrische all-MiniLM-default. Draait via fastembed op onnxruntime
+    # (géén torch → lichte offline-bundle, ~220MB). Overschrijfbaar via env EMBED_MODEL.
+    embed_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
     # LLM-provider: DeepSeek is OpenAI-compatibel, dus alleen base_url + model verschillen.
     # Per-endpoint model: /ask is grounded RAG (context meegegeven) → het snelle/goedkope
     # flash volstaat ruim; /learn structureert kennis (extractie) → daar telt kwaliteit,

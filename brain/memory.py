@@ -6,6 +6,43 @@ from typing import Optional
 from .config import settings
 from .models import KennisItem
 
+# Meertalig embedding-model i.p.v. chroma's default all-MiniLM (Engels-centrisch, zwak
+# op NL → "waar gevestigd" matchte "Adres" niet). We draaien het via fastembed
+# (onnxruntime, GEEN torch → lichte offline-bundle) en geven de vectoren expliciet aan
+# chroma mee — zo blijven we los van chroma's embedding-function-persistentie.
+_embedder = None
+
+
+def _fastembed_cache_dir() -> Optional[str]:
+    # In de gebundelde app zit het embedding-model offline mee in de PyInstaller-
+    # resources (zie build_sidecar.py); wijs fastembed daarheen en zet HF offline zodat
+    # het nooit het netwerk probeert. In dev (None): fastembed gebruikt zijn eigen cache
+    # en downloadt het model één keer.
+    import sys
+    base = getattr(sys, "_MEIPASS", None)
+    if base:
+        cache = os.path.join(base, "fastembed_models")
+        if os.path.isdir(cache):
+            os.environ.setdefault("HF_HUB_OFFLINE", "1")
+            return cache
+    return None
+
+
+def _get_embedder():
+    global _embedder
+    if _embedder is None:
+        from fastembed import TextEmbedding
+        _embedder = TextEmbedding(
+            model_name=settings.embed_model, cache_dir=_fastembed_cache_dir()
+        )
+    return _embedder
+
+
+def _embed(texts: list[str]) -> list[list[float]]:
+    # fastembed levert numpy-vectoren; chroma wil gewone lijsten.
+    return [v.tolist() for v in _get_embedder().embed(list(texts))]
+
+
 class Memory:
     def __init__(self):
         # Persistente ChromaDB-client; data wordt op schijf bewaard.
@@ -14,8 +51,31 @@ class Memory:
         os.makedirs(settings.chroma_db_path, exist_ok=True)
         self.client = chromadb.PersistentClient(path=settings.chroma_db_path)
         self.collection = self.client.get_or_create_collection(
-            name=f"coeus_{settings.coeus_tenant}"
+            name=f"coeus_{settings.coeus_tenant}",
+            metadata={"embed_model": settings.embed_model},
         )
+        self._migrate_if_model_changed()
+
+    def _migrate_if_model_changed(self) -> None:
+        # De app auto-update; wisselt het embedding-model (of komt een install van vóór
+        # deze versie), dan zijn de opgeslagen vectoren incompatibel → herbereken ze
+        # eenmalig uit de bewaarde documenten. Eén keer bij opstart, daarna nooit meer.
+        stored = (self.collection.metadata or {}).get("embed_model")
+        if stored == settings.embed_model:
+            return
+        data = self.collection.get(include=["documents", "metadatas"])
+        ids = data.get("ids") or []
+        name = self.collection.name
+        self.client.delete_collection(name)
+        self.collection = self.client.create_collection(
+            name=name, metadata={"embed_model": settings.embed_model}
+        )
+        if ids:
+            docs = data["documents"]
+            self.collection.add(
+                ids=ids, documents=docs, metadatas=data["metadatas"],
+                embeddings=_embed(docs),
+            )
 
     def add(self, title: str, category: str, content: str,
             source: str = "manual", source_detail: Optional[str] = None) -> KennisItem:
@@ -26,6 +86,7 @@ class Memory:
         self.collection.add(
             ids=[item_id],
             documents=[content],
+            embeddings=_embed([content]),
             metadatas=[{
                 "title": title,
                 "category": category,
@@ -46,7 +107,7 @@ class Memory:
         # Zoek semantisch in de kennisbank, optioneel gefilterd op categorie
         where_filter = {"category": category} if category else None
         results = self.collection.query(
-            query_texts=[query], n_results=limit, where=where_filter
+            query_embeddings=_embed([query]), n_results=limit, where=where_filter
         )
 
         items = []

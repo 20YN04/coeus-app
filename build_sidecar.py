@@ -2,9 +2,10 @@
 """Cross-platform PyInstaller build for the Coeus brein sidecar (used by CI on
 macOS + Windows; locally you can still use build_sidecar.sh).
 
-Warms the all-MiniLM ONNX embedding model into ChromaDB's per-user cache, then
-bundles a onedir binary that ships the model + seed so semantic search / graph /
-CRUD and first-run seeding work fully offline. Output: dist/coeus-brein/.
+Warms the multilingual ONNX embedding model (via fastembed, geen torch) into a
+build-local cache, then bundles a onedir binary that ships the model + seed so
+semantic search / graph / CRUD en first-run seeding volledig offline werken.
+Output: dist/coeus-brein/.
 """
 import os
 import subprocess
@@ -12,26 +13,27 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-MODEL = Path.home() / ".cache" / "chroma" / "onnx_models" / "all-MiniLM-L6-v2"
+# Build-lokale cache waarin we het fastembed-model downloaden om het mee te bundelen.
+# In de gebundelde app komt dit terecht op <_MEIPASS>/fastembed_models (zie memory.py).
+FASTEMBED_CACHE = ROOT / "build" / "fastembed_models"
 
 
 def warm_model() -> None:
-    """ChromaDB downloads the embedding model once on first use — trigger that so
-    the path exists before we bundle it."""
-    if MODEL.exists():
-        return
-    print("Embedding model not cached — warming it up once via ChromaDB...")
-    import chromadb
+    """Download het meertalige embedding-model één keer naar de build-cache, zodat we
+    het in de bundel kunnen meenemen (de app draait dan offline)."""
+    sys.path.insert(0, str(ROOT))
+    from brain.config import settings
+    from fastembed import TextEmbedding
 
-    client = chromadb.Client()
-    col = client.get_or_create_collection("warmup")
-    col.add(ids=["x"], documents=["warmup"])
+    FASTEMBED_CACHE.mkdir(parents=True, exist_ok=True)
+    print(f"Warming embedding model {settings.embed_model} into {FASTEMBED_CACHE} ...")
+    TextEmbedding(model_name=settings.embed_model, cache_dir=str(FASTEMBED_CACHE))
 
 
 def main() -> None:
     warm_model()
-    if not MODEL.exists():
-        sys.exit(f"embedding model still missing at {MODEL} after warmup")
+    if not any(FASTEMBED_CACHE.glob("models--*")):
+        sys.exit(f"embedding model still missing in {FASTEMBED_CACHE} after warmup")
 
     # PyInstaller --add-data uses ';' on Windows, ':' elsewhere.
     sep = ";" if os.name == "nt" else ":"
@@ -41,7 +43,8 @@ def main() -> None:
         "--collect-all", "chromadb",
         "--collect-all", "onnxruntime",
         "--collect-all", "tokenizers",
-        f"--add-data={MODEL}{sep}onnx_models/all-MiniLM-L6-v2",
+        "--collect-all", "fastembed",
+        f"--add-data={FASTEMBED_CACHE}{sep}fastembed_models",
         f"--add-data={ROOT / 'seed'}{sep}seed",
         "--hidden-import", "uvicorn.logging",
         "--hidden-import", "uvicorn.loops.auto",
