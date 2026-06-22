@@ -53,7 +53,13 @@ class Learner:
     )
 
     def extract_knowledge(self, text: str,
-                          category_hint: str = None) -> list[dict]:
+                          category_hint: str = None,
+                          model: str = None,
+                          max_tokens: int = 4000) -> list[dict]:
+        # model=None → het ingestelde extractie-model (pro, voor /learn). Crawl geeft
+        # flash mee: veel sneller/goedkoper voor bulk (15 pagina's), met schone output.
+        # max_tokens ruim (4000): pro is een reasoning-model dat anders het budget aan
+        # redeneren opmaakt en een lege string teruggeeft → onparseerbare JSON.
         # Data los van de instructie, tussen delimiters; verwijder eventuele <bron>-tags
         # uit de tekst zelf zodat een aanvaller niet uit de delimiter kan breken.
         safe_text = text.replace("</bron>", "").replace("<bron>", "")
@@ -61,13 +67,13 @@ class Learner:
 
         try:
             response = self._get_client().chat.completions.create(
-                model=settings.llm_model_learn,  # /learn → pro (kwaliteit van extractie)
+                model=model or settings.llm_model_learn,
                 messages=[
                     {"role": "system", "content": self._EXTRACT_SYSTEM},
                     {"role": "user", "content": user},
                 ],
                 temperature=0.2,
-                max_tokens=2000,
+                max_tokens=max_tokens,
                 response_format={"type": "json_object"},
             )
         except openai.OpenAIError as e:
