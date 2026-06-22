@@ -128,8 +128,12 @@ def learn(request: LearnRequest):
 
 @app.post("/ask")
 def ask(request: AskRequest):
-    # Beantwoord een vraag op basis van de kennisbank
-    context = memory.search(request.question, limit=5)
+    # Beantwoord een vraag op basis van de kennisbank. Ruimere recall (12 i.p.v. 5):
+    # bij een grotere/ruisigere kennisbank (bv. na een crawl) en de zwakke meertalige
+    # embeddings zakte het relevante item anders onder de top-5 → "weet ik niks" terwijl
+    # het antwoord wél in de kennisbank stond. De gehardde system-prompt laat het model
+    # de irrelevante items negeren.
+    context = memory.search(request.question, limit=12)
     try:
         answer = learner.answer_question(request.question, context)
     except RuntimeError:
@@ -215,6 +219,48 @@ def _ingest_chunks(text: str, category: str | None, source_detail: str) -> int:
     return added
 
 
+# Max tekst per pagina die we aan de LLM voeren — token-/kostenplafond bij crawl.
+_AI_EXTRACT_MAX_CHARS = 12000
+
+
+def _ingest_page(text: str, category: str | None, source_detail: str) -> int:
+    # Slimme ingest van één opgehaalde webpagina. MÉT LLM-sleutel: laat de Learner (Pro)
+    # de pagina structureren tot een paar schone feiten i.p.v. de hele pagina (incl.
+    # nav/footer/"Lees meer") ruw te chunken — ruwe chunking maakte bij echte sites een
+    # vuilnisbak-kennisbank (validatie ericbanden.be: 15 pagina's → 544 ruis-items).
+    # ZONDER sleutel of bij een LLM-fout op deze pagina: val terug op key-free chunking
+    # zodat de crawl altijd werkt (offline-veilig); één rotte pagina stopt de crawl niet.
+    if settings.llm_api_key:
+        try:
+            # Crawl is bulk (veel pagina's) → flash (snel/goedkoop), niet pro (reasoning,
+            # ~5x trager per pagina). Flash extraheert schone feiten in ~15s/pagina.
+            items = learner.extract_knowledge(
+                text[:_AI_EXTRACT_MAX_CHARS], category, model=settings.llm_model
+            )
+            added = 0
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                title = (item.get("title") or "").strip()
+                content = (item.get("content") or "").strip()
+                if not title or not content:
+                    continue
+                memory.add(
+                    title=title,
+                    category=(item.get("category") or category or "import").strip() or "import",
+                    content=content,
+                    source="ai",
+                    source_detail=source_detail,
+                )
+                added += 1
+            if added:
+                return added
+            # AI gaf niets bruikbaars terug → val terug op chunking
+        except (RuntimeError, ValueError):
+            pass
+    return _ingest_chunks(text, category, source_detail)
+
+
 @app.post("/ingest/text")
 def ingest_text(request: IngestTextRequest):
     # Onboarding-motor: vrije tekst (of geplakte website-tekst) in stukken hakken
@@ -252,8 +298,8 @@ def ingest_url(request: IngestUrlRequest):
     if not text.strip():
         raise HTTPException(422, "Geen leesbare tekst gevonden op deze pagina")
 
-    added = _ingest_chunks(text, request.category, url)
-    return {"toegevoegd": added}
+    added = _ingest_page(text, request.category, url)
+    return {"toegevoegd": added, "ai_extractie": bool(settings.llm_api_key)}
 
 
 @app.post("/ingest/crawl")
@@ -287,10 +333,10 @@ def ingest_crawl(request: IngestCrawlRequest):
     added = 0
     pages = 0
     for page_url, text in crawl_site(url, request.max_pages):
-        added += _ingest_chunks(text, request.category, page_url)
+        added += _ingest_page(text, request.category, page_url)
         pages += 1
 
-    return {"toegevoegd": added, "paginas": pages}
+    return {"toegevoegd": added, "paginas": pages, "ai_extractie": bool(settings.llm_api_key)}
 
 
 # Toegestane upload-types en een ruime maximumgrootte (~10MB) zodat één bestand
