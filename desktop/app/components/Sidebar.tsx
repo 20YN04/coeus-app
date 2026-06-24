@@ -3,27 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const NAV = [
+const KLANT_NAV = [
   {
     href: '/dashboard',
-    label: 'Dashboard',
+    label: 'Home',
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
-        <rect x="1.5" y="1.5" width="5" height="5" />
-        <rect x="9.5" y="1.5" width="5" height="5" />
-        <rect x="1.5" y="9.5" width="5" height="5" />
-        <rect x="9.5" y="9.5" width="5" height="5" />
-      </svg>
-    ),
-  },
-  {
-    href: '/vraag',
-    label: 'Vraag',
-    icon: (
-      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
-        <path d="M2 3.5h12v7H7l-3 3v-3H2z" strokeLinejoin="round" />
-        <path d="M6 6.25a2 2 0 1 1 2.4 1.96c-.4.1-.65.45-.65.86V9.4" strokeLinecap="round" />
-        <path d="M7.75 11h.01" strokeLinecap="round" />
+        <path d="M2 7.5 8 2l6 5.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M3.5 6.5V13a.5.5 0 0 0 .5.5h3v-4h2v4h3a.5.5 0 0 0 .5-.5V6.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -46,6 +33,28 @@ const NAV = [
       </svg>
     ),
   },
+];
+
+const BEHEER_NAV = [
+  {
+    href: '/importeren',
+    label: 'Importeren',
+    icon: (
+      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
+        <path d="M8 1.5v7M5 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M2 10.5v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    href: '/nieuw',
+    label: 'Nieuw',
+    icon: (
+      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
+        <path d="M8 2v12M2 8h12" />
+      </svg>
+    ),
+  },
   {
     href: '/graph',
     label: 'Graph',
@@ -59,16 +68,6 @@ const NAV = [
     ),
   },
   {
-    href: '/importeren',
-    label: 'Importeren',
-    icon: (
-      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
-        <path d="M8 1.5v7M5 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M2 10.5v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-  {
     href: '/automatisaties',
     label: 'Automatisaties',
     icon: (
@@ -76,15 +75,6 @@ const NAV = [
         <circle cx="4" cy="8" r="2" />
         <circle cx="12" cy="8" r="2" />
         <path d="M6 8h4M2 4.5h2M2 11.5h2M12 4.5h2M12 11.5h2" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    href: '/nieuw',
-    label: 'Nieuw',
-    icon: (
-      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
-        <path d="M8 2v12M2 8h12" />
       </svg>
     ),
   },
@@ -111,17 +101,37 @@ export default function Sidebar({ tenantName }: { tenantName: string }) {
       </Link>
 
       <nav className="sidebar__nav">
-        {NAV.map(({ href, label, icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className="sidebar__link"
-            data-active={pathname.startsWith(href) ? 'true' : undefined}
-          >
-            {icon}
-            {label}
-          </Link>
-        ))}
+        <div className="sidebar__group">
+          {KLANT_NAV.map(({ href, label, icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="sidebar__link sidebar__link--primary"
+              data-active={pathname.startsWith(href) ? 'true' : undefined}
+            >
+              {icon}
+              {label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="sidebar__divider">
+          <span className="sidebar__divider-label">Beheer</span>
+        </div>
+
+        <div className="sidebar__group sidebar__group--secondary">
+          {BEHEER_NAV.map(({ href, label, icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="sidebar__link sidebar__link--secondary"
+              data-active={pathname.startsWith(href) ? 'true' : undefined}
+            >
+              {icon}
+              {label}
+            </Link>
+          ))}
+        </div>
       </nav>
 
       <div className="sidebar__footer">
