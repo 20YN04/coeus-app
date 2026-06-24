@@ -91,7 +91,7 @@ export default function InstellingenPage() {
           </div>
 
           <div className="config-table">
-            <ConfigRow label="App" value="0.1.0" />
+            <ConfigRow label="App" value={process.env.NEXT_PUBLIC_APP_VERSION ?? '0.2.0'} />
             <ConfigRow label="Stack" value="Next.js 16 · React 19 · Tailwind 4" />
           </div>
 

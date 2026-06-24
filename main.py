@@ -126,6 +126,24 @@ def learn(request: LearnRequest):
             skipped += 1
     return {"geleerd": len(saved), "overgeslagen": skipped, "items": saved}
 
+def _cited_bronnen(answer: str, context: list) -> list:
+    # Geef alleen de bronnen terug die het model echt aanhaalt: hun titel komt voor in
+    # het antwoord (de prompt vraagt om de titel te noemen bij citeren). Matcht niets
+    # (impliciet geciteerd), val terug op de top-3 meest relevante. Dedupe op titel zodat
+    # crawl-duplicaten ('Contactgegevens' ×3) niet driemaal verschijnen.
+    low = (answer or "").lower()
+    cited = [c for c in context if c.title and c.title.lower() in low]
+    chosen = cited or context[:3]
+    seen, out = set(), []
+    for c in chosen:
+        key = (c.title or "").lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(c)
+    return out
+
+
 @app.post("/ask")
 def ask(request: AskRequest):
     # Beantwoord een vraag op basis van de kennisbank. Ruimere recall (12 i.p.v. 5):
@@ -141,9 +159,12 @@ def ask(request: AskRequest):
 
     return {
         "antwoord": answer,
+        # Alleen de écht geciteerde bronnen teruggeven (titel komt voor in het antwoord),
+        # niet alle 12 opgehaalde context-items — anders oogt elk antwoord onfocus.
         # id meegeven zodat de frontend per bron naar /kennisbank/detail kan linken.
         "bronnen": [
-            {"id": c.id, "title": c.title, "category": c.category} for c in context
+            {"id": c.id, "title": c.title, "category": c.category}
+            for c in _cited_bronnen(answer, context)
         ],
     }
 
