@@ -10,6 +10,8 @@ answering/extraction when a key is configured.
 
 A product of **Ynarchive**. This is the product monorepo (backend + desktop app, one installer).
 
+![Coeus — the chat-first home: ask your knowledge base in plain language, grounded answers with sources](docs/home.png)
+
 ---
 
 ## Why it's interesting (engineering)
