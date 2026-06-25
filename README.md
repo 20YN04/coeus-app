@@ -1,129 +1,92 @@
 # Coeus
 
-**Coeus** is a local-first, white-label company knowledge base — an "eigen
-Obsidian voor bedrijven" — shipped as an installable desktop app. A product of
-Ynarchive.
+**A local-first, white-label AI knowledge base — shipped as an installable desktop app.**
 
-This is the **monorepo**: one installer is built from both parts here.
+Point Coeus at your business's information — paste text, ingest a URL, crawl a whole
+website, or drop in PDFs — and ask questions in plain language. It answers grounded in
+*your* data, **with sources**. Everything runs on the user's own machine: offline, no
+accounts, no data leaving the device. The cloud LLM is optional and only used for
+answering/extraction when a key is configured.
 
-| Path | What |
-|---|---|
-| **`/` (repo root)** | The **brein** — Python FastAPI + ChromaDB backend. Runs as a sidecar on a loopback port; fully offline (all-MiniLM ONNX embeddings). Docs below. |
-| **`desktop/`** | The **desktop app** — static Next.js kennisbank UI + the Tauri (Rust) shell that bundles the brein sidecar and launches it. See [`desktop/README.md`](desktop/README.md) and [`desktop/docs/per-client-build.md`](desktop/docs/per-client-build.md). |
-
-The desktop release pipeline (`.github/workflows/desktop-release.yml`) builds the
-brein sidecar at the root and bundles it into the Tauri app under `desktop/` — no
-cross-repo checkout. Build locally with `(cd .. && ./build_sidecar.sh)` then
-`cd desktop && npm run desktop:build`.
-
-> `coeus-site` (the marketing site) stays a separate repo. The former
-> `coeus-kennisbank` repo (the desktop UI) has been folded in here under
-> `desktop/` and deleted. Two earlier branches that never hit its `main` were
-> rescued onto this repo: `recovered/graph-view-frontend` (the `/graph` view, to
-> port into the static SPA) and `recovered/desktop-ci` (`security.yml` +
-> `dependabot.yml` + `SECURITY.md`, to port into this repo's CI).
+A product of **Ynarchive**. This is the product monorepo (backend + desktop app, one installer).
 
 ---
 
-## Brein (repo root)
+## Why it's interesting (engineering)
 
-The Python core of **Coeus**: an AI brain that learns a business's knowledge and answers questions about it. It stores knowledge in a ChromaDB vector store and uses GPT (via the OpenAI API) to extract structured knowledge from free text and to answer questions grounded in that knowledge base.
+- A **Tauri (Rust) desktop shell bundles a Python AI backend as a sidecar** and supervises its lifecycle on a loopback port.
+- A **static Next.js SPA** (no server, no auth) talks to that backend client-side, served over Tauri's asset protocol.
+- **Multilingual semantic retrieval runs fully offline via ONNX** (`fastembed`) — **no PyTorch** in the bundle, so the installer stays lean (~220 MB model vs ~1 GB with torch).
+- **LLM is optional and key-configurable per install** — the key lives locally, never in the shipped bundle.
+- **Signed auto-updates** via GitHub Releases, **prompt-injection-hardened**, strict CSP, and a **CI-gated** pipeline.
+
+## What it does
+
+- **Ask your knowledge base** — natural-language RAG Q&A grounded in your own data, with **cited sources**. (DeepSeek: a fast model for answering, a stronger one for extraction.)
+- **Onboard in minutes** — paste text, ingest a single URL, **crawl an entire site**, or upload **PDF / Markdown / TXT**. An LLM structures messy real-world pages into clean, categorized knowledge instead of raw noise.
+- **Multilingual semantic search** — `paraphrase-multilingual-MiniLM` via ONNX, strong on Dutch, runs offline.
+- **Knowledge graph**, a sortable overview with **CSV / PDF export**, and manual create/edit.
+- **Local auto-backup**, **auto-cleanup** (near-duplicate dedupe via embeddings), and **signed auto-update**.
+- **White-label** — per-client theming + seed data at build time.
 
 ## Architecture
 
-- `brain/config.py` — settings (loaded from `.env` via pydantic-settings).
-- `brain/models.py` — pydantic models (`KennisItem`, `LearnRequest`, `AskRequest`).
-- `brain/memory.py` — `Memory`: the ChromaDB-backed knowledge base (add, search, get, update, delete, categories).
-- `brain/learner.py` — `Learner`: GPT-powered knowledge extraction and Q&A.
-- `main.py` — the FastAPI app exposing the HTTP API. Lives at the repo root because it imports the `brain` package.
+| Layer | Tech | Notes |
+|---|---|---|
+| **Desktop shell** | Tauri 2 (Rust) | Bundles + launches the brein sidecar; signed auto-updates; strict CSP; kills the child on exit. |
+| **UI** | Next.js 16 · React 19 · Tailwind 4 | `output: export` static SPA — no server, no auth gate; client-side fetch to the local brein. |
+| **Brein (backend)** | Python 3.12 · FastAPI · ChromaDB | Key-free CRUD / search / graph / ingest; optional LLM for `/learn` + `/ask`. Loopback only. |
+| **Embeddings** | `fastembed` (ONNX runtime) | Multilingual, offline, no torch. Bundled into the app for offline use. |
+| **CI/CD** | GitHub Actions | Gated PRs (types, lint, static build, `cargo check`, backend import) + dependency/secret scanning + signed multi-platform release builds. |
 
-## Installation
+**Security:** prompt-injection hardening (LLM context wrapped in delimiters + a system
+instruction that delimited content is data, never instructions, + JSON-mode extraction),
+a strict Content-Security-Policy, loopback-only backend, and the LLM key stored locally
+in the data dir — never in the JS bundle or the binary.
 
-Requires **Python 3.12** (the type annotations use `X | None`, which crashes on 3.9).
+## Repo layout
+
+| Path | What |
+|---|---|
+| **`/` (root)** | The **brein** — Python FastAPI + ChromaDB backend. Runs as an offline sidecar. |
+| **`desktop/`** | The **desktop app** — static Next.js UI + the Tauri (Rust) shell that bundles and launches the brein. See [`desktop/README.md`](desktop/README.md). |
+
+## Run the backend locally
+
+Requires **Python 3.12** (type annotations use `X | None`).
 
 ```bash
-cd ~/Projects/coeus-app
-
-# create the virtual environment with python3.12
-python3.12 -m venv venv
-source venv/bin/activate
-
-# install dependencies
+python3.12 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
+
+cp .env.example .env            # optional: add a DeepSeek/OpenAI key for /learn + /ask
+uvicorn main:app --reload       # http://127.0.0.1:8000  ·  docs at /docs
 ```
 
-### Configuration
+The knowledge endpoints (`/kennis*`, `/kennis/search`, `/categories`, `/graph`,
+`/ingest/*`) work **without any API key**. `/learn` and `/ask` need a key (DeepSeek by
+default, OpenAI-compatible). The multilingual embedding model downloads once on first use
+and is cached for offline runs.
 
-Copy the example env file and fill in your OpenAI key:
+### API (selected)
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/kennis/search?q=` | Offline semantic search |
+| `POST` | `/learn` | LLM extracts structured knowledge from free text |
+| `POST` | `/ask` | RAG answer grounded in the knowledge base, with sources |
+| `POST` | `/ingest/url` · `/ingest/crawl` · `/ingest/file` | Onboard a page, a whole site, or a PDF/MD/TXT |
+| `GET` | `/graph` | Knowledge graph (nodes + relations) |
+
+## Build the desktop app
 
 ```bash
-cp .env.example .env
+python build_sidecar.py                  # build + bundle the offline brein sidecar
+cd desktop && npm install && npm run desktop:build
 ```
 
-`.env`:
+See [`desktop/README.md`](desktop/README.md) for the per-client (white-label) build flow.
 
-```
-OPENAI_API_KEY=sk-...        # required for /learn and /ask
-COEUS_TENANT=default         # collection namespace
-```
+---
 
-`OPENAI_API_KEY` is required: the `Learner` (used by `/learn` and `/ask`) calls the OpenAI API. The knowledge-base endpoints (`/kennis*`, `/categories`) work without a real key.
-
-The first call to `Memory.add()` downloads the default embedding model (`all-MiniLM-L6-v2`, ~80MB) from the internet. ChromaDB data is persisted under `data/chroma/` (gitignored).
-
-## Running
-
-Run from the repo root so `from brain.memory import Memory` and `from main import app` resolve:
-
-```bash
-cd ~/Projects/coeus-app
-source venv/bin/activate
-uvicorn main:app --reload
-```
-
-The API is then available at `http://127.0.0.1:8000`. Interactive docs at `http://127.0.0.1:8000/docs`.
-
-## API endpoints
-
-| Method | Path                  | Description                                              |
-| ------ | --------------------- | -------------------------------------------------------- |
-| GET    | `/`                   | Status check.                                            |
-| GET    | `/kennis`             | List all knowledge items (optional `?category=`).        |
-| GET    | `/kennis/search`      | Semantic search (`?q=`, optional `?category=`, `?limit=`).|
-| GET    | `/kennis/{item_id}`   | Get one knowledge item by id.                            |
-| POST   | `/kennis`             | Add a knowledge item manually.                           |
-| PUT    | `/kennis/{item_id}`   | Update a knowledge item.                                 |
-| DELETE | `/kennis/{item_id}`   | Delete a knowledge item.                                 |
-| POST   | `/learn`              | Extract knowledge from free text with GPT and store it.  |
-| POST   | `/ask`                | Answer a question grounded in the knowledge base.        |
-| GET    | `/categories`         | List categories with item counts.                        |
-
-## Example flow
-
-Teach Coeus something, then ask about it.
-
-```bash
-# 1. Learn from free text — GPT extracts structured knowledge
-curl -X POST http://127.0.0.1:8000/learn \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Onze webshop is open van maandag tot vrijdag van 9u tot 17u. We verkopen handgemaakte keramiek. Een grote vaas kost 45 euro."}'
-
-# response: {"geleerd": 3, "items": [ ... ]}
-
-# 2. Ask a question — answered using only the stored knowledge
-curl -X POST http://127.0.0.1:8000/ask \
-  -H "Content-Type: application/json" \
-  -d '{"question": "Wat kost een grote vaas?"}'
-
-# response: {"antwoord": "Een grote vaas kost 45 euro.", "bronnen": [ ... ]}
-```
-
-## Testing (no API calls)
-
-The import tests below do not call the OpenAI API:
-
-```bash
-cd ~/Projects/coeus-app
-source venv/bin/activate
-python -c "from brain.memory import Memory; from brain.learner import Learner; from main import app; print('Alle imports OK')"
-```
+*Coeus — named after the Titan of intellect. Built by [Ynarchive](https://github.com/20YN04), a one-person design + full-stack studio.*
