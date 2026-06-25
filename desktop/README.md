@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Coeus — desktop app
 
-## Getting Started
+The desktop layer of [Coeus](../README.md): a **Tauri 2 (Rust) shell** that bundles
+and launches the Python **brein** sidecar, and serves a **static Next.js 16 SPA** over
+Tauri's asset protocol. No server, no auth — the UI fetches the local brein on
+`127.0.0.1:8765` directly from the webview.
 
-First, run the development server:
+## Layout
+
+| Path | What |
+|---|---|
+| `app/` | Next.js App Router UI, static export. `(app)/` holds the screens (Home/ask, Kennisbank, Overzicht, Importeren, Graph, Instellingen…); `components/`, `globals.css`, `layout.tsx`. |
+| `lib/brein.ts` | Typed client for the brein API (`ask`, `search`, `ingest*`, `getGraph`, key config…). |
+| `config/tenant.ts` | Per-client (white-label) name / accent / seed, baked at build time. |
+| `src-tauri/` | The Rust shell: spawns + supervises the brein sidecar, signed auto-updates, strict CSP, kills the child on exit. |
+
+## Develop the UI
+
+Run a brein on `:8765` (see the [root README](../README.md)), then:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run scan       # browser-verify the routes (Playwright) before committing UI
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Build the full desktop app
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+python ../build_sidecar.py     # build + bundle the offline brein sidecar
+npm run desktop:build          # → src-tauri/target/release/bundle/
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The UI is exported as a static SPA (`output: 'export'`), bundled with the sidecar; the
+Tauri shell launches the brein on startup and shuts it down on exit.
 
-## Learn More
+## Notes
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The same bundle is also a plain static web export. Tauri-only features (auto-update,
+  local backup, the AI-key file) are guarded at runtime via a `__TAURI_INTERNALS__`
+  check, so the web build degrades gracefully instead of crashing.
+- White-label / per-client builds (custom name, colour, seed data, signed release):
+  see [`docs/per-client-build.md`](docs/per-client-build.md).
