@@ -1,5 +1,8 @@
 # Coeus
 
+[![CI](https://github.com/20YN04/coeus-app/actions/workflows/ci.yml/badge.svg)](https://github.com/20YN04/coeus-app/actions/workflows/ci.yml)
+[![Security](https://github.com/20YN04/coeus-app/actions/workflows/security.yml/badge.svg)](https://github.com/20YN04/coeus-app/actions/workflows/security.yml)
+
 **A local-first, white-label AI knowledge base — shipped as an installable desktop app.**
 
 Point Coeus at your business's information — paste text, ingest a URL, crawl a whole
