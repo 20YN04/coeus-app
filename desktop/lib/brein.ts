@@ -208,10 +208,11 @@ export type AskResult = { antwoord: string; bronnen: AskBron[] };
 
 // Stel een vraag aan de kennisbank: het brein zoekt relevante items en laat de
 // LLM daarop een antwoord baseren. Geeft het antwoord + de gebruikte bronnen terug.
-export async function ask(question: string): Promise<AskResult> {
+// `lang` (nl|en) bepaalt de taal van het antwoord — de UI-taal van de gebruiker.
+export async function ask(question: string, lang?: 'nl' | 'en'): Promise<AskResult> {
   return req<AskResult>('/ask', {
     method: 'POST',
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, lang }),
   });
 }
 

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { listKennis, addKennis, type KennisCreateInput } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 type ExportPhase =
   | { kind: 'idle' }
@@ -40,6 +41,7 @@ function toCreateInput(raw: unknown): KennisCreateInput | null {
 }
 
 export default function DataBeheer() {
+  const { t } = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const [exportPhase, setExportPhase] = useState<ExportPhase>({ kind: 'idle' });
   const [importPhase, setImportPhase] = useState<ImportPhase>({ kind: 'idle' });
@@ -63,7 +65,7 @@ export default function DataBeheer() {
     } catch (e) {
       setExportPhase({
         kind: 'error',
-        message: e instanceof Error ? e.message : 'Exporteren mislukt.',
+        message: e instanceof Error ? e.message : t('instellingen.data.exportFailed'),
       });
     }
   }
@@ -83,21 +85,20 @@ export default function DataBeheer() {
       const text = await file.text();
       const parsed = JSON.parse(text);
       if (!Array.isArray(parsed)) {
-        throw new Error('Het bestand bevat geen lijst met kennis-items.');
+        throw new Error(t('instellingen.data.importNoList'));
       }
       entries = parsed;
     } catch (err) {
       setImportPhase({
         kind: 'error',
         message:
-          err instanceof Error ? err.message : 'Het bestand kon niet gelezen worden.',
+          err instanceof Error ? err.message : t('instellingen.data.importFailed'),
       });
       return;
     }
 
     const proceed = window.confirm(
-      `Dit voegt ${entries.length} item(s) toe aan de huidige kennisbank. ` +
-        'Bestaande items blijven staan. Doorgaan?',
+      t('instellingen.data.importConfirm', { count: entries.length }),
     );
     if (!proceed) return;
 
@@ -129,13 +130,8 @@ export default function DataBeheer() {
   return (
     <section className="settings-section">
       <div className="settings-section__header">
-        <p className="settings-section__label">Back-up &amp; migratie</p>
-        <p className="settings-section__desc">
-          Exporteer de volledige kennisbank naar één JSON-bestand als back-up, of
-          importeer hem op een nieuwe machine. Gebruik dit bij een laptop-wissel of
-          een overstap van lokaal naar de cloud. Alles draait lokaal — er gaat niets
-          naar buiten.
-        </p>
+        <p className="settings-section__label">{t('instellingen.data.label')}</p>
+        <p className="settings-section__desc">{t('instellingen.data.desc')}</p>
       </div>
 
       <div className="data-beheer">
@@ -146,11 +142,11 @@ export default function DataBeheer() {
             disabled={exportBusy}
             aria-busy={exportBusy}
           >
-            {exportBusy ? 'Exporteren…' : 'Exporteer kennisbank'}
+            {exportBusy ? t('instellingen.data.exporting') : t('instellingen.data.exportBtn')}
           </button>
           {exportPhase.kind === 'done' && (
             <p className="update-check__status update-check__status--ok">
-              {exportPhase.count} item(s) geëxporteerd naar {EXPORT_FILENAME}.
+              {t('instellingen.data.exportDone', { count: exportPhase.count, filename: EXPORT_FILENAME })}
             </p>
           )}
           {exportPhase.kind === 'error' && (
@@ -167,7 +163,7 @@ export default function DataBeheer() {
             disabled={importBusy}
             aria-busy={importBusy}
           >
-            {importBusy ? 'Importeren…' : 'Importeer kennisbank'}
+            {importBusy ? t('instellingen.data.importing') : t('instellingen.data.importBtn')}
           </button>
           <input
             ref={fileRef}
@@ -180,12 +176,12 @@ export default function DataBeheer() {
           />
           {importPhase.kind === 'busy' && (
             <p className="update-check__status">
-              Importeren… {importPhase.done} / {importPhase.total}
+              {t('instellingen.data.importProgress', { done: importPhase.done, total: importPhase.total })}
             </p>
           )}
           {importPhase.kind === 'done' && (
             <p className="update-check__status update-check__status--ok">
-              {importPhase.imported} geïmporteerd, {importPhase.skipped} overgeslagen.
+              {t('instellingen.data.importDone', { imported: importPhase.imported, skipped: importPhase.skipped })}
             </p>
           )}
           {importPhase.kind === 'error' && (

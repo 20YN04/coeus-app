@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { addKennis, updateKennis, getCategories, type KennisItem } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 type Props = {
   mode: 'create' | 'edit';
@@ -11,6 +12,7 @@ type Props = {
 
 export default function KennisForm({ mode, item }: Props) {
   const router = useRouter();
+  const { t } = useT();
   const [title, setTitle] = useState(item?.title ?? '');
   const [category, setCategory] = useState(item?.category ?? '');
   const [customCategory, setCustomCategory] = useState('');
@@ -30,6 +32,7 @@ export default function KennisForm({ mode, item }: Props) {
       })
       .catch(() => setCategories([]))
       .finally(() => setCatLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const effectiveCategory = category === '__custom__' ? customCategory.trim() : category;
@@ -37,7 +40,7 @@ export default function KennisForm({ mode, item }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim() || !effectiveCategory || !content.trim()) {
-      setError('Vul alle verplichte velden in.');
+      setError(t('kennisForm.errFillFields'));
       return;
     }
     setError('');
@@ -59,7 +62,7 @@ export default function KennisForm({ mode, item }: Props) {
         router.push(`/kennisbank/detail?id=${encodeURIComponent(created.id)}`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Er ging iets mis.');
+      setError(err instanceof Error ? err.message : t('common.somethingWrong'));
       setLoading(false);
     }
   }
@@ -68,13 +71,13 @@ export default function KennisForm({ mode, item }: Props) {
     <form onSubmit={handleSubmit} className="kennis-form">
       <div className="form-field">
         <label className="form-label" htmlFor="kf-title">
-          Titel <span aria-hidden="true">*</span>
+          {t('kennisForm.titleLabel')} <span aria-hidden="true">*</span>
         </label>
         <input
           id="kf-title"
           className="form-input"
           type="text"
-          placeholder="Duidelijke, beschrijvende titel"
+          placeholder={t('kennisForm.titlePlaceholder')}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           autoFocus={mode === 'create'}
@@ -84,10 +87,10 @@ export default function KennisForm({ mode, item }: Props) {
 
       <div className="form-field">
         <label className="form-label" htmlFor="kf-category">
-          Categorie <span aria-hidden="true">*</span>
+          {t('kennisForm.categoryLabel')} <span aria-hidden="true">*</span>
         </label>
         {catLoading ? (
-          <div className="form-input form-input--loading">Categorieën laden…</div>
+          <div className="form-input form-input--loading">{t('kennisForm.categoryLoading')}</div>
         ) : (
           <select
             id="kf-category"
@@ -97,12 +100,12 @@ export default function KennisForm({ mode, item }: Props) {
             required
           >
             {categories.length === 0 && (
-              <option value="">Kies een categorie</option>
+              <option value="">{t('kennisForm.categoryChoose')}</option>
             )}
             {categories.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
-            <option value="__custom__">+ Nieuwe categorie…</option>
+            <option value="__custom__">{t('kennisForm.categoryNew')}</option>
           </select>
         )}
         {category === '__custom__' && (
@@ -110,7 +113,7 @@ export default function KennisForm({ mode, item }: Props) {
             className="form-input"
             style={{ marginTop: 'var(--s-2)' }}
             type="text"
-            placeholder="Naam van nieuwe categorie"
+            placeholder={t('kennisForm.categoryNewPlaceholder')}
             value={customCategory}
             onChange={(e) => setCustomCategory(e.target.value)}
             autoFocus
@@ -120,12 +123,12 @@ export default function KennisForm({ mode, item }: Props) {
 
       <div className="form-field">
         <label className="form-label" htmlFor="kf-content">
-          Inhoud <span aria-hidden="true">*</span>
+          {t('kennisForm.contentLabel')} <span aria-hidden="true">*</span>
         </label>
         <textarea
           id="kf-content"
           className="form-input form-textarea"
-          placeholder="Schrijf hier de kennisinhoud…"
+          placeholder={t('kennisForm.contentPlaceholder')}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={12}
@@ -137,7 +140,7 @@ export default function KennisForm({ mode, item }: Props) {
 
       <div className="form-actions">
         <button type="submit" className="btn-primary" disabled={loading}>
-          <span>{loading ? 'Opslaan…' : mode === 'edit' ? 'Wijzigingen opslaan' : 'Item opslaan'}</span>
+          <span>{loading ? t('kennisForm.submitSaving') : mode === 'edit' ? t('kennisForm.submitEdit') : t('kennisForm.submitCreate')}</span>
           <span aria-hidden="true">→</span>
         </button>
         <button
@@ -146,7 +149,7 @@ export default function KennisForm({ mode, item }: Props) {
           onClick={() => router.back()}
           disabled={loading}
         >
-          Annuleren
+          {t('common.cancel')}
         </button>
       </div>
     </form>

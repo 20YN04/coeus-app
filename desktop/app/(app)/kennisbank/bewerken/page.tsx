@@ -5,8 +5,10 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getKennis, type KennisItem } from '@/lib/brein';
 import KennisForm from '@/app/(app)/components/KennisForm';
+import { useT } from '@/lib/i18n';
 
 function BewerkenLoader({ id }: { id: string }) {
+  const { t } = useT();
   const [item, setItem] = useState<KennisItem | null>(null);
   const [status, setStatus] = useState<'loading' | 'ok' | 'notfound'>(id ? 'loading' : 'notfound');
 
@@ -32,15 +34,15 @@ function BewerkenLoader({ id }: { id: string }) {
   }, [id]);
 
   if (status === 'loading') {
-    return <div className="page-loading" role="status">Laden…</div>;
+    return <div className="page-loading" role="status">{t('common.loading')}</div>;
   }
 
   if (status === 'notfound' || !item) {
     return (
       <div className="empty-state">
-        <p className="empty-state__label">Niet gevonden</p>
-        <p className="empty-state__heading">Dit kennisitem bestaat niet</p>
-        <Link href="/kennisbank" className="btn-ghost-sm">← Terug naar kennisbank</Link>
+        <p className="empty-state__label">{t('common.notFound')}</p>
+        <p className="empty-state__heading">{t('detail.notFoundHeading')}</p>
+        <Link href="/kennisbank" className="btn-ghost-sm">{t('detail.backToKennisbank')}</Link>
       </div>
     );
   }
@@ -49,13 +51,13 @@ function BewerkenLoader({ id }: { id: string }) {
     <>
       <div className="page-header">
         <p className="page-eyebrow">
-          <Link href="/kennisbank" className="breadcrumb-link">Kennisbank</Link>
+          <Link href="/kennisbank" className="breadcrumb-link">{t('kennisbank.title')}</Link>
           <span className="breadcrumb-sep"> / </span>
           <Link href={`/kennisbank/detail?id=${encodeURIComponent(item.id)}`} className="breadcrumb-link">{item.title}</Link>
           <span className="breadcrumb-sep"> / </span>
-          Bewerken
+          {t('bewerken.title')}
         </p>
-        <h1 className="page-title">Bewerken</h1>
+        <h1 className="page-title">{t('bewerken.title')}</h1>
       </div>
 
       <KennisForm mode="edit" item={item} />
@@ -69,8 +71,9 @@ function BewerkenInner() {
 }
 
 export default function BewerkenPage() {
+  const { t } = useT();
   return (
-    <Suspense fallback={<div className="page-loading" role="status">Laden…</div>}>
+    <Suspense fallback={<div className="page-loading" role="status">{t('common.loading')}</div>}>
       <BewerkenInner />
     </Suspense>
   );

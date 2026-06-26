@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import { getGraph, getCategories, waitForBrein, type KennisGraph } from '@/lib/brein';
 import GraphClient from './GraphClient';
+import { useT } from '@/lib/i18n';
 
 export default function GraphPage() {
+  const { t } = useT();
   const [graph, setGraph] = useState<KennisGraph>({ nodes: [], edges: [] });
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,18 +37,18 @@ export default function GraphPage() {
   return (
     <>
       <div className="page-header">
-        <p className="page-eyebrow">Kennis in kaart</p>
-        <h1 className="page-title">Graph</h1>
+        <p className="page-eyebrow">{t('graph.eyebrow')}</p>
+        <h1 className="page-title">{t('graph.title')}</h1>
       </div>
 
       {apiError && (
         <div className="api-error-banner">
-          <span>Kan geen verbinding maken met het brein — controleer of de lokale brein draait.</span>
+          <span>{t('graph.connectionError')}</span>
         </div>
       )}
 
       {loading && !apiError && (
-        <div className="page-loading" role="status">Laden…</div>
+        <div className="page-loading" role="status">{t('common.loading')}</div>
       )}
 
       {!loading && !apiError && <GraphClient graph={graph} categories={categories} />}

@@ -153,7 +153,7 @@ def ask(request: AskRequest):
     # de irrelevante items negeren.
     context = memory.search(request.question, limit=12)
     try:
-        answer = learner.answer_question(request.question, context)
+        answer = learner.answer_question(request.question, context, lang=request.lang)
     except RuntimeError:
         raise HTTPException(503, "Upstream AI-service niet bereikbaar")
 

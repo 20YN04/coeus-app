@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useSyncExternalStore } from 'react';
+import { useT } from '@/lib/i18n';
 
 type Phase =
   | { kind: 'idle' }
@@ -28,6 +29,7 @@ function inTauri(): boolean {
 const noopSubscribe = () => () => {};
 
 export default function UpdateCheck() {
+  const { t } = useT();
   const isTauri = useSyncExternalStore(noopSubscribe, inTauri, () => false);
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' });
 
@@ -54,7 +56,7 @@ export default function UpdateCheck() {
     } catch (e) {
       setPhase({
         kind: 'error',
-        message: e instanceof Error ? e.message : 'Controle mislukt.',
+        message: e instanceof Error ? e.message : t('instellingen.update.checkFailed'),
       });
     }
   }
@@ -73,25 +75,25 @@ export default function UpdateCheck() {
         aria-busy={busy}
       >
         {phase.kind === 'checking'
-          ? 'Controleren…'
+          ? t('instellingen.update.checking')
           : phase.kind === 'installing'
-            ? 'Installeren…'
-            : 'Controleer op updates'}
+            ? t('instellingen.update.installing')
+            : t('instellingen.update.check')}
       </button>
 
       {phase.kind === 'uptodate' && (
         <p className="update-check__status update-check__status--ok">
-          Je bent up-to-date.
+          {t('instellingen.update.uptodate')}
         </p>
       )}
       {phase.kind === 'installing' && (
         <p className="update-check__status">
-          Update {phase.version} beschikbaar — wordt geïnstalleerd…
+          {t('instellingen.update.availableInstalling', { version: phase.version })}
         </p>
       )}
       {phase.kind === 'done' && (
         <p className="update-check__status update-check__status--ok">
-          Update {phase.version} geïnstalleerd — de app herstart.
+          {t('instellingen.update.installed', { version: phase.version })}
         </p>
       )}
       {phase.kind === 'error' && (

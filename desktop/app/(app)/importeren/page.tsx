@@ -10,11 +10,13 @@ import {
   ingestFile,
   waitForBrein,
 } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 type Mode = 'tekst' | 'website' | 'bestand';
 type WebMode = 'pagina' | 'crawl';
 
 export default function ImporterenPage() {
+  const { t } = useT();
   const [mode, setMode] = useState<Mode>('tekst');
   const [webMode, setWebMode] = useState<WebMode>('pagina');
   const [ready, setReady] = useState(false);
@@ -40,12 +42,13 @@ export default function ImporterenPage() {
     waitForBrein(undefined, ctrl.signal).then((ok) => {
       if (!alive) return;
       setReady(true);
-      if (!ok) setBreinError('Brein niet bereikbaar — controleer of de lokale brein draait.');
+      if (!ok) setBreinError(t('common.breinUnreachableShort'));
     });
     return () => {
       alive = false;
       ctrl.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function switchMode(next: Mode) {
@@ -63,16 +66,16 @@ export default function ImporterenPage() {
 
     if (mode === 'tekst') {
       if (!text.trim()) {
-        setError('Plak eerst wat tekst om te importeren.');
+        setError(t('importeren.errPasteText'));
         return;
       }
     } else if (mode === 'website') {
       if (!url.trim()) {
-        setError('Vul een website-URL in.');
+        setError(t('importeren.errFillUrl'));
         return;
       }
     } else if (!file) {
-      setError('Kies eerst een bestand om te importeren.');
+      setError(t('importeren.errChooseFile'));
       return;
     }
 
@@ -81,36 +84,51 @@ export default function ImporterenPage() {
       if (mode === 'tekst') {
         if (useAi) {
           const res = await learnText(text.trim(), cat);
-          setResult(`${res.geleerd} ${res.geleerd === 1 ? 'item geleerd' : 'items geleerd'}`);
+          setResult(
+            res.geleerd === 1
+              ? t('importeren.resultItemsLearned', { count: res.geleerd })
+              : t('importeren.resultItemsLearnedPlural', { count: res.geleerd }),
+          );
         } else {
           const res = await ingestText(text.trim(), { category: cat });
-          setResult(`${res.toegevoegd} ${res.toegevoegd === 1 ? 'item toegevoegd' : 'items toegevoegd'}`);
+          setResult(
+            res.toegevoegd === 1
+              ? t('importeren.resultItemsAdded', { count: res.toegevoegd })
+              : t('importeren.resultItemsAddedPlural', { count: res.toegevoegd }),
+          );
         }
         setText('');
       } else if (mode === 'website') {
         if (webMode === 'crawl') {
           const res = await ingestCrawl(url.trim(), { category: cat, maxPages });
           setResult(
-            `${res.toegevoegd} ${res.toegevoegd === 1 ? 'item' : 'items'} van ${res.paginas} ${res.paginas === 1 ? 'pagina' : "pagina's"}`,
+            res.toegevoegd === 1 && res.paginas === 1
+              ? t('importeren.resultCrawlSingle', { count: res.toegevoegd, pages: res.paginas })
+              : t('importeren.resultCrawlPlural', { count: res.toegevoegd, pages: res.paginas }),
           );
         } else {
           const res = await ingestUrl(url.trim(), { category: cat });
-          setResult(`${res.toegevoegd} ${res.toegevoegd === 1 ? 'item toegevoegd' : 'items toegevoegd'}`);
+          setResult(
+            res.toegevoegd === 1
+              ? t('importeren.resultItemsAdded', { count: res.toegevoegd })
+              : t('importeren.resultItemsAddedPlural', { count: res.toegevoegd }),
+          );
         }
         setUrl('');
       } else {
         const res = await ingestFile(file!, { category: cat });
-        setResult(`${res.toegevoegd} ${res.toegevoegd === 1 ? 'item toegevoegd' : 'items toegevoegd'}`);
+        setResult(
+          res.toegevoegd === 1
+            ? t('importeren.resultItemsAdded', { count: res.toegevoegd })
+            : t('importeren.resultItemsAddedPlural', { count: res.toegevoegd }),
+        );
         setFile(null);
       }
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Er ging iets mis bij het importeren.';
+      const message = err instanceof Error ? err.message : t('importeren.errGeneric');
       // 502/503 bij AI-extractie = geen LLM-sleutel ingesteld.
       if (mode === 'tekst' && useAi && /\b50[23]\b/.test(message)) {
-        setError(
-          'AI-extractie vereist een AI-sleutel — stel die in bij Instellingen → AI, of zet AI-extractie uit voor key-vrij importeren.',
-        );
+        setError(t('importeren.errAiNoKey'));
       } else {
         setError(message);
       }
@@ -120,32 +138,27 @@ export default function ImporterenPage() {
   }
 
   const submitLabel = loading
-    ? 'Importeren…'
+    ? t('importeren.submitImporting')
     : mode === 'tekst'
       ? useAi
-        ? 'Tekst leren (AI)'
-        : 'Tekst importeren'
+        ? t('importeren.submitLearnAi')
+        : t('importeren.submitText')
       : mode === 'website'
         ? webMode === 'crawl'
-          ? 'Site crawlen'
-          : 'Website importeren'
-        : 'Bestand importeren';
+          ? t('importeren.submitCrawl')
+          : t('importeren.submitWebsite')
+        : t('importeren.submitFile');
 
   return (
     <>
       <div className="page-header">
-        <p className="page-eyebrow">Kennisbank</p>
-        <h1 className="page-title">Importeren</h1>
+        <p className="page-eyebrow">{t('importeren.eyebrow')}</p>
+        <h1 className="page-title">{t('importeren.title')}</h1>
       </div>
 
-      <p className="import-intro">
-        Vul de kennisbank zonder handmatig te typen. Plak een lap tekst, geef een
-        website-URL op (één pagina of een hele site) of upload een bestand — Coeus
-        hakt het in zinnige stukken en bewaart elk stuk als kennis-item. Geen
-        AI-sleutel nodig.
-      </p>
+      <p className="import-intro">{t('importeren.intro')}</p>
 
-      <div className="kb-filters" role="tablist" aria-label="Importmodus">
+      <div className="kb-filters" role="tablist" aria-label={t('importeren.modeAriaLabel')}>
         <button
           type="button"
           role="tab"
@@ -154,7 +167,7 @@ export default function ImporterenPage() {
           data-active={mode === 'tekst' ? 'true' : undefined}
           onClick={() => switchMode('tekst')}
         >
-          Plak tekst
+          {t('importeren.modeText')}
         </button>
         <button
           type="button"
@@ -164,7 +177,7 @@ export default function ImporterenPage() {
           data-active={mode === 'website' ? 'true' : undefined}
           onClick={() => switchMode('website')}
         >
-          Vanaf website
+          {t('importeren.modeWebsite')}
         </button>
         <button
           type="button"
@@ -174,7 +187,7 @@ export default function ImporterenPage() {
           data-active={mode === 'bestand' ? 'true' : undefined}
           onClick={() => switchMode('bestand')}
         >
-          Upload bestand
+          {t('importeren.modeFile')}
         </button>
       </div>
 
@@ -188,12 +201,12 @@ export default function ImporterenPage() {
         {mode === 'tekst' && (
           <div className="form-field">
             <label className="form-label" htmlFor="im-text">
-              Tekst <span aria-hidden="true">*</span>
+              {t('importeren.textLabel')} <span aria-hidden="true">*</span>
             </label>
             <textarea
               id="im-text"
               className="form-input form-textarea"
-              placeholder="Plak hier een document, notities, een handleiding…"
+              placeholder={t('importeren.textPlaceholder')}
               value={text}
               onChange={(e) => setText(e.target.value)}
               rows={14}
@@ -205,7 +218,7 @@ export default function ImporterenPage() {
                 onChange={(e) => setUseAi(e.target.checked)}
               />
               <span>
-                AI-extractie (slimmer) <span className="import-optional">— vereist een AI-sleutel</span>
+                {t('importeren.aiToggleLabel')} <span className="import-optional">{t('importeren.aiToggleHint')}</span>
               </span>
             </label>
           </div>
@@ -216,7 +229,7 @@ export default function ImporterenPage() {
             <div
               className="import-subtoggle"
               role="tablist"
-              aria-label="Website-importmodus"
+              aria-label={t('importeren.webModeAriaLabel')}
             >
               <button
                 type="button"
@@ -226,7 +239,7 @@ export default function ImporterenPage() {
                 data-active={webMode === 'pagina' ? 'true' : undefined}
                 onClick={() => setWebMode('pagina')}
               >
-                Enkele pagina
+                {t('importeren.webSinglePage')}
               </button>
               <button
                 type="button"
@@ -236,20 +249,20 @@ export default function ImporterenPage() {
                 data-active={webMode === 'crawl' ? 'true' : undefined}
                 onClick={() => setWebMode('crawl')}
               >
-                Hele site (crawl)
+                {t('importeren.webCrawl')}
               </button>
             </div>
 
             <div className="form-field">
               <label className="form-label" htmlFor="im-url">
-                Website-URL <span aria-hidden="true">*</span>
+                {t('importeren.urlLabel')} <span aria-hidden="true">*</span>
               </label>
               <input
                 id="im-url"
                 className="form-input"
                 type="url"
                 inputMode="url"
-                placeholder="https://voorbeeld.be/over-ons"
+                placeholder={t('importeren.urlPlaceholder')}
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
               />
@@ -258,7 +271,7 @@ export default function ImporterenPage() {
             {webMode === 'crawl' && (
               <div className="form-field">
                 <label className="form-label" htmlFor="im-maxpages">
-                  Max. pagina&apos;s <span className="import-optional">— optioneel</span>
+                  {t('importeren.maxPagesLabel')} <span className="import-optional">{t('importeren.maxPagesHint')}</span>
                 </label>
                 <input
                   id="im-maxpages"
@@ -279,8 +292,8 @@ export default function ImporterenPage() {
         {mode === 'bestand' && (
           <div className="form-field">
             <label className="form-label" htmlFor="im-file">
-              Bestand <span aria-hidden="true">*</span>
-              <span className="import-optional"> — .pdf, .md, .txt</span>
+              {t('importeren.fileLabel')} <span aria-hidden="true">*</span>
+              <span className="import-optional"> {t('importeren.fileHint')}</span>
             </label>
             <div className="import-file">
               <input
@@ -292,7 +305,7 @@ export default function ImporterenPage() {
               />
               <label className="import-file__label" htmlFor="im-file">
                 <span aria-hidden="true">↥</span>
-                <span>Kies een bestand</span>
+                <span>{t('importeren.fileChoose')}</span>
               </label>
               {file && <span className="import-file__name">{file.name}</span>}
             </div>
@@ -301,13 +314,13 @@ export default function ImporterenPage() {
 
         <div className="form-field">
           <label className="form-label" htmlFor="im-category">
-            Categorie <span className="import-optional">— optioneel</span>
+            {t('importeren.categoryLabel')} <span className="import-optional">{t('importeren.categoryHint')}</span>
           </label>
           <input
             id="im-category"
             className="form-input"
             type="text"
-            placeholder="Bijv. procedures, producten, hr…"
+            placeholder={t('importeren.categoryPlaceholder')}
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           />
@@ -319,7 +332,7 @@ export default function ImporterenPage() {
           <div className="import-result">
             <p className="import-result__count">{result}</p>
             <Link href="/kennisbank" className="btn-ghost-sm">
-              Bekijk in kennisbank →
+              {t('importeren.viewInKennisbank')}
             </Link>
           </div>
         )}

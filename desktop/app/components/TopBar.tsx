@@ -2,10 +2,12 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { useT } from '@/lib/i18n';
 
 export default function TopBar({ tenantName }: { tenantName: string }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useT();
   const [q, setQ] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -29,7 +31,7 @@ export default function TopBar({ tenantName }: { tenantName: string }) {
             ref={inputRef}
             type="search"
             className="topbar__search-input"
-            placeholder="Zoek in kennisbank..."
+            placeholder={t('topbar.searchPlaceholder')}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             autoComplete="off"

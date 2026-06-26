@@ -32,6 +32,8 @@ class LearnRequest(BaseModel):
 
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=1000)
+    # UI-taal van de gebruiker: het antwoord volgt deze taal (nl/en). Default nl.
+    lang: str = Field(default="nl", max_length=5)
 
 class IngestTextRequest(BaseModel):
     # Onboarding-motor: vrije tekst in stukken hakken en als kennis-items opslaan
