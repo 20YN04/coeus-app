@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { KennisGraph } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 // Coeus-palet: indigo eerst, daarna onderscheidende tinten per categorie.
 const PALETTE = [
@@ -79,6 +80,7 @@ type Mode = '2d' | '3d';
 type Props = { graph: KennisGraph; categories: string[] };
 
 export default function GraphClient({ graph, categories }: Props) {
+  const { t } = useT();
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('2d');
@@ -317,8 +319,8 @@ export default function GraphClient({ graph, categories }: Props) {
   if (graph.nodes.length === 0) {
     return (
       <div className="graph-empty">
-        <p>Nog te weinig kennis om een graph te tekenen.</p>
-        <p className="graph-empty__hint">Voeg items toe via Nieuw — de verbanden verschijnen vanzelf.</p>
+        <p>{t('graph.emptyTitle')}</p>
+        <p className="graph-empty__hint">{t('graph.emptyHint')}</p>
       </div>
     );
   }
@@ -331,7 +333,7 @@ export default function GraphClient({ graph, categories }: Props) {
   return (
     <div className="graph-wrap">
       <div ref={containerRef} className="graph-canvas" />
-      <div className="graph-toggle" role="group" aria-label="Weergave 2D of 3D">
+      <div className="graph-toggle" role="group" aria-label={t('graph.toggleAriaLabel')}>
         <button
           type="button"
           className={`graph-toggle__btn${mode === '2d' ? ' is-active' : ''}`}
@@ -350,7 +352,7 @@ export default function GraphClient({ graph, categories }: Props) {
         </button>
       </div>
       <div className="graph-legend">
-        <span className="graph-legend__title">Categorieën</span>
+        <span className="graph-legend__title">{t('graph.categories')}</span>
         {legendCats.map((c) => (
           <span key={c} className="graph-legend__item">
             <span className="graph-legend__dot" style={{ background: colorFor(c) }} />
@@ -358,7 +360,7 @@ export default function GraphClient({ graph, categories }: Props) {
           </span>
         ))}
         <span className="graph-legend__meta">
-          {graph.nodes.length} items · {graph.edges.length} verbanden
+          {t('graph.stats', { nodes: graph.nodes.length, edges: graph.edges.length })}
         </span>
       </div>
     </div>

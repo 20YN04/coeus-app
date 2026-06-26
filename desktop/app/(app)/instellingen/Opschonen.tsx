@@ -7,6 +7,7 @@ import {
   waitForBrein,
   type CleanupPreview,
 } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 type ScanPhase =
   | { kind: 'idle' }
@@ -24,6 +25,7 @@ type ApplyPhase =
 const SAMPLE_LIMIT = 3;
 
 export default function Opschonen() {
+  const { t } = useT();
   const [scan, setScan] = useState<ScanPhase>({ kind: 'idle' });
   const [apply, setApply] = useState<ApplyPhase>({ kind: 'idle' });
 
@@ -38,7 +40,7 @@ export default function Opschonen() {
     } catch (e) {
       setScan({
         kind: 'error',
-        message: e instanceof Error ? e.message : 'Zoeken mislukt.',
+        message: e instanceof Error ? e.message : t('instellingen.cleanup.scanFailed'),
       });
     }
   }
@@ -46,9 +48,10 @@ export default function Opschonen() {
   async function handleApply() {
     if (scan.kind !== 'done' || scan.preview.duplicaten === 0) return;
     const proceed = window.confirm(
-      `Dit verwijdert ${scan.preview.duplicaten} duplicaat/duplicaten uit ` +
-        `${scan.preview.groepen} groep(en). Per groep blijft één item bewaard. ` +
-        'Dit kan niet ongedaan gemaakt worden. Doorgaan?',
+      t('instellingen.cleanup.removeConfirm', {
+        duplicates: scan.preview.duplicaten,
+        groups: scan.preview.groepen,
+      }),
     );
     if (!proceed) return;
 
@@ -61,7 +64,7 @@ export default function Opschonen() {
     } catch (e) {
       setApply({
         kind: 'error',
-        message: e instanceof Error ? e.message : 'Verwijderen mislukt.',
+        message: e instanceof Error ? e.message : t('instellingen.cleanup.removeFailed'),
       });
     }
   }
@@ -73,13 +76,8 @@ export default function Opschonen() {
   return (
     <section className="settings-section">
       <div className="settings-section__header">
-        <p className="settings-section__label">Opschonen</p>
-        <p className="settings-section__desc">
-          Vind near-duplicate kennis-items en ruim ze in één klik op. Coeus
-          vergelijkt items via de lokale embeddings — geen AI-sleutel nodig, niets
-          gaat naar buiten. Per groep dubbelen blijft het meest complete item
-          bewaard.
-        </p>
+        <p className="settings-section__label">{t('instellingen.cleanup.label')}</p>
+        <p className="settings-section__desc">{t('instellingen.cleanup.desc')}</p>
       </div>
 
       <div className="data-beheer">
@@ -90,18 +88,20 @@ export default function Opschonen() {
             disabled={scanBusy}
             aria-busy={scanBusy}
           >
-            {scanBusy ? 'Zoeken…' : 'Zoek duplicaten'}
+            {scanBusy ? t('instellingen.cleanup.scanning') : t('instellingen.cleanup.scanBtn')}
           </button>
 
           {scan.kind === 'done' && scan.preview.duplicaten === 0 && (
             <p className="update-check__status update-check__status--ok">
-              Geen duplicaten gevonden — je kennisbank is netjes.
+              {t('instellingen.cleanup.noneFound')}
             </p>
           )}
           {hasDuplicates && (
             <p className="update-check__status">
-              {scan.preview.duplicaten} duplicaten gevonden in{' '}
-              {scan.preview.groepen} groep(en).
+              {t('instellingen.cleanup.found', {
+                duplicates: scan.preview.duplicaten,
+                groups: scan.preview.groepen,
+              })}
             </p>
           )}
           {scan.kind === 'error' && (
@@ -120,7 +120,7 @@ export default function Opschonen() {
                   <span className="opschonen-cluster__keep">{c.keep}</span>
                   <span className="opschonen-cluster__remove">
                     {c.remove.slice(0, SAMPLE_LIMIT).join(', ')}
-                    {extra > 0 ? ` +${extra} meer` : ''}
+                    {extra > 0 ? ` ${t('instellingen.cleanup.moreLabel', { count: extra })}` : ''}
                   </span>
                 </li>
               );
@@ -136,7 +136,7 @@ export default function Opschonen() {
               disabled={applyBusy}
               aria-busy={applyBusy}
             >
-              {applyBusy ? 'Verwijderen…' : 'Verwijder duplicaten'}
+              {applyBusy ? t('instellingen.cleanup.removing') : t('instellingen.cleanup.removeBtn')}
             </button>
             {apply.kind === 'error' && (
               <p className="update-check__status update-check__status--error">
@@ -148,7 +148,7 @@ export default function Opschonen() {
 
         {apply.kind === 'done' && (
           <p className="update-check__status update-check__status--ok">
-            {apply.removed} verwijderd.
+            {t('instellingen.cleanup.removed', { count: apply.removed })}
           </p>
         )}
       </div>

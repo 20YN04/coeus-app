@@ -8,6 +8,7 @@ import {
   waitForBrein,
   type LlmStatus,
 } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 type LoadPhase =
   | { kind: 'loading' }
@@ -25,6 +26,7 @@ const PROVIDER_LABEL: Record<string, string> = {
 };
 
 export default function AiSleutel() {
+  const { t } = useT();
   const [load, setLoad] = useState<LoadPhase>({ kind: 'loading' });
   const [action, setAction] = useState<ActionPhase>({ kind: 'idle' });
   const [key, setKey] = useState('');
@@ -38,7 +40,7 @@ export default function AiSleutel() {
     } catch (e) {
       setLoad({
         kind: 'error',
-        message: e instanceof Error ? e.message : 'Status ophalen mislukt.',
+        message: e instanceof Error ? e.message : t('instellingen.ai.statusFailed'),
       });
     }
   }
@@ -54,7 +56,7 @@ export default function AiSleutel() {
         if (alive) {
           setLoad({
             kind: 'error',
-            message: e instanceof Error ? e.message : 'Status ophalen mislukt.',
+            message: e instanceof Error ? e.message : t('instellingen.ai.statusFailed'),
           });
         }
       }
@@ -62,13 +64,14 @@ export default function AiSleutel() {
     return () => {
       alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = key.trim();
     if (!trimmed) {
-      setAction({ kind: 'error', message: 'Plak eerst een sleutel.' });
+      setAction({ kind: 'error', message: t('instellingen.ai.errPasteKey') });
       return;
     }
     setAction({ kind: 'busy' });
@@ -80,16 +83,13 @@ export default function AiSleutel() {
     } catch (e) {
       setAction({
         kind: 'error',
-        message: e instanceof Error ? e.message : 'Opslaan mislukt.',
+        message: e instanceof Error ? e.message : t('errors.saveFailed'),
       });
     }
   }
 
   async function handleDelete() {
-    const proceed = window.confirm(
-      'Dit verwijdert de lokale AI-sleutel. /ask en AI-extractie werken daarna ' +
-        'niet meer tot je een nieuwe sleutel instelt. Doorgaan?',
-    );
+    const proceed = window.confirm(t('instellingen.ai.deleteConfirm'));
     if (!proceed) return;
     setAction({ kind: 'busy' });
     try {
@@ -99,7 +99,7 @@ export default function AiSleutel() {
     } catch (e) {
       setAction({
         kind: 'error',
-        message: e instanceof Error ? e.message : 'Verwijderen mislukt.',
+        message: e instanceof Error ? e.message : t('errors.deleteFailed'),
       });
     }
   }
@@ -111,22 +111,23 @@ export default function AiSleutel() {
       ? PROVIDER_LABEL[load.status.provider] ?? load.status.provider
       : null;
 
+  const descParts = t('instellingen.ai.desc').split('Vraag de kennisbank');
+
   return (
     <section className="settings-section">
       <div className="settings-section__header">
-        <p className="settings-section__label">AI</p>
+        <p className="settings-section__label">{t('instellingen.ai.label')}</p>
         <p className="settings-section__desc">
-          Met een AI-sleutel kan Coeus vragen beantwoorden (<code className="code-inline">Vraag de kennisbank</code>)
-          en slimmer kennis uit tekst halen. De sleutel blijft lokaal — opgeslagen
-          in de data-map op deze machine, nooit in de app zelf. Normaal stelt
-          Ynarchive die in bij oplevering; je hoeft hier dan niets te doen.
+          {descParts[0]}
+          <code className="code-inline">{t('vraag.title')}</code>
+          {descParts[1]}
         </p>
       </div>
 
       <div className="data-beheer">
         <div className="data-beheer__action">
           {load.kind === 'loading' && (
-            <p className="update-check__status">Status laden…</p>
+            <p className="update-check__status">{t('instellingen.ai.statusLoading')}</p>
           )}
           {load.kind === 'error' && (
             <p className="update-check__status update-check__status--error">
@@ -136,25 +137,25 @@ export default function AiSleutel() {
           {load.kind === 'ready' &&
             (configured ? (
               <p className="update-check__status update-check__status--ok">
-                AI actief{provider ? ` · ${provider}` : ''}
+                {t('instellingen.ai.statusActive')}{provider ? ` · ${provider}` : ''}
                 {load.status.model ? ` · ${load.status.model}` : ''}
               </p>
             ) : (
-              <p className="update-check__status">Geen sleutel ingesteld.</p>
+              <p className="update-check__status">{t('instellingen.ai.statusNoKey')}</p>
             ))}
         </div>
 
         <form onSubmit={handleSave} className="data-beheer__action">
           <div className="form-field">
             <label className="form-label" htmlFor="ai-key">
-              AI-sleutel
+              {t('instellingen.ai.keyLabel')}
             </label>
             <input
               id="ai-key"
               className="form-input"
               type="password"
               autoComplete="off"
-              placeholder="sk-…"
+              placeholder={t('instellingen.ai.keyPlaceholder')}
               value={key}
               onChange={(ev) => setKey(ev.target.value)}
             />
@@ -173,7 +174,7 @@ export default function AiSleutel() {
               disabled={busy}
               aria-busy={busy}
             >
-              {busy ? 'Opslaan…' : 'Sleutel opslaan'}
+              {busy ? t('common.saving') : t('instellingen.ai.saveKey')}
             </button>
             {configured && (
               <button
@@ -182,7 +183,7 @@ export default function AiSleutel() {
                 onClick={handleDelete}
                 disabled={busy}
               >
-                Verwijderen
+                {t('common.delete')}
               </button>
             )}
           </div>

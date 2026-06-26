@@ -4,6 +4,7 @@ export type TenantConfig = {
   logo?: string;
   accentColor?: string;
   breinUrl?: string;
+  defaultLang: 'nl' | 'en';
 };
 
 const tenant: TenantConfig = {
@@ -12,6 +13,8 @@ const tenant: TenantConfig = {
   logo: process.env.NEXT_PUBLIC_TENANT_LOGO ?? undefined,
   accentColor: process.env.NEXT_PUBLIC_TENANT_ACCENT ?? undefined,
   breinUrl: process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://127.0.0.1:8765',
+  // White-label clients can override via env; Coeus defaults to Dutch.
+  defaultLang: (process.env.NEXT_PUBLIC_TENANT_LANG as 'nl' | 'en' | undefined) ?? 'nl',
 };
 
 export default tenant;

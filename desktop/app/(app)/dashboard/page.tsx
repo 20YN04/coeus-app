@@ -3,16 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ask, waitForBrein, type AskResult } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 const BREIN_URL = process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://127.0.0.1:8765';
-
-const VOORBEELDVRAGEN = [
-  'Wat zijn de openingsuren?',
-  'Welke diensten bieden jullie aan?',
-  'Hoe vraag ik een offerte aan?',
-  'Wat is ons annuleringsbeleid?',
-  'Wie is de contactpersoon voor leveranciers?',
-];
 
 type Turn = {
   question: string;
@@ -28,6 +21,7 @@ function isNoKeyError(message: string): boolean {
 }
 
 export default function HomePage() {
+  const { t, tList, lang } = useT();
   const [ready, setReady] = useState(false);
   const [breinError, setBreinError] = useState('');
 
@@ -47,15 +41,14 @@ export default function HomePage() {
       if (!alive) return;
       setReady(true);
       if (!ok) {
-        setBreinError(
-          `Brein niet bereikbaar — controleer of de lokale brein draait op ${BREIN_URL}.`,
-        );
+        setBreinError(t('common.breinUnreachable', { url: BREIN_URL }));
       }
     });
     return () => {
       alive = false;
       ctrl.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Scroll het nieuwste antwoord in beeld zodra de geschiedenis groeit.
@@ -66,22 +59,21 @@ export default function HomePage() {
   async function submitQuestion(q: string) {
     const trimmed = q.trim();
     if (!trimmed) {
-      setError('Stel eerst een vraag.');
+      setError(t('errors.askFirst'));
       return;
     }
     setError('');
     setNoKey(false);
     setLoading(true);
     try {
-      const res = await ask(trimmed);
+      const res = await ask(trimmed, lang);
       setHistory((prev) => [
         ...prev,
         { question: trimmed, answer: res.antwoord, bronnen: res.bronnen ?? [] },
       ]);
       setQuestion('');
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Er ging iets mis bij het vragen.';
+      const message = err instanceof Error ? err.message : t('errors.askFailed');
       if (isNoKeyError(message)) {
         setNoKey(true);
       } else {
@@ -102,15 +94,14 @@ export default function HomePage() {
     submitQuestion(vraag);
   }
 
+  const voorbeeldvragen = tList<string[]>('home.chips');
+
   return (
     <div className="home">
       <div className="home-hero">
-        <p className="home-hero__eyebrow">Coeus</p>
-        <h1 className="home-hero__title">Wat wil je weten?</h1>
-        <p className="home-hero__sub">
-          Stel een vraag in gewone taal. Coeus zoekt het op in jullie kennisbank
-          en geeft antwoord — met de bronnen erbij.
-        </p>
+        <p className="home-hero__eyebrow">{t('home.eyebrow')}</p>
+        <h1 className="home-hero__title">{t('home.title')}</h1>
+        <p className="home-hero__sub">{t('home.subtitle')}</p>
       </div>
 
       {breinError && (
@@ -122,9 +113,9 @@ export default function HomePage() {
       {noKey && (
         <div className="api-error-banner">
           <span>
-            AI is nog niet ingesteld — voeg een sleutel toe bij{' '}
+            {t('errors.noKeyBanner').replace(/\.$/, '').split('{link}')[0]}
             <Link href="/instellingen" className="breadcrumb-link">
-              Instellingen → AI
+              {t('errors.settingsAiLink')}
             </Link>
             .
           </span>
@@ -135,7 +126,7 @@ export default function HomePage() {
         <div className="ask-box">
           <textarea
             className="ask-box__input"
-            placeholder="Bijv. Wat zijn onze openingstijden tijdens de feestdagen?"
+            placeholder={t('home.inputPlaceholder')}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             rows={2}
@@ -150,7 +141,7 @@ export default function HomePage() {
             className="ask-box__submit"
             disabled={loading || !ready}
             aria-busy={loading}
-            aria-label="Vraag stellen"
+            aria-label={t('home.askLabel')}
           >
             {loading ? (
               <span className="ask-box__spinner" aria-hidden="true" />
@@ -166,7 +157,7 @@ export default function HomePage() {
 
       {history.length === 0 && (
         <div className="ask-chips">
-          {VOORBEELDVRAGEN.map((vraag) => (
+          {voorbeeldvragen.map((vraag) => (
             <button
               key={vraag}
               type="button"
@@ -188,7 +179,7 @@ export default function HomePage() {
               <div className="ask-turn__answer">{turn.answer}</div>
               {turn.bronnen.length > 0 && (
                 <div className="ask-turn__bronnen">
-                  <p className="ask-turn__bronnen-label">Bronnen</p>
+                  <p className="ask-turn__bronnen-label">{t('home.bronnenLabel')}</p>
                   <ul className="vraag-bronnen">
                     {turn.bronnen.map((bron, j) =>
                       bron.id ? (
@@ -224,9 +215,9 @@ export default function HomePage() {
       )}
 
       <p className="home-footline">
-        Liever bladeren?{' '}
+        {t('home.footline')}{' '}
         <Link href="/kennisbank" className="breadcrumb-link">
-          Open de kennisbank →
+          {t('home.footlineLink')}
         </Link>
       </p>
     </div>

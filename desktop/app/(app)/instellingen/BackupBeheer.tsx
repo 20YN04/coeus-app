@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import { useT, type Lang } from '@/lib/i18n';
 
 type BackupInfo = {
   name: string;
@@ -39,9 +40,9 @@ function formatBytes(bytes: number): string {
   return `${value.toFixed(value >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
-function formatDate(ms: number): string {
+function formatDate(ms: number, lang: Lang): string {
   if (!ms) return '—';
-  return new Date(ms).toLocaleString('nl-BE', {
+  return new Date(ms).toLocaleString(lang === 'en' ? 'en-GB' : 'nl-BE', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -51,6 +52,7 @@ function formatDate(ms: number): string {
 }
 
 export default function BackupBeheer() {
+  const { t, lang } = useT();
   const isTauri = useSyncExternalStore(noopSubscribe, inTauri, () => false);
   const [backups, setBackups] = useState<BackupInfo[]>([]);
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' });
@@ -65,9 +67,10 @@ export default function BackupBeheer() {
     } catch (e) {
       setPhase({
         kind: 'error',
-        message: e instanceof Error ? e.message : 'Back-ups laden mislukt.',
+        message: e instanceof Error ? e.message : t('instellingen.backup.loadFailed'),
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -84,7 +87,7 @@ export default function BackupBeheer() {
         if (!cancelled) {
           setPhase({
             kind: 'error',
-            message: e instanceof Error ? e.message : 'Back-ups laden mislukt.',
+            message: e instanceof Error ? e.message : t('instellingen.backup.loadFailed'),
           });
         }
       }
@@ -92,6 +95,7 @@ export default function BackupBeheer() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTauri]);
 
   async function handleBackupNow() {
@@ -105,7 +109,7 @@ export default function BackupBeheer() {
     } catch (e) {
       setPhase({
         kind: 'error',
-        message: e instanceof Error ? e.message : 'Back-up mislukt.',
+        message: e instanceof Error ? e.message : t('instellingen.backup.failed'),
       });
     }
   }
@@ -117,7 +121,7 @@ export default function BackupBeheer() {
       const { invoke } = await import('@tauri-apps/api/core');
       await invoke('open_backups_dir');
     } catch (e) {
-      setOpenError(e instanceof Error ? e.message : 'Map openen mislukt.');
+      setOpenError(e instanceof Error ? e.message : t('instellingen.backup.openDirFailed'));
     }
   }
 
@@ -129,13 +133,8 @@ export default function BackupBeheer() {
   return (
     <section className="settings-section">
       <div className="settings-section__header">
-        <p className="settings-section__label">Automatische back-up</p>
-        <p className="settings-section__desc">
-          Coeus maakt elke keer bij het opstarten automatisch een lokale back-up van
-          de kennisbank. De laatste {10} back-ups worden bewaard, oudere worden
-          opgeruimd. Dit staat naast de JSON-export hierboven — alles blijft lokaal,
-          er gaat niets naar buiten.
-        </p>
+        <p className="settings-section__label">{t('instellingen.backup.label')}</p>
+        <p className="settings-section__desc">{t('instellingen.backup.desc')}</p>
       </div>
 
       <div className="backup-beheer">
@@ -146,16 +145,16 @@ export default function BackupBeheer() {
             disabled={busy}
             aria-busy={busy}
           >
-            {busy ? 'Back-up bezig…' : 'Back-up nu'}
+            {busy ? t('instellingen.backup.backingUp') : t('instellingen.backup.backupNow')}
           </button>
           <button className="btn-outline" onClick={handleOpenDir}>
-            Open back-up-map
+            {t('instellingen.backup.openDir')}
           </button>
         </div>
 
         {phase.kind === 'done' && (
           <p className="update-check__status update-check__status--ok">
-            Back-up gemaakt.
+            {t('instellingen.backup.done')}
           </p>
         )}
         {phase.kind === 'error' && (
@@ -170,16 +169,13 @@ export default function BackupBeheer() {
         )}
 
         {backups.length === 0 ? (
-          <p className="backup-beheer__empty">
-            Nog geen back-ups. De eerste wordt gemaakt bij de volgende start, of klik
-            op &ldquo;Back-up nu&rdquo;.
-          </p>
+          <p className="backup-beheer__empty">{t('instellingen.backup.empty')}</p>
         ) : (
           <ul className="backup-list">
             {backups.map((b) => (
               <li key={b.name} className="backup-list__row">
                 <span className="backup-list__name">{b.name}</span>
-                <span className="backup-list__meta">{formatDate(b.created_ms)}</span>
+                <span className="backup-list__meta">{formatDate(b.created_ms, lang)}</span>
                 <span className="backup-list__meta">{formatBytes(b.size_bytes)}</span>
               </li>
             ))}

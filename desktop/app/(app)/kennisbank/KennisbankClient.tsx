@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { listKennis, searchKennis, getCategories, waitForBrein, type KennisItem } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 function CategoryIcon({ category }: { category: string }) {
   const key = category.toLowerCase();
@@ -40,6 +41,7 @@ type Props = {
 };
 
 export default function KennisbankClient({ initialCategory, initialQuery }: Props) {
+  const { t } = useT();
   const [query, setQuery] = useState(initialQuery ?? '');
   const [activeCategory, setActiveCategory] = useState(initialCategory ?? '');
   const [items, setItems] = useState<KennisItem[]>([]);
@@ -56,12 +58,13 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
     waitForBrein(undefined, ctrl.signal).then((ok) => {
       if (!alive) return;
       setReady(true);
-      if (!ok) setError('Brein niet bereikbaar — controleer of de lokale brein draait.');
+      if (!ok) setError(t('common.breinUnreachableShort'));
     });
     return () => {
       alive = false;
       ctrl.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Categories drive the filter chips — fetched client-side once the brein is up.
@@ -90,12 +93,12 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
           : await listKennis(cat || undefined);
         setItems(result);
       } catch {
-        setError('Kan geen verbinding maken met het brein.');
+        setError(t('errors.connectionFailed'));
       } finally {
         setLoading(false);
       }
     },
-    [],
+    [t],
   );
 
   useEffect(() => {
@@ -120,21 +123,21 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
           <input
             type="search"
             className="kb-search__input"
-            placeholder="Semantisch zoeken…"
+            placeholder={t('kennisbank.searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            aria-label="Zoek in kennisbank"
+            aria-label={t('kennisbank.searchAriaLabel')}
           />
-          {loading && <span className="kb-search__spinner" aria-label="Laden" />}
+          {loading && <span className="kb-search__spinner" aria-label={t('common.loading')} />}
         </div>
 
         <Link href="/nieuw" className="btn-primary-sm">
-          + Nieuw item
+          {t('kennisbank.newItem')}
         </Link>
       </div>
 
       {categories.length > 0 && (
-        <div className="kb-filters" role="tablist" aria-label="Categorie filter">
+        <div className="kb-filters" role="tablist" aria-label={t('kennisbank.filterAriaLabel')}>
           <button
             role="tab"
             aria-selected={activeCategory === ''}
@@ -142,7 +145,7 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
             data-active={activeCategory === '' ? 'true' : undefined}
             onClick={() => setActiveCategory('')}
           >
-            Alles
+            {t('kennisbank.filterAll')}
           </button>
           {categories.map((cat) => (
             <button
@@ -171,11 +174,11 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
       {!error && items.length === 0 && !loading && (
         <div className="empty-state">
           <p className="empty-state__label">
-            {query ? `Geen resultaten voor "${query}"` : 'Niets gevonden'}
+            {query ? t('kennisbank.emptyNoResults', { query }) : t('kennisbank.emptyNothingFound')}
           </p>
-          <p className="empty-state__heading">Geen kennisitems</p>
+          <p className="empty-state__heading">{t('kennisbank.emptyHeading')}</p>
           {!query && (
-            <Link href="/nieuw" className="btn-ghost-sm">Eerste item toevoegen →</Link>
+            <Link href="/nieuw" className="btn-ghost-sm">{t('kennisbank.emptyCta')}</Link>
           )}
         </div>
       )}
@@ -195,7 +198,7 @@ export default function KennisbankClient({ initialCategory, initialQuery }: Prop
                 <span className="kennis-row__category">{item.category}</span>
                 {item.source && (
                   <span className={`source-badge source-badge--${item.source === 'ai' ? 'ai' : 'handmatig'}`}>
-                    {item.source === 'ai' ? 'AI' : 'Handmatig'}
+                    {item.source === 'ai' ? t('common.source.ai') : t('common.source.manual')}
                   </span>
                 )}
               </span>

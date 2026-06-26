@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ask, waitForBrein, type AskResult } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 type Turn = {
   question: string;
@@ -18,6 +19,7 @@ function isNoKeyError(message: string): boolean {
 }
 
 export default function VraagPage() {
+  const { t, lang } = useT();
   const [ready, setReady] = useState(false);
   const [breinError, setBreinError] = useState('');
 
@@ -37,15 +39,14 @@ export default function VraagPage() {
       if (!alive) return;
       setReady(true);
       if (!ok) {
-        setBreinError(
-          'Brein niet bereikbaar — controleer of de lokale brein draait.',
-        );
+        setBreinError(t('common.breinUnreachableShort'));
       }
     });
     return () => {
       alive = false;
       ctrl.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Scroll de nieuwste Q&A in beeld zodra de geschiedenis groeit.
@@ -57,22 +58,21 @@ export default function VraagPage() {
     e.preventDefault();
     const q = question.trim();
     if (!q) {
-      setError('Stel eerst een vraag.');
+      setError(t('errors.askFirst'));
       return;
     }
     setError('');
     setNoKey(false);
     setLoading(true);
     try {
-      const res = await ask(q);
+      const res = await ask(q, lang);
       setHistory((prev) => [
         ...prev,
         { question: q, answer: res.antwoord, bronnen: res.bronnen ?? [] },
       ]);
       setQuestion('');
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Er ging iets mis bij het vragen.';
+      const message = err instanceof Error ? err.message : t('errors.askFailed');
       if (isNoKeyError(message)) {
         setNoKey(true);
       } else {
@@ -86,15 +86,11 @@ export default function VraagPage() {
   return (
     <>
       <div className="page-header">
-        <p className="page-eyebrow">Kennisbank</p>
-        <h1 className="page-title">Vraag de kennisbank</h1>
+        <p className="page-eyebrow">{t('vraag.eyebrow')}</p>
+        <h1 className="page-title">{t('vraag.title')}</h1>
       </div>
 
-      <p className="import-intro">
-        Stel een vraag in gewone taal. Coeus zoekt de relevante kennis erbij en
-        formuleert een antwoord — met de bronnen waarop het zich baseert. Alles
-        blijft lokaal.
-      </p>
+      <p className="import-intro">{t('vraag.intro')}</p>
 
       {breinError && (
         <div className="api-error-banner">
@@ -105,9 +101,9 @@ export default function VraagPage() {
       {noKey && (
         <div className="api-error-banner">
           <span>
-            AI is nog niet geconfigureerd — stel een sleutel in bij{' '}
+            {t('errors.noKeyBanner').replace(/\.$/, '').split('{link}')[0]}
             <Link href="/instellingen" className="breadcrumb-link">
-              Instellingen → AI
+              {t('errors.settingsAiLink')}
             </Link>
             .
           </span>
@@ -122,7 +118,7 @@ export default function VraagPage() {
               <div className="vraag-turn__answer">{turn.answer}</div>
               {turn.bronnen.length > 0 && (
                 <div className="vraag-turn__bronnen">
-                  <p className="vraag-turn__bronnen-label">Bronnen</p>
+                  <p className="vraag-turn__bronnen-label">{t('vraag.bronnenLabel')}</p>
                   <ul className="vraag-bronnen">
                     {turn.bronnen.map((bron, j) =>
                       bron.id ? (
@@ -160,12 +156,12 @@ export default function VraagPage() {
       <form onSubmit={handleSubmit} className="vraag-form">
         <div className="form-field">
           <label className="form-label" htmlFor="vraag-input">
-            Je vraag
+            {t('vraag.label')}
           </label>
           <textarea
             id="vraag-input"
             className="form-input form-textarea"
-            placeholder="Bijv. Wat zijn onze openingstijden tijdens de feestdagen?"
+            placeholder={t('home.inputPlaceholder')}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             rows={3}
@@ -186,7 +182,7 @@ export default function VraagPage() {
             disabled={loading || !ready}
             aria-busy={loading}
           >
-            <span>{loading ? 'Denken…' : 'Vraag stellen'}</span>
+            <span>{loading ? t('vraag.thinking') : t('vraag.submit')}</span>
             <span aria-hidden="true">→</span>
           </button>
         </div>

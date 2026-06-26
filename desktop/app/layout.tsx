@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import tenant from '@/config/tenant';
 import AutoUpdate from './AutoUpdate';
+import { I18nProvider } from '@/lib/i18n';
 
 export const metadata: Metadata = {
   title: `Kennisbank — ${tenant.name}`,
@@ -40,8 +41,10 @@ export default function RootLayout({
     <html lang="nl">
       <body>
         {accent && <style dangerouslySetInnerHTML={{ __html: accent }} />}
-        {children}
-        <AutoUpdate />
+        <I18nProvider>
+          {children}
+          <AutoUpdate />
+        </I18nProvider>
       </body>
     </html>
   );

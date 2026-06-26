@@ -302,6 +302,9 @@ body {
 .sidebar__footer {
   padding: var(--s-6);
   border-top: 1px solid var(--c-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
 }
 @media (max-width: 56rem) {
   .sidebar__footer {
@@ -309,6 +312,9 @@ body {
     border-top: none;
     border-left: 1px solid var(--c-border);
     margin-left: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--s-2);
   }
 }
 
@@ -318,6 +324,36 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--c-ink-muted);
+}
+
+.sidebar__lang {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.sidebar__lang-btn {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  color: var(--c-ink-muted);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color var(--d-fast) var(--ease-out);
+}
+.sidebar__lang-btn:hover { color: var(--c-ink); }
+.sidebar__lang-btn[data-active="true"] {
+  color: var(--c-ink);
+  font-weight: 700;
+}
+
+.sidebar__lang-sep {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--c-ink-muted);
+  opacity: 0.5;
 }
 
 /* Client-side data loading + boot splash (static SPA, local-first) */

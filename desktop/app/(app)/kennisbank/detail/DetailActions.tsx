@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteKennis } from '@/lib/brein';
+import { useT } from '@/lib/i18n';
 
 type Props = {
   id: string;
@@ -11,6 +12,7 @@ type Props = {
 
 export default function DetailActions({ id, title }: Props) {
   const router = useRouter();
+  const { t } = useT();
   const [confirming, setConfirming] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -26,7 +28,7 @@ export default function DetailActions({ id, title }: Props) {
       await deleteKennis(id);
       router.push('/kennisbank');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Verwijderen mislukt.');
+      setError(e instanceof Error ? e.message : t('errors.deleteFailed'));
       setLoading(false);
       setConfirming(false);
     }
@@ -37,23 +39,25 @@ export default function DetailActions({ id, title }: Props) {
       {error && <p className="form-error">{error}</p>}
       {confirming && (
         <p className="delete-confirm-text">
-          Verwijder &ldquo;{title.length > 40 ? title.slice(0, 40) + '…' : title}&rdquo;? Dit is onomkeerbaar.
+          {t('detail.deleteConfirm', {
+            title: title.length > 40 ? title.slice(0, 40) + '…' : title,
+          })}
         </p>
       )}
       <button
         className={confirming ? 'btn-danger' : 'btn-ghost'}
         onClick={handleDelete}
         disabled={loading}
-        aria-label={confirming ? 'Bevestig verwijdering' : 'Verwijder dit item'}
+        aria-label={confirming ? t('detail.deleteAriaConfirm') : t('detail.deleteAriaDelete')}
       >
-        {loading ? 'Verwijderen…' : confirming ? 'Bevestigen' : 'Verwijderen'}
+        {loading ? t('common.deleting') : confirming ? t('common.confirm') : t('common.delete')}
       </button>
       {confirming && !loading && (
         <button
           className="btn-ghost"
           onClick={() => setConfirming(false)}
         >
-          Annuleren
+          {t('common.cancel')}
         </button>
       )}
     </div>

@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useT } from '@/lib/i18n';
 
 const KLANT_NAV = [
   {
     href: '/dashboard',
-    label: 'Home',
+    labelKey: 'nav.home',
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
         <path d="M2 7.5 8 2l6 5.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -16,7 +17,7 @@ const KLANT_NAV = [
   },
   {
     href: '/kennisbank',
-    label: 'Kennisbank',
+    labelKey: 'nav.kennisbank',
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
         <path d="M2 3h12M2 6h9M2 9h11M2 12h7" />
@@ -25,7 +26,7 @@ const KLANT_NAV = [
   },
   {
     href: '/overzicht',
-    label: 'Overzicht',
+    labelKey: 'nav.overzicht',
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
         <rect x="1.5" y="2.5" width="13" height="11" />
@@ -38,7 +39,7 @@ const KLANT_NAV = [
 const BEHEER_NAV = [
   {
     href: '/importeren',
-    label: 'Importeren',
+    labelKey: 'nav.importeren',
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
         <path d="M8 1.5v7M5 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round" />
@@ -48,7 +49,7 @@ const BEHEER_NAV = [
   },
   {
     href: '/nieuw',
-    label: 'Nieuw',
+    labelKey: 'nav.nieuw',
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
         <path d="M8 2v12M2 8h12" />
@@ -57,7 +58,7 @@ const BEHEER_NAV = [
   },
   {
     href: '/graph',
-    label: 'Graph',
+    labelKey: 'nav.graph',
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
         <circle cx="3.5" cy="3.5" r="1.75" />
@@ -69,7 +70,7 @@ const BEHEER_NAV = [
   },
   {
     href: '/automatisaties',
-    label: 'Automatisaties',
+    labelKey: 'nav.automatisaties',
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
         <circle cx="4" cy="8" r="2" />
@@ -80,7 +81,7 @@ const BEHEER_NAV = [
   },
   {
     href: '/instellingen',
-    label: 'Instellingen',
+    labelKey: 'nav.instellingen',
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
         <circle cx="8" cy="8" r="2" />
@@ -92,6 +93,7 @@ const BEHEER_NAV = [
 
 export default function Sidebar({ tenantName }: { tenantName: string }) {
   const pathname = usePathname();
+  const { t, lang, setLang } = useT();
 
   return (
     <aside className="sidebar">
@@ -102,7 +104,7 @@ export default function Sidebar({ tenantName }: { tenantName: string }) {
 
       <nav className="sidebar__nav">
         <div className="sidebar__group">
-          {KLANT_NAV.map(({ href, label, icon }) => (
+          {KLANT_NAV.map(({ href, labelKey, icon }) => (
             <Link
               key={href}
               href={href}
@@ -110,17 +112,17 @@ export default function Sidebar({ tenantName }: { tenantName: string }) {
               data-active={pathname.startsWith(href) ? 'true' : undefined}
             >
               {icon}
-              {label}
+              {t(labelKey)}
             </Link>
           ))}
         </div>
 
         <div className="sidebar__divider">
-          <span className="sidebar__divider-label">Beheer</span>
+          <span className="sidebar__divider-label">{t('nav.beheer')}</span>
         </div>
 
         <div className="sidebar__group sidebar__group--secondary">
-          {BEHEER_NAV.map(({ href, label, icon }) => (
+          {BEHEER_NAV.map(({ href, labelKey, icon }) => (
             <Link
               key={href}
               href={href}
@@ -128,14 +130,33 @@ export default function Sidebar({ tenantName }: { tenantName: string }) {
               data-active={pathname.startsWith(href) ? 'true' : undefined}
             >
               {icon}
-              {label}
+              {t(labelKey)}
             </Link>
           ))}
         </div>
       </nav>
 
       <div className="sidebar__footer">
-        <span className="sidebar__footer-mark">Coeus · lokaal</span>
+        <span className="sidebar__footer-mark">{t('nav.footerMark')}</span>
+        <div className="sidebar__lang" role="group" aria-label="Taal / Language">
+          <button
+            type="button"
+            className="sidebar__lang-btn"
+            data-active={lang === 'nl' ? 'true' : undefined}
+            onClick={() => setLang('nl')}
+          >
+            NL
+          </button>
+          <span className="sidebar__lang-sep" aria-hidden="true">·</span>
+          <button
+            type="button"
+            className="sidebar__lang-btn"
+            data-active={lang === 'en' ? 'true' : undefined}
+            onClick={() => setLang('en')}
+          >
+            EN
+          </button>
+        </div>
       </div>
     </aside>
   );

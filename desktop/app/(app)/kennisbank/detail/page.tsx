@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getKennis, type KennisItem } from '@/lib/brein';
 import DetailActions from './DetailActions';
+import { useT } from '@/lib/i18n';
 
 function renderBody(content: string) {
   const paragraphs = content
@@ -33,6 +34,7 @@ function renderBody(content: string) {
 }
 
 function DetailLoader({ id }: { id: string }) {
+  const { t, lang } = useT();
   const [item, setItem] = useState<KennisItem | null>(null);
   const [status, setStatus] = useState<'loading' | 'ok' | 'notfound'>(id ? 'loading' : 'notfound');
 
@@ -58,21 +60,21 @@ function DetailLoader({ id }: { id: string }) {
   }, [id]);
 
   if (status === 'loading') {
-    return <div className="page-loading" role="status">Laden…</div>;
+    return <div className="page-loading" role="status">{t('common.loading')}</div>;
   }
 
   if (status === 'notfound' || !item) {
     return (
       <div className="empty-state">
-        <p className="empty-state__label">Niet gevonden</p>
-        <p className="empty-state__heading">Dit kennisitem bestaat niet</p>
-        <Link href="/kennisbank" className="btn-ghost-sm">← Terug naar kennisbank</Link>
+        <p className="empty-state__label">{t('common.notFound')}</p>
+        <p className="empty-state__heading">{t('detail.notFoundHeading')}</p>
+        <Link href="/kennisbank" className="btn-ghost-sm">{t('detail.backToKennisbank')}</Link>
       </div>
     );
   }
 
   const formattedDate = item.created_at
-    ? new Date(item.created_at).toLocaleDateString('nl-BE', {
+    ? new Date(item.created_at).toLocaleDateString(lang === 'en' ? 'en-GB' : 'nl-BE', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -85,7 +87,7 @@ function DetailLoader({ id }: { id: string }) {
       <div className="page-header">
         <p className="page-eyebrow">
           <Link href="/kennisbank" className="breadcrumb-link">
-            Kennisbank
+            {t('kennisbank.title')}
           </Link>
           <span className="breadcrumb-sep"> / </span>
           {item.category}
@@ -96,7 +98,7 @@ function DetailLoader({ id }: { id: string }) {
       <div className="detail-layout">
         <article className="detail-content">
           <Link href="/kennisbank" className="detail-back">
-            ← Kennisbank
+            {t('detail.backShort')}
           </Link>
           <div className="detail-body">
             {renderBody(item.content)}
@@ -105,16 +107,16 @@ function DetailLoader({ id }: { id: string }) {
 
         <aside className="detail-meta">
           <div className="meta-block">
-            <p className="meta-label">Categorie</p>
+            <p className="meta-label">{t('detail.category')}</p>
             <p className="meta-value">{item.category}</p>
           </div>
 
           {item.source && (
             <div className="meta-block">
-              <p className="meta-label">Bron</p>
+              <p className="meta-label">{t('detail.source')}</p>
               <p className="meta-value">
                 <span className={`source-badge source-badge--${item.source === 'ai' ? 'ai' : 'handmatig'}`}>
-                  {item.source === 'ai' ? 'AI gegenereerd' : 'Handmatig'}
+                  {item.source === 'ai' ? t('common.source.aiGenerated') : t('common.source.manual')}
                 </span>
               </p>
             </div>
@@ -122,21 +124,21 @@ function DetailLoader({ id }: { id: string }) {
 
           {item.source_detail && (
             <div className="meta-block">
-              <p className="meta-label">Bron detail</p>
+              <p className="meta-label">{t('detail.sourceDetail')}</p>
               <p className="meta-value meta-value--muted">{item.source_detail}</p>
             </div>
           )}
 
           {formattedDate && (
             <div className="meta-block">
-              <p className="meta-label">Aangemaakt</p>
+              <p className="meta-label">{t('detail.createdAt')}</p>
               <p className="meta-value meta-value--muted">{formattedDate}</p>
             </div>
           )}
 
           <div className="detail-actions">
             <Link href={`/kennisbank/bewerken?id=${encodeURIComponent(item.id)}`} className="btn-outline">
-              Bewerken
+              {t('common.edit')}
             </Link>
             <DetailActions id={item.id} title={item.title} />
           </div>
@@ -154,8 +156,9 @@ function DetailInner() {
 }
 
 export default function KennisDetailPage() {
+  const { t } = useT();
   return (
-    <Suspense fallback={<div className="page-loading" role="status">Laden…</div>}>
+    <Suspense fallback={<div className="page-loading" role="status">{t('common.loading')}</div>}>
       <DetailInner />
     </Suspense>
   );
