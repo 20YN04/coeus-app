@@ -82,6 +82,71 @@ def chunk_text(text: str) -> list[str]:
     return [c.strip() for c in chunks if c.strip()]
 
 
+# Ruis-filter voor web-afgeleide chunks (URL-import + crawl-fallback). Boilerplate
+# die html_to_text overleeft — knoppen, cookie-balken, nav-lijsten ín de body — is
+# geen kennis; bij de ericbanden.be-validatie was ~33% van de items zulke ruis.
+NOISE_MIN_CHARS = 40
+
+# Frasen die op zichzelf nooit kennis zijn (vergeleken case-insensitief, zonder
+# leestekens). Bewust een korte, conservatieve lijst: liever een ruis-item te veel
+# dan een echt feit weggegooid.
+_NOISE_PHRASES = {
+    'lees meer', 'lees verder', 'read more', 'meer info', 'meer informatie',
+    'meer weten', 'ontdek meer', 'bekijk meer', 'bekijk alle',
+    'terug naar boven', 'naar boven', 'terug', 'vorige', 'volgende',
+    'home', 'menu', 'sluiten', 'zoeken', 'ok', 'oke', 'akkoord',
+    'contacteer ons', 'neem contact op', 'contact opnemen', 'contact',
+    'deel dit bericht', 'deel dit artikel', 'delen', 'share',
+    'cookies accepteren', 'accepteer cookies', 'alle cookies accepteren',
+    'cookie instellingen', 'cookieinstellingen', 'privacybeleid',
+    'privacy policy', 'algemene voorwaarden', 'disclaimer',
+}
+
+# Zins-signalen: een regel mét leesteken/valuta is een zin of feit, geen nav-label.
+_SENTENCE_CHARS = re.compile(r'[.!?:;€$]')
+
+
+def _normalize_phrase(line: str) -> str:
+    # "Lees meer →" / "LEES MEER..." → "lees meer" zodat de frase-lijst matcht.
+    return re.sub(r'[^\w\s]', '', line, flags=re.UNICODE).strip().lower()
+
+
+def is_noise_chunk(chunk: str) -> bool:
+    """True als een web-chunk boilerplate is i.p.v. kennis.
+
+    Drie signalen (alleen voor web-afgeleide tekst gebruiken — een gebruiker die
+    zelf een kort feit plakt mag nooit gefilterd worden):
+    1. kort fragment zonder cijfer ("Lees meer", "Onze diensten") = knop/kop-tekst;
+       korte regels MÉT cijfer (telefoonnummer, prijs) zijn juist waardevol;
+    2. de hele chunk bestaat uit bekende boilerplate-frasen (cookie-balk, share);
+    3. (bijna) alle regels zijn korte woordgroepjes zonder zinsleestekens of
+       cijfers — een aan elkaar geplakt menu, geen alinea.
+    """
+    text = chunk.strip()
+    if not text:
+        return True
+    has_digit = any(ch.isdigit() for ch in text)
+    if len(text) < NOISE_MIN_CHARS and not has_digit:
+        return True
+    lines = [ln for ln in (raw.strip() for raw in text.splitlines()) if ln]
+    normalized = [n for n in (_normalize_phrase(ln) for ln in lines) if n]
+    if normalized and all(n in _NOISE_PHRASES for n in normalized):
+        return True
+    if len(lines) >= 3 and not has_digit:
+        nav_like = sum(
+            1 for ln in lines
+            if len(ln.split()) <= 3 and not _SENTENCE_CHARS.search(ln)
+        )
+        if nav_like / len(lines) >= 0.8:
+            return True
+    return False
+
+
+def filter_noise_chunks(chunks: list[str]) -> list[str]:
+    """Verwijder boilerplate-chunks uit web-afgeleide tekst (zie is_noise_chunk)."""
+    return [c for c in chunks if not is_noise_chunk(c)]
+
+
 def derive_title(chunk: str) -> str:
     """Leid een korte titel af: eerste niet-lege regel, gecapt op ~60 tekens."""
     first_line = next((ln.strip() for ln in chunk.splitlines() if ln.strip()), '')

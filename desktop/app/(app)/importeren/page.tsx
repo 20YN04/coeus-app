@@ -101,10 +101,14 @@ export default function ImporterenPage() {
       } else if (mode === 'website') {
         if (webMode === 'crawl') {
           const res = await ingestCrawl(url.trim(), { category: cat, maxPages });
-          setResult(
+          const crawlMsg =
             res.toegevoegd === 1 && res.paginas === 1
               ? t('importeren.resultCrawlSingle', { count: res.toegevoegd, pages: res.paginas })
-              : t('importeren.resultCrawlPlural', { count: res.toegevoegd, pages: res.paginas }),
+              : t('importeren.resultCrawlPlural', { count: res.toegevoegd, pages: res.paginas });
+          setResult(
+            res.opgeschoond > 0
+              ? `${crawlMsg} · ${t('importeren.resultCrawlCleaned', { cleaned: res.opgeschoond })}`
+              : crawlMsg,
           );
         } else {
           const res = await ingestUrl(url.trim(), { category: cat });
