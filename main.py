@@ -6,7 +6,7 @@ import requests
 from brain.memory import Memory
 from brain.learner import Learner
 from brain.seed import seed_if_empty
-from brain.ingest import chunk_text, derive_title, html_to_text, crawl_site
+from brain.ingest import chunk_text, derive_title, filter_noise_chunks, html_to_text, crawl_site
 from brain.config import settings
 from brain.models import (
     KennisItem, CreateKennisRequest, UpdateKennisRequest,
@@ -222,10 +222,17 @@ def delete_llm_key():
 
     return {"configured": bool(settings.llm_api_key)}
 
-def _ingest_chunks(text: str, category: str | None, source_detail: str) -> int:
-    # Gedeelde kern van /ingest/text en /ingest/url: tekst hakken, titel afleiden,
+def _ingest_chunks(
+    text: str, category: str | None, source_detail: str, *, filter_noise: bool = False
+) -> int:
+    # Gedeelde kern van de key-free ingest-routes: tekst hakken, titel afleiden,
     # elk stuk als kennis-item opslaan met source="import". Key-free, geen LLM.
+    # filter_noise alleen voor web-afgeleide tekst (URL/crawl): boilerplate-chunks
+    # (knoppen, cookie-balken, nav-lijsten) eruit. Zelf geplakte tekst en bestanden
+    # worden nooit gefilterd — wat de gebruiker bewust aanlevert is per definitie kennis.
     chunks = chunk_text(text)
+    if filter_noise:
+        chunks = filter_noise_chunks(chunks)
     cat = (category or "").strip() or "import"
     added = 0
     for chunk in chunks:
@@ -279,7 +286,7 @@ def _ingest_page(text: str, category: str | None, source_detail: str) -> int:
             # AI gaf niets bruikbaars terug → val terug op chunking
         except (RuntimeError, ValueError):
             pass
-    return _ingest_chunks(text, category, source_detail)
+    return _ingest_chunks(text, category, source_detail, filter_noise=True)
 
 
 @app.post("/ingest/text")
@@ -357,7 +364,18 @@ def ingest_crawl(request: IngestCrawlRequest):
         added += _ingest_page(text, request.category, page_url)
         pages += 1
 
-    return {"toegevoegd": added, "paginas": pages, "ai_extractie": bool(settings.llm_api_key)}
+    # Auto-opschonen ná de crawl: dezelfde near-duplicate-pass als Instellingen →
+    # Opschonen, maar automatisch — blokken die over meerdere pagina's herhaald
+    # worden (uitgelekte boilerplate, dubbele feiten) verdwijnen meteen i.p.v. dat
+    # de klant zelf moet opschonen. Alleen draaien als er echt iets is toegevoegd.
+    opgeschoond = memory.dedupe(CLEANUP_DEFAULT_THRESHOLD) if added else 0
+
+    return {
+        "toegevoegd": added,
+        "paginas": pages,
+        "opgeschoond": opgeschoond,
+        "ai_extractie": bool(settings.llm_api_key),
+    }
 
 
 # Toegestane upload-types en een ruime maximumgrootte (~10MB) zodat één bestand

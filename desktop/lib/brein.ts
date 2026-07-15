@@ -126,7 +126,7 @@ export async function getCategories(): Promise<string[]> {
 }
 
 export type IngestResult = { toegevoegd: number };
-export type CrawlResult = { toegevoegd: number; paginas: number };
+export type CrawlResult = { toegevoegd: number; paginas: number; opgeschoond: number };
 export type FileResult = { toegevoegd: number; bestand: string };
 
 // Onboarding-motor: hak vrije tekst in stukken en sla ze key-free op als

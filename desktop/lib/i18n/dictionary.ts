@@ -175,6 +175,7 @@ const nl = {
     resultItemsAddedPlural: '{count} items toegevoegd',
     resultCrawlSingle: '{count} item van {pages} pagina',
     resultCrawlPlural: '{count} items van {pages} pagina\'s',
+    resultCrawlCleaned: '{cleaned} dubbele items automatisch opgeschoond',
   },
   nieuw: {
     eyebrow: 'Kennisbank',
@@ -487,6 +488,7 @@ const en: Dictionary = {
     resultItemsAddedPlural: '{count} items added',
     resultCrawlSingle: '{count} item from {pages} page',
     resultCrawlPlural: '{count} items from {pages} pages',
+    resultCrawlCleaned: '{cleaned} duplicate items cleaned up automatically',
   },
   nieuw: {
     eyebrow: 'Knowledge base',
