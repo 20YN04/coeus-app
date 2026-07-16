@@ -19,7 +19,7 @@ inlined into `out/`):
 | `NEXT_PUBLIC_TENANT_NAME` | Company name (titlebar, sidebar, metadata) |
 | `NEXT_PUBLIC_TENANT_SLUG` | Short slug |
 | `NEXT_PUBLIC_TENANT_LOGO` | Optional logo path under `public/` |
-| `NEXT_PUBLIC_TENANT_ACCENT` | Primary colour, e.g. `#C2410C`. Re-tints the whole indigo token family (`--c-field`, `--c-field-deep`, `--c-paper-ink`, `--c-paper-muted`) via `color-mix`. Omit / leave `#3A1DD8` for the default Coeus indigo. |
+| `NEXT_PUBLIC_TENANT_ACCENT` | Primary colour, e.g. `#C2410C`. Re-tints only the *interactive accent* family (`--c-accent`, `--c-accent-rgb`, `--c-paper-muted`) — links, active nav, primary buttons, focus/selection. Body text ink (`--c-ink`/`--c-ink-muted`) and the field background never change: reading text stays neutral, brand colour is interaction-only (2026-07 ergonomics restyle). Omit / leave `#1F1FD1` for the default Coeus blue. |
 | `NEXT_PUBLIC_BREIN_URL` | Leave at `http://127.0.0.1:8765` — the local sidecar. |
 
 ## 2. Brein sidecar (one per OS)

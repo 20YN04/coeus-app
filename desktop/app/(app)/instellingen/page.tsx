@@ -107,11 +107,11 @@ export default function InstellingenPage() {
             <div className="accent-preview">
               <div
                 className="accent-swatch"
-                style={{ background: '#006B2B' }}
+                style={{ background: '#1F1FD1' }}
                 aria-label={t('instellingen.branding.defaultAriaLabel')}
               />
               <span className="accent-swatch__label">
-                #006B2B <span className="meta-value--muted">{t('instellingen.branding.defaultSuffix')}</span>
+                #1F1FD1 <span className="meta-value--muted">{t('instellingen.branding.defaultSuffix')}</span>
               </span>
             </div>
           )}
