@@ -177,6 +177,39 @@ export async function ingestCrawl(
   });
 }
 
+// Onboarding-motor: start een crawl als achtergrond-job i.p.v. te wachten tot de
+// hele site klaar is. Geeft meteen een job_id terug; voortgang via
+// getCrawlStatus. Zelfde crawl als ingestCrawl, ander transport (async=true).
+export async function ingestCrawlAsync(
+  url: string,
+  opts?: { category?: string; maxPages?: number },
+): Promise<{ job_id: string }> {
+  return req<{ job_id: string }>('/ingest/crawl?async=true', {
+    method: 'POST',
+    body: JSON.stringify({
+      url,
+      category: opts?.category || undefined,
+      max_pages: opts?.maxPages || undefined,
+    }),
+  });
+}
+
+export type CrawlJobStatus = {
+  status: 'running' | 'done' | 'error';
+  paginas_bezocht: number;
+  paginas_totaal_geschat: number;
+  toegevoegd: number;
+  huidige_url: string | null;
+  opgeschoond: number | null;
+  error: string | null;
+};
+
+// Voortgang van een async crawl-job. 404 (job niet gevonden / verlopen) komt
+// door de gedeelde req-helper als Error naar boven — de caller vangt dat af.
+export async function getCrawlStatus(jobId: string): Promise<CrawlJobStatus> {
+  return req<CrawlJobStatus>(`/ingest/status/${encodeURIComponent(jobId)}`);
+}
+
 // Onboarding-motor: upload een bestand (.pdf / .md / .markdown / .txt), extraheer
 // de tekst server-side en sla die key-free op. FormData-upload: géén handmatige
 // Content-Type zetten — de browser bepaalt de multipart-boundary zelf (de gedeelde

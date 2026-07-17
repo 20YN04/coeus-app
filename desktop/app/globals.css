@@ -2883,3 +2883,243 @@ a.vraag-bron:hover {
 .import-ai-toggle input {
   accent-color: var(--c-accent);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Welkom — first-run onboarding wizard (/welkom)
+   Full-bleed, no sidebar/topbar — this is the one screen in the
+   app allowed a single dominant moment (see Mainstyle §Section
+   Rhythm). Zodiak-serif only on the step heading itself.
+   ───────────────────────────────────────────────────────────── */
+.welkom {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-8);
+  background: var(--c-field);
+}
+
+.welkom-shell {
+  width: 100%;
+  max-width: 30rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-8);
+}
+
+.welkom-steps {
+  display: flex;
+  gap: var(--s-2);
+}
+
+.welkom-steps__dot {
+  height: 2px;
+  flex: 1;
+  background: var(--c-border);
+}
+.welkom-steps__dot[data-done="true"] {
+  background: var(--c-accent);
+}
+
+.welkom-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.welkom-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-ink-muted);
+  margin: 0;
+}
+
+.welkom-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.875rem, 5vw, 2.75rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  color: var(--c-ink);
+  margin: 0;
+}
+
+.welkom-lead {
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  color: var(--c-ink-muted);
+  margin: 0;
+  max-width: 32rem;
+}
+
+.welkom-cards {
+  display: grid;
+  gap: 1px;
+  background: var(--c-border);
+  border: 1px solid var(--c-border);
+}
+
+.welkom-card {
+  background: var(--c-field);
+  padding: var(--s-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.welkom-card[data-active="true"] { background: rgba(var(--c-accent-rgb), 0.06); }
+
+/* Website-kaart: de tekst-kop is een losse toggle-button (opent het URL-veld);
+   de kaart zelf blijft een <div> zodat het geneste <form> geldige HTML is —
+   interactieve content mag niet in een <button> zitten. */
+.welkom-card__toggle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 100%;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  color: inherit;
+}
+
+/* Documenten (Link) en Later (button) zijn zelf het volledige klikvlak. */
+.welkom-card--link,
+.welkom-card[data-variant="ghost"] {
+  text-decoration: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font-family: var(--font-ui);
+  transition: background var(--d-fast) var(--ease-out);
+}
+.welkom-card--link:hover,
+.welkom-card[data-variant="ghost"]:hover,
+.welkom-card__toggle:hover {
+  background: rgba(var(--c-ink-rgb), 0.04);
+}
+.welkom-card[data-variant="ghost"] {
+  color: var(--c-ink-muted);
+}
+
+.welkom-card__label {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-ink-muted);
+  margin: 0;
+}
+
+.welkom-card__title {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  color: var(--c-ink);
+  margin: 0;
+}
+
+.welkom-card__desc {
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--c-ink-muted);
+  margin: 0;
+}
+
+.welkom-card-url {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding-top: var(--s-4);
+  margin-top: var(--s-1);
+  border-top: 1px solid var(--c-border);
+}
+.welkom-card-url__row {
+  display: flex;
+  gap: var(--s-2);
+}
+.welkom-card-url__row .form-input {
+  flex: 1;
+}
+
+.welkom-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+
+/* Voortgang — bescheiden accent-balk. transform-only (scaleX), dubbel-gated:
+   de transitie zelf schakelt uit onder reduced-motion, en de breedte komt uit
+   React state, nooit uit de animatie zelf — zonder JS/bij een falende poll
+   staat de balk gewoon stil op de laatst bekende waarde, nooit onzichtbaar. */
+.welkom-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.welkom-progress__track {
+  height: 2px;
+  background: var(--c-border);
+  overflow: hidden;
+}
+
+.welkom-progress__bar {
+  height: 100%;
+  width: 100%;
+  background: var(--c-accent);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .welkom-progress__bar {
+    transition: transform var(--d-slow) var(--ease-out);
+  }
+}
+
+.welkom-progress__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  color: var(--c-ink-muted);
+}
+
+.welkom-progress__url {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.01em;
+  color: var(--c-ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.welkom-progress__hint {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--c-ink-muted);
+  margin: 0;
+}
+
+.welkom-done__count {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
+  color: var(--c-ink);
+  margin: 0;
+}

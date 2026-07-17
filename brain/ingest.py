@@ -225,15 +225,22 @@ def _extract_links(html: str, base_url: str, host: str) -> list[str]:
     return links
 
 
-def crawl_site(start_url: str, max_pages: int = 15) -> Iterator[tuple[str, str]]:
+def crawl_site_with_progress(
+    start_url: str, max_pages: int = 15
+) -> Iterator[tuple[str, str, int, int]]:
     """Crawl pagina's op dezelfde host vanaf start_url (BFS), key-free.
 
-    Yield per pagina een (url, text)-paar met de leesbare tekst. Breadth-first:
-    haal een pagina op, extraheer interne links op dezelfde host, zet onbekende
-    in de wachtrij, dedupe, cap op max_pages. Per-pagina 15s timeout, beleefd
-    (één request tegelijk). Resilient: een pagina die faalt wordt overgeslagen,
-    de crawl crasht nooit. De eerste pagina (start_url) wordt door de aanroeper
-    apart opgehaald/gevalideerd; deze generator herstart vanaf die response.
+    Yield per pagina een (url, text, bezocht, queue_len)-tuple: de leesbare
+    tekst plus voortgangscijfers op dat moment — bezocht is het aantal
+    afgeronde pagina's (inclusief deze), queue_len het aantal nog-te-bezoeken
+    URLs die de crawl al kent (bezocht + queue_len = een levende schatting
+    van het totaal, groeit naarmate er meer links ontdekt worden). Breadth-
+    first: haal een pagina op, extraheer interne links op dezelfde host, zet
+    onbekende in de wachtrij, dedupe, cap op max_pages. Per-pagina 15s
+    timeout, beleefd (één request tegelijk). Resilient: een pagina die faalt
+    wordt overgeslagen, de crawl crasht nooit. De eerste pagina (start_url)
+    wordt door de aanroeper apart opgehaald/gevalideerd; deze generator
+    herstart vanaf die response.
     """
     import requests
 
@@ -265,4 +272,11 @@ def crawl_site(start_url: str, max_pages: int = 15) -> Iterator[tuple[str, str]]
 
         text = html_to_text(resp.text)
         if text.strip():
-            yield url, text
+            yield url, text, len(seen), len(queue)
+
+
+def crawl_site(start_url: str, max_pages: int = 15) -> Iterator[tuple[str, str]]:
+    """Backwards-compat wrapper rond crawl_site_with_progress: (url, text)-paren
+    zonder voortgangscijfers, voor het bestaande synchrone /ingest/crawl-pad."""
+    for url, text, _bezocht, _queue_len in crawl_site_with_progress(start_url, max_pages):
+        yield url, text
