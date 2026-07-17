@@ -328,6 +328,39 @@ class Memory:
                 removed += 1
         return removed
 
+    def get_by_source_detail(self, source_detail: str) -> list[KennisItem]:
+        # Alle items die van één bron-detail afkomstig zijn (bv. een relatief
+        # bestandspad uit de map-connector). Gebruikt bij een gewijzigd/verwijderd
+        # bestand om eerst de oude items van dat pad op te ruimen.
+        result = self.collection.get(where={"source_detail": source_detail})
+        items = []
+        if result['ids']:
+            for i in range(len(result['ids'])):
+                meta = result['metadatas'][i]
+                items.append(KennisItem(
+                    id=result['ids'][i], title=meta['title'],
+                    category=meta['category'],
+                    content=result['documents'][i],
+                    source=meta.get('source', 'manual'),
+                    source_detail=meta.get('source_detail'),
+                    created_at=datetime.fromisoformat(meta['created_at'])
+                ))
+        return items
+
+    def count_by_source(self, source: str) -> int:
+        # Aantal items met een gegeven source (bv. "connector"), zonder de
+        # volledige documenten/embeddings op te halen.
+        result = self.collection.get(where={"source": source}, include=[])
+        return len(result['ids'] or [])
+
+    def delete_by_source(self, source: str) -> int:
+        # Verwijder alle items met een gegeven source. Geeft het aantal terug.
+        result = self.collection.get(where={"source": source}, include=[])
+        ids = result['ids'] or []
+        if ids:
+            self.collection.delete(ids=ids)
+        return len(ids)
+
     def get_categories(self) -> list[dict]:
         # Geef alle categorieën terug met het aantal items per categorie
         result = self.collection.get()

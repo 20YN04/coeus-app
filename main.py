@@ -7,12 +7,15 @@ from brain.memory import Memory
 from brain.learner import Learner
 from brain.seed import seed_if_empty
 from brain.ingest import chunk_text, derive_title, filter_noise_chunks, html_to_text, crawl_site
+from brain.files import ALLOWED_SUFFIXES, MAX_UPLOAD_BYTES, extract_text, pdf_to_text
 from brain.config import settings
 from brain.models import (
     KennisItem, CreateKennisRequest, UpdateKennisRequest,
     LearnRequest, AskRequest, IngestTextRequest, IngestUrlRequest,
     IngestCrawlRequest, CleanupApplyRequest, LlmKeyRequest, LlmStatus,
+    ConnectFolderRequest,
 )
+from brain import connector as connector_mod
 
 # Auto-opschonen: standaard embedding-afstand waaronder twee items als duplicaat
 # gelden. Empirisch getuned op de default embedding (all-MiniLM, cosine-afstand):
@@ -26,6 +29,9 @@ async def lifespan(app: FastAPI):
     # First-run seed: vul een lege kennisbank uit seed/default.json (of COEUS_SEED_FILE)
     # zodat een verse installatie niet blanco is. Faalt nooit hard — zie brain/seed.py.
     seed_if_empty(memory)
+    # Gekoppelde map (indien aanwezig) her-scannen bij opstart, in een achtergrond-
+    # thread zodat een grote map de boot nooit blokkeert. Faalt nooit hard.
+    connector_mod.auto_rescan_in_background(memory)
     yield
 
 
@@ -378,54 +384,31 @@ def ingest_crawl(request: IngestCrawlRequest):
     }
 
 
-# Toegestane upload-types en een ruime maximumgrootte (~10MB) zodat één bestand
-# het brein niet kan platleggen. PDF gaat door pypdf, .md/.txt als UTF-8-tekst.
-_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
-_TEXT_SUFFIXES = (".md", ".markdown", ".txt")
-
-
-def _pdf_to_text(data: bytes) -> str:
-    # Extraheer tekst per pagina uit een PDF met pypdf. Onleesbare/lege pagina's
-    # leveren gewoon niets op; een corrupte PDF geeft een nette 422 (zie caller).
-    import io
-    from pypdf import PdfReader
-
-    reader = PdfReader(io.BytesIO(data))
-    pages = []
-    for page in reader.pages:
-        extracted = page.extract_text() or ""
-        if extracted.strip():
-            pages.append(extracted.strip())
-    return "\n\n".join(pages)
-
-
 @app.post("/ingest/file")
 async def ingest_file(file: UploadFile = File(...), category: str | None = Form(default=None)):
     # Onboarding-motor: een geüpload bestand (.pdf / .md / .markdown / .txt) inlezen,
     # tekst extraheren, in stukken hakken en key-free opslaan. source_detail =
     # de bestandsnaam. Resilient: verkeerd type / te groot / onleesbaar → nette 4xx.
+    # Extractie zit in brain/files.py, gedeeld met de map-connector (brain/connector.py).
     name = (file.filename or "").strip() or "upload"
     lower = name.lower()
 
     data = await file.read()
-    if len(data) > _MAX_UPLOAD_BYTES:
+    if len(data) > MAX_UPLOAD_BYTES:
         raise HTTPException(422, "Bestand is te groot (max 10MB)")
     if not data:
         raise HTTPException(422, "Het bestand is leeg")
 
+    if not lower.endswith(ALLOWED_SUFFIXES):
+        raise HTTPException(422, "Niet-ondersteund bestandstype — gebruik .pdf, .md, .markdown of .txt")
+
     if lower.endswith(".pdf"):
         try:
-            text = _pdf_to_text(data)
+            text = pdf_to_text(data)
         except Exception:
             raise HTTPException(422, "Kon de PDF niet lezen — is het een geldig PDF-bestand?")
-    elif lower.endswith(_TEXT_SUFFIXES):
-        try:
-            text = data.decode("utf-8")
-        except UnicodeDecodeError:
-            # Val terug op een tolerante decode i.p.v. te crashen op rare bytes.
-            text = data.decode("utf-8", errors="replace")
     else:
-        raise HTTPException(422, "Niet-ondersteund bestandstype — gebruik .pdf, .md, .markdown of .txt")
+        text = extract_text(name, data) or ""
 
     if not text.strip():
         raise HTTPException(422, "Geen leesbare tekst gevonden in dit bestand")
@@ -476,3 +459,41 @@ def cleanup_apply(request: CleanupApplyRequest):
     threshold = request.threshold if request.threshold is not None else CLEANUP_DEFAULT_THRESHOLD
     removed = memory.dedupe(threshold)
     return {"verwijderd": removed}
+
+
+# --- Lokale-map-connector ---------------------------------------------------
+# "Gedeelde map"-variant van map-sync (géén Google-OAuth): een KMO koppelt één
+# map op deze machine (bv. de offerte-/documentenmap) en Coeus leert alle
+# .pdf/.md/.markdown/.txt-bestanden erin, met her-scan om nieuwe/gewijzigde
+# bestanden bij te leren. Werkt alleen zolang het brein op dezelfde machine
+# draait als de gekoppelde map (Tauri-sidecar leest rechtstreeks van schijf).
+# Logica in brain/connector.py; hier alleen HTTP-vertaling.
+
+@app.get("/connector/folder")
+def connector_status():
+    # Huidige koppeling + laatste scan-cijfers, of {"path": null} als er geen is.
+    return connector_mod.get_status(memory)
+
+
+@app.post("/connector/folder")
+def connector_connect(request: ConnectFolderRequest):
+    # Koppel een absolute map en draai meteen de eerste scan. Ongeldig/
+    # onbereikbaar pad → 422 (bestaat niet, is geen map, of niet leesbaar).
+    try:
+        return connector_mod.connect_folder(memory, request.path)
+    except connector_mod.ConnectorError as e:
+        raise HTTPException(422, str(e))
+
+
+@app.post("/connector/rescan")
+def connector_rescan():
+    # Scan de gekoppelde map opnieuw: nieuw/gewijzigd/verwijderd bijwerken.
+    # Geen koppeling → lege tellers (geen 404; "niets te doen" is geen fout).
+    return connector_mod.scan_folder(memory)
+
+
+@app.delete("/connector/folder")
+def connector_disconnect(verwijder_items: bool = Query(default=False)):
+    # Ontkoppel de map. De koppeling (connector.json) verdwijnt; de al geleerde
+    # items blijven staan tenzij verwijder_items=true expliciet wordt meegegeven.
+    return connector_mod.disconnect(memory, verwijder_items=verwijder_items)
