@@ -1,0 +1,310 @@
+[
+  {
+    "title": "Knippen dames",
+    "category": "diensten",
+    "content": "Een damesknipbeurt omvat altijd wassen, knippen en brushen, afgestemd op uw haartype en gezichtsvorm. Reken op 45 tot 60 minuten, afhankelijk van de haarlengte. Wilt u een grote verandering van coupe, vraag dan bij het boeken een iets langere afspraak aan.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Knippen heren",
+    "category": "diensten",
+    "content": "Een herenknipbeurt duurt ongeveer 30 minuten en omvat wassen, knippen met schaar en/of tondeuse en drogen. De baard bijwerken kan aansluitend; vermeld dat bij het boeken zodat we er tijd voor voorzien. Febe is in ons salon het vaste aanspreekpunt voor herencoupes.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Kinderen knippen",
+    "category": "diensten",
+    "content": "Kinderen tot en met 12 jaar knippen we in ongeveer 30 minuten, met wat extra geduld en een beloning achteraf. Woensdagmiddag is onze populairste kindermiddag, boek die dus tijdig. Voor een eerste knipbeurt mag mama of papa er gerust naast blijven zitten.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Kleuring",
+    "category": "diensten",
+    "content": "We doen zowel uitgroeikleuringen als volledige kleuringen, ook in ammoniakvrije varianten. Reken op 1,5 tot 2 uur, inclusief inwerktijd, uitspoelen en brushing. Bij een eerste kleuring in ons salon is vooraf een allergietest verplicht; zie daarvoor onze hygiëne-informatie.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Balayage en highlights",
+    "category": "diensten",
+    "content": "Voor balayage, highlights en andere vrije-handtechnieken is Nora onze kleurspecialiste. Een volledige balayage duurt 2,5 tot 3 uur, inclusief toner en brushing. Kom bij een eerste balayage vooraf langs voor een gratis adviesgesprek, zodat we het resultaat en de onderhoudsfrequentie realistisch kunnen inschatten.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Brushing en stylen",
+    "category": "diensten",
+    "content": "Een losse brushing, bijvoorbeeld voor een feest of fotoshoot, duurt ongeveer 30 minuten inclusief wassen. Krullen of glad stylen met de stijltang kan in dezelfde afspraak. Handig om te weten: op donderdagavond zijn we open tot 20:00, ideaal voor een brushing na het werk.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Opsteek- en feestkapsels",
+    "category": "diensten",
+    "content": "Voor communies, gala's en trouwfeesten als gast maken we opsteek- en feestkapsels; reken op ongeveer 45 minuten. Breng gerust een foto mee van het gewenste kapsel. Boek feestkapsels ruim op voorhand, zeker in het communie- en trouwseizoen van april tot september.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Bruidskapsels",
+    "category": "diensten",
+    "content": "Een bruidskapsel bereiden we altijd voor met een proefsessie van ongeveer een uur, enkele weken voor de trouwdatum; breng dan uw sluier of haaraccessoires mee. Op de trouwdag zelf komt u 's ochtends naar het salon en werken we het kapsel in ongeveer een uur af. Reserveer uw trouwdatum zo vroeg mogelijk, drukke zaterdagen zijn maanden vooraf volzet.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Verzorgingsbehandelingen",
+    "category": "diensten",
+    "content": "Als aanvulling op een knip- of kleurbeurt bieden we een dieptemasker aan dat droog of beschadigd haar herstelt; dat verlengt uw afspraak met een kwartier. Voor pluizig of moeilijk haar is er een keratinebehandeling die het haar gladder en handelbaarder maakt; die duurt ongeveer 2 uur. Vraag Elise of uw haar er baat bij heeft.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Gratis adviesgesprek",
+    "category": "diensten",
+    "content": "Twijfelt u over een grote verandering, zoals van donker naar blond of een volledig nieuwe coupe? Boek dan een gratis adviesgesprek van 15 minuten. We bekijken samen uw haarstructuur, de haalbaarheid en het onderhoud, en maken meteen de juiste vervolgafspraak. Zo komt u nooit voor verrassingen te staan.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Prijs knippen dames",
+    "category": "prijzen",
+    "content": "Een volledige damesknipbeurt met wassen, knippen en brushen kost 42 euro. Pony bijknippen tussen twee knipbeurten door is gratis. De prijs is dezelfde bij elke kapster in het salon.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Prijs knippen heren en kinderen",
+    "category": "prijzen",
+    "content": "Een herenknipbeurt kost 28 euro, inclusief wassen en drogen. Kinderen tot en met 12 jaar knippen we voor 18 euro. Baard bijwerken bij een herenknipbeurt kost 8 euro extra.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Prijzen kleuring",
+    "category": "prijzen",
+    "content": "Een uitgroeikleuring kost vanaf 55 euro, een volledige kleuring vanaf 70 euro; de exacte prijs hangt af van haarlengte en -dikte. Knippen zit niet in deze prijs en kan gecombineerd worden in dezelfde afspraak. U krijgt altijd vooraf een duidelijke prijsindicatie voor we starten.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Prijzen balayage en highlights",
+    "category": "prijzen",
+    "content": "Een volledige balayage kost vanaf 95 euro, inclusief toner en brushing. Highlights met folies kosten vanaf 75 euro. Omdat de prijs sterk afhangt van haarlengte en gewenst resultaat, krijgt u bij het adviesgesprek of aan het begin van de afspraak een exacte prijs.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Prijzen brushing en feestkapsels",
+    "category": "prijzen",
+    "content": "Een losse brushing kost 25 euro, inclusief wassen. Een opsteek- of feestkapsel kost vanaf 45 euro, afhankelijk van de complexiteit. Voor feestkapsels met uitgebreid vlecht- of opsteekwerk hoort u de exacte prijs bij het boeken.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Prijs bruidskapsel",
+    "category": "prijzen",
+    "content": "De proefsessie voor een bruidskapsel kost 35 euro; het bruidskapsel op de trouwdag zelf kost 85 euro. Feestkapsels voor mama's of getuigen op dezelfde ochtend rekenen we aan als gewone feestkapsels. Vraag bij het vastleggen van de trouwdatum een offerte als u met meerdere personen tegelijk komt.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Prijzen verzorgingsbehandelingen",
+    "category": "prijzen",
+    "content": "Een dieptemasker als aanvulling op uw knip- of kleurbeurt kost 20 euro extra. Een keratinebehandeling kost vanaf 120 euro, afhankelijk van haarlengte en -dikte. Beide behandelingen boekt u samen met uw gewone afspraak, dan voorzien we de extra tijd.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Studentenkorting",
+    "category": "prijzen",
+    "content": "Studenten krijgen 10% korting op alle behandelingen op dinsdag, woensdag en donderdag, op vertoon van een geldige studentenkaart. De korting geldt niet op zaterdag en is niet combineerbaar met andere acties of cadeaubonnen met korting. Gewoon je studentenkaart tonen bij het afrekenen volstaat.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Cadeaubon bedragen",
+    "category": "prijzen",
+    "content": "Cadeaubonnen zijn er met een vrij te kiezen bedrag vanaf 20 euro, of voor een specifieke behandeling zoals een knipbeurt of balayage. Bij besteding wordt de bon in mindering gebracht op de rekening en blijft een eventueel saldo staan voor een volgend bezoek.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Een afspraak maken",
+    "category": "afspraken",
+    "content": "Wij werken uitsluitend op afspraak. Boeken kan 24/7 via de online agenda op www.salonelise.be of telefonisch op 089 34 56 78 tijdens de openingsuren. Bij het online boeken kiest u zelf uw behandeling en, als u wilt, uw voorkeurskapster: Elise, Nora of Febe.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Annuleren of verplaatsen",
+    "category": "afspraken",
+    "content": "Een afspraak annuleren of verplaatsen is gratis tot 24 uur op voorhand, via de link in uw bevestigingsmail of telefonisch op 089 34 56 78. Zo kunnen we de vrijgekomen plek nog aan iemand op de wachtlijst geven. Later annuleren kan uitzonderlijk, maar verwittig ons dan altijd even telefonisch.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Te laat komen",
+    "category": "afspraken",
+    "content": "Bent u meer dan 15 minuten te laat, dan kan het zijn dat we de behandeling moeten inkorten of de afspraak moeten verzetten, omdat de klant na u anders moet wachten. Verwittig ons bij vertraging altijd even op 089 34 56 78, dan bekijken we samen wat er nog mogelijk is.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Niet komen opdagen",
+    "category": "afspraken",
+    "content": "Wie zonder verwittigen niet komt opdagen, laat een lege stoel achter die we niet meer konden invullen. Bij herhaaldelijk wegblijven zonder verwittigen vragen we bij een volgende boeking een voorschot. Annuleren is altijd beter dan wegblijven, ook al is het last-minute.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Afspraakherinnering",
+    "category": "afspraken",
+    "content": "Een dag voor uw afspraak ontvangt u automatisch een herinnering per sms of e-mail, afhankelijk van de gegevens die u bij het boeken opgaf. In dat bericht zit ook de link om te verplaatsen of te annuleren. Controleer bij het online boeken dus of uw gsm-nummer en e-mailadres correct zijn.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Zonder afspraak langskomen",
+    "category": "afspraken",
+    "content": "Binnenspringen zonder afspraak kan alleen als er toevallig een gaatje vrij is, en dat is zeldzaam, zeker op zaterdag. Bel op 089 34 56 78 voor u langskomt, dan kijken we meteen of er die dag nog plaats is. Online ziet u in de agenda op www.salonelise.be ook zelf de eerstvolgende vrije momenten.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Wachtlijst voor vroegere afspraken",
+    "category": "afspraken",
+    "content": "Is uw gewenste moment volzet, dan kunt u zich bij het online boeken op de wachtlijst zetten. Komt er door een annulatie een plek vrij, dan krijgt u automatisch een berichtje en kunt u de plek bevestigen. Zo raken last-minute vrijgekomen momenten toch ingevuld.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Thuisverzorging kopen",
+    "category": "producten",
+    "content": "In het salon verkopen we de professionele productlijn waarmee we zelf werken: shampoos, conditioners en maskers per haartype, waaronder een lijn speciaal voor gekleurd haar. Zo houdt uw kleur en coupe thuis langer stand. U kunt producten ook zonder afspraak komen kopen tijdens de openingsuren.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Persoonlijk productadvies",
+    "category": "producten",
+    "content": "Na elke behandeling vertelt uw kapster welke producten ze gebruikt heeft en wat bij uw haartype past. Dat advies is vrijblijvend: er is nooit koopverplichting. Twijfelt u thuis welke shampoo u nodig heeft, bel of spring gerust binnen.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Stylingproducten",
+    "category": "producten",
+    "content": "Naast verzorging verkopen we ook stylingproducten: hittebescherming voor wie vaak stijlt of föhnt, droogshampoo, haarlak, wax en krulcrème. Uw kapster toont tijdens de brushing graag hoe u een product thuis het best gebruikt. Zo lukt het kapsel ook aan uw eigen spiegel.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Ruilen en retour van producten",
+    "category": "producten",
+    "content": "Ongeopende producten kunt u binnen 14 dagen ruilen of retourneren met uw kasticket. Geopende of gebruikte producten nemen we om hygiënische redenen niet terug. Reageert uw huid onverwacht op een product, breng het dan mee, dan zoeken we samen een geschikt alternatief.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Cadeaubon voor behandelingen en producten",
+    "category": "producten",
+    "content": "Onze cadeaubonnen zijn geldig voor alle behandelingen én voor producten uit het salon. Een bon is 1 jaar geldig vanaf de aankoopdatum. Kopen kan in het salon of via www.salonelise.be; de beschikbare bedragen vindt u bij onze prijsinformatie.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Allergietest bij kleuren",
+    "category": "hygiene",
+    "content": "Laat u voor het eerst bij ons kleuren, dan doen we minstens 48 uur vooraf een gratis gevoeligheidstest: een kleine hoeveelheid kleurproduct achter het oor of in de elleboogplooi. Even binnenspringen zonder afspraak volstaat daarvoor. Zo sluiten we een allergische reactie op de kleurstof zoveel mogelijk uit voor we uw volledige haar behandelen.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Hygiëne in het salon",
+    "category": "hygiene",
+    "content": "Scharen, kammen en tondeuses worden na elke klant gereinigd en ontsmet, en elke klant krijgt verse handdoeken en een schone kapmantel. Borstels maken we dagelijks grondig schoon. Zo is de stoel voor iedereen even fris.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Kleuren tijdens de zwangerschap",
+    "category": "hygiene",
+    "content": "Veel zwangere klanten laten hun haar gewoon kleuren; wie liever voorzichtig is, kiest voor onze ammoniakvrije kleuringen of voor technieken zoals balayage waarbij het product de hoofdhuid amper raakt. Bespreek uw wensen gerust met uw kapster, en bij twijfel met uw arts of vroedvrouw. Meld uw zwangerschap in elk geval even bij het boeken van een kleurafspraak.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Gevoelige hoofdhuid",
+    "category": "hygiene",
+    "content": "Heeft u een gevoelige hoofdhuid, eczeem of psoriasis, meld het dan bij het boeken; we gebruiken dan mildere producten en passen de behandeling aan. Bij actieve wondjes of een huidaandoening die opflakkert, verwijzen we eerst door naar de huisarts of dermatoloog voor we kleuren. Veiligheid gaat voor op de afspraak.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Luizen bij kinderen",
+    "category": "hygiene",
+    "content": "Stellen we tijdens een knipbeurt luizen of neten vast, dan moeten we de behandeling meteen stopzetten; dat is een kwestie van hygiëne voor alle klanten. We melden het discreet aan de ouder en plannen gratis een nieuwe afspraak zodra het haar luisvrij behandeld is. Controleer bij twijfel het haar even thuis voor de afspraak.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Openingsuren",
+    "category": "praktisch",
+    "content": "Salon Elise is open van dinsdag tot en met vrijdag van 9:00 tot 18:00, op donderdag doorlopend tot 20:00, en op zaterdag van 8:30 tot 16:00. Zondag en maandag zijn onze vaste sluitingsdagen. Rond feestdagen communiceren we aangepaste uren via www.salonelise.be en onze sociale media.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Locatie en parkeren",
+    "category": "praktisch",
+    "content": "U vindt ons in de Molenstraat 12, 3600 Genk, vlak bij het centrum. Parkeren kan om de hoek op de parking aan het Molenplein, waar het eerste uur gratis is. Voor de deur staat een fietsenstalling.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Betaalmethodes",
+    "category": "praktisch",
+    "content": "U betaalt bij ons met Bancontact, Payconiq of cash. Kredietkaarten aanvaarden we niet. Cadeaubonnen van het salon kunt u uiteraard ook gebruiken als betaalmiddel.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Het team",
+    "category": "praktisch",
+    "content": "Salon Elise wordt gerund door zaakvoerster Elise Vandebroek, gespecialiseerd in damescoupes en verzorging. Nora is onze kleurspecialiste voor balayage en highlights, en Febe neemt de heren- en kinderknipbeurten voor haar rekening. Bij het online boeken kiest u zelf bij wie u een afspraak maakt; geen voorkeur doorgeven mag ook.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Cadeaubonnen kopen",
+    "category": "praktisch",
+    "content": "Een cadeaubon koopt u in het salon, mooi verpakt en meteen mee te nemen, of online via www.salonelise.be met verzending per e-mail. De bon is 1 jaar geldig vanaf de aankoopdatum en bruikbaar voor alle behandelingen en producten. De beschikbare bedragen vindt u bij onze prijsinformatie.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Toegankelijkheid",
+    "category": "praktisch",
+    "content": "Het salon is gelijkvloers en zonder drempels toegankelijk, ook met een rolstoel of buggy. Eén wasbak is onderrijdbaar voor rolstoelgebruikers. Meld bij het boeken dat u met een rolstoel komt, dan houden we die plek vrij.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Wachten en kinderen meebrengen",
+    "category": "praktisch",
+    "content": "In de wachthoek staat koffie, thee en water klaar, en er liggen tijdschriften en wat speelgoed voor de kleinsten. Uw kind mag gerust meekomen terwijl u geknipt wordt. Komt u met een buggy, dan is daar plaats voor naast de wachthoek.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  },
+  {
+    "title": "Avondopening op donderdag",
+    "category": "praktisch",
+    "content": "Op donderdag zijn we doorlopend open tot 20:00, ideaal voor wie overdag werkt. De avondsloten tussen 18:00 en 20:00 zijn het snelst volzet, dus boek die enkele weken op voorhand via www.salonelise.be. Voor langere behandelingen zoals balayage start u op donderdag het best uiterlijk om 17:00.",
+    "source": "seed",
+    "source_detail": "kapper-template"
+  }
+]

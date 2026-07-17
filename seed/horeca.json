@@ -1,0 +1,373 @@
+[
+  {
+    "title": "Een tafel reserveren",
+    "category": "reservaties",
+    "content": "Reserveren kan online via www.brasseriedelinde.be, telefonisch op 011 23 45 67 of per e-mail naar info@brasseriedelinde.be. U ontvangt altijd een bevestiging per e-mail. Vermeld bij uw reservatie het aantal personen en eventuele dieetwensen, dan houden wij daar meteen rekening mee.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Groepsreservaties",
+    "category": "reservaties",
+    "content": "Voor groepen vanaf 8 personen reserveert u uitsluitend telefonisch op 011 23 45 67, zodat we de tafelschikking goed kunnen voorbereiden. Vraag naar onze gastvrouw Lies Wouters, zij regelt alle groepsreservaties. Vanaf 10 personen raden we een vaste menuformule aan; zo verloopt de bediening vlotter voor iedereen.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Annuleren of verplaatsen van een reservatie",
+    "category": "reservaties",
+    "content": "Een gewone reservatie annuleert of verplaatst u gratis tot 24 uur op voorhand, via de link in uw bevestigingsmail of telefonisch op 011 23 45 67. Voor groepen vanaf 8 personen vragen we om minstens 48 uur op voorhand te verwittigen. Laattijdig annuleren of niet komen opdagen valt onder ons no-show-beleid.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "No-show-beleid",
+    "category": "reservaties",
+    "content": "Wie reserveert en zonder verwittigen wegblijft, laat een lege tafel achter die we aan niemand anders konden geven. Bij groepen vanaf 8 personen vragen we daarom kaartgegevens ter garantie bij de reservatie. Blijft de groep zonder verwittigen weg, dan rekenen we een no-show-vergoeding per persoon aan; het bedrag vindt u bij onze prijsinformatie. Verwittig ons dus altijd, ook last-minute: bellen kan tot vlak voor uw reservatie.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Zonder reservatie langskomen",
+    "category": "reservaties",
+    "content": "U bent zonder reservatie welkom als er plaats is; op weekdagen lukt dat meestal wel. In het weekend en op feestdagen zit de zaal vaak vol, dus dan raden we sterk aan om vooraf te reserveren. Is er even geen tafel vrij, dan kunt u aan de bar iets drinken tot er een plaats vrijkomt.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Tafeltijd op drukke avonden",
+    "category": "reservaties",
+    "content": "Op vrijdag- en zaterdagavond werken we met twee shiften: aanschuiven om 18:00 of om 20:30. U beschikt dan ongeveer 2 uur en 15 minuten over uw tafel. Reserveert u de late shift, dan is er geen tijdslimiet meer. Op andere dagen hanteren we geen vaste tafeltijd.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Kinderstoelen en kinderwagens",
+    "category": "reservaties",
+    "content": "We hebben meerdere kinderstoelen beschikbaar; vermeld bij uw reservatie graag dat u er een nodig heeft. Voor kinderwagens voorzien we plaats naast de tafel of aan de ingang, afhankelijk van de drukte. Meld ook dit vooraf, dan kiezen we een tafel waar de kinderwagen comfortabel bij kan staan.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Opbouw van de menukaart",
+    "category": "menu",
+    "content": "Onze kaart bestaat uit voorgerechten, hoofdgerechten en desserts, aangevuld met seizoenssuggesties op het krijtbord. De vaste kaart wisselt vier keer per jaar mee met de seizoenen. Alle actuele gerechten en prijzen vindt u op de menukaart in de zaak en op www.brasseriedelinde.be.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Lunchmenu",
+    "category": "menu",
+    "content": "Van woensdag tot en met vrijdag serveren we 's middags een lunchmenu in twee of drie gangen. Het lunchmenu wisselt wekelijks en staat elke maandag op onze website. De prijzen van het lunchmenu vindt u bij onze prijsinformatie.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Brasserieklassiekers",
+    "category": "menu",
+    "content": "De klassiekers staan het hele jaar op de kaart: vol-au-vent met frietjes en sla, Limburgs stoofvlees op grootmoeders wijze en huisgemaakte garnaalkroketten met gefrituurde peterselie. Het zijn onze meest bestelde gerechten en ze worden allemaal in eigen keuken bereid. Prijzen vindt u op de menukaart.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Steak en vleesgerechten",
+    "category": "menu",
+    "content": "Onze steaks komen van Belgisch witblauw rund en worden gebakken zoals u ze vraagt. U kiest een saus naar keuze: natuur, peperroomsaus, champignonroomsaus of béarnaise, geserveerd met frietjes of kroketten en sla. Daarnaast staat er steeds een wisselend vleesgerecht van het seizoen op het krijtbord.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Visgerechten",
+    "category": "menu",
+    "content": "Vis wordt dagvers geleverd; het aanbod wisselt daarom mee met de vangst. Vaste waarden zijn de tongrolletjes in witte wijnsaus en de vispannetje van de chef. In het mosselseizoen, grofweg van juli tot februari, serveren we mosselen op verschillende wijzen.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Vegetarisch aanbod",
+    "category": "menu",
+    "content": "Er staan altijd minstens twee volwaardige vegetarische hoofdgerechten op de kaart, geen aangepaste bijgerechten maar echte gerechten. Veganistisch eten kan ook: meld het bij uw reservatie, dan werkt de keuken een volwaardig alternatief uit. Ter plaatse improviseren lukt meestal ook, maar vooraf melden geeft het beste resultaat.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Kindermenu",
+    "category": "menu",
+    "content": "Voor kinderen tot en met 12 jaar is er een kindermenu: een kinderportie vol-au-vent, spaghetti bolognese of curryworst met frietjes, telkens met een drankje en een ijsje als dessert. Kleinere porties van gerechten van de grote kaart kunnen ook, vraag ernaar bij de bediening. De prijs van het kindermenu vindt u bij onze prijsinformatie.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Desserts",
+    "category": "menu",
+    "content": "Vaste dessertklassiekers zijn de dame blanche met warme chocoladesaus, crème brûlée en huisgemaakte appeltaart met vanille-ijs. Daarnaast staat er altijd een wisselend seizoensdessert op het krijtbord. Een dessertkoffie met een zoetigheid erbij kan ook; vraag naar de Hasseltse koffie.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Seizoenssuggesties",
+    "category": "menu",
+    "content": "Naast de vaste kaart werkt de keuken met seizoenssuggesties op het krijtbord: asperges in het voorjaar, mosselen in de zomer en wild in het najaar. De suggesties wisselen om de paar weken en zijn er zolang de voorraad strekt. Vraag de bediening gerust wat de chef die week aanraadt.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Brood en aperitiefhapjes",
+    "category": "menu",
+    "content": "Bij elk hoofdgerecht serveren we huisgebakken brood met boter en een smeersel van de chef. Bij het aperitief kunt u een plankje bestellen met Limburgse kaas, droge worst en olijven om te delen. Ideaal om de keuze uit de kaart rustig te maken.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Prijzen lunchmenu",
+    "category": "prijzen",
+    "content": "Het lunchmenu, geserveerd van woensdag tot en met vrijdag 's middags, kost 29 euro voor twee gangen en 36 euro voor drie gangen. Dranken zijn niet inbegrepen. Het menu wisselt wekelijks; de gerechten van de week staan op www.brasseriedelinde.be.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Prijsklasse hoofdgerechten",
+    "category": "prijzen",
+    "content": "Onze hoofdgerechten liggen tussen 19 en 32 euro. Ter referentie: de vol-au-vent met frietjes kost 22 euro, het Limburgs stoofvlees 21 euro en de steak natuur met frietjes en sla 28 euro. Seizoensgerechten zoals mosselen of wild kunnen daarboven zitten; de actuele prijs staat altijd op de kaart.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Prijzen voorgerechten en desserts",
+    "category": "prijzen",
+    "content": "Voorgerechten kosten tussen 12 en 18 euro; de huisgemaakte garnaalkroketten als voorgerecht kosten 19 euro. Desserts liggen tussen 9 en 12 euro. De actuele prijzen per gerecht vindt u op de menukaart in de zaak en op de website.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Prijs kindermenu",
+    "category": "prijzen",
+    "content": "Het kindermenu kost 14 euro en omvat een kindergerecht naar keuze, een drankje en een ijsje als dessert. Het geldt voor kinderen tot en met 12 jaar. Een kleinere portie van een gerecht van de grote kaart rekenen we aan volgens de kaart, met een korting voor de kinderportie.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Drankenprijzen",
+    "category": "prijzen",
+    "content": "Een koffie kost 3,20 euro, frisdranken 3 euro en een pils van het vat 3,10 euro. Streek- en degustatiebieren liggen tussen 5 en 7 euro. De huiswijn schenken we per glas voor 5,50 euro; een fles huiswijn kost 27 euro. De volledige dranken- en wijnkaart met prijzen ligt in de zaak.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Prijzen feestformules",
+    "category": "prijzen",
+    "content": "Voor groepen en feesten werken we met vaste formules: een driegangenmenu vanaf 55 euro per persoon, en een all-in formule met aperitief, aangepaste wijnen, water en koffie vanaf 75 euro per persoon. De exacte prijs hangt af van de gekozen gerechten; u ontvangt altijd vooraf een offerte op maat.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Cadeaubon bedragen",
+    "category": "prijzen",
+    "content": "Onze cadeaubonnen zijn er met een vrij te kiezen bedrag vanaf 25 euro. U kunt ook een bon kopen voor een vaste formule, bijvoorbeeld het driegangen feestmenu. De bon wordt bij besteding gewoon in mindering gebracht op de rekening; een eventueel saldo blijft bruikbaar bij een volgend bezoek.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "No-show-vergoeding en voorschot feesten",
+    "category": "prijzen",
+    "content": "Blijft een groep vanaf 8 personen zonder verwittigen weg, dan rekenen we een no-show-vergoeding van 25 euro per persoon aan via de kaartgarantie. Voor privéfeesten en groepsmenu's vragen we een voorschot van 30% van de offerte om de datum vast te leggen. Annuleert u een feest tot 14 dagen op voorhand, dan betalen we het voorschot volledig terug; daarna wordt het ingehouden.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Allergeneninformatie",
+    "category": "allergenen",
+    "content": "Voor elk gerecht op de kaart houden we een allergenenlijst bij met de 14 wettelijke allergenen. Vraag ernaar bij de bediening; zij halen de actuele lijst erbij of vragen het rechtstreeks aan de keuken. Twijfelt u over een gerecht, meld uw allergie dan altijd voor u bestelt.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Glutenvrij eten",
+    "category": "allergenen",
+    "content": "Verschillende gerechten op de kaart zijn glutenvrij of kunnen glutenvrij bereid worden, zoals de steak met sla en onze frietjes, die in een aparte frituur zonder gepaneerde producten gebakken worden. Glutenvrij brood is beschikbaar als u het bij uw reservatie meldt. Zeg het altijd ook bij het bestellen, dan let de keuken extra op.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Lactose-intolerantie",
+    "category": "allergenen",
+    "content": "Veel sauzen in een brasseriekeuken bevatten room of boter, maar de keuken past graag aan waar het kan: gerechten zonder saus, bereidingen in olijfolie of een lactosevrij alternatief. Meld uw lactose-intolerantie bij de reservatie of ten laatste bij het bestellen. De bediening overloopt dan met u welke gerechten veilig zijn.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Notenallergie en kruisbesmetting",
+    "category": "allergenen",
+    "content": "Wij werken in één keuken waar ook noten verwerkt worden; volledige afwezigheid van sporen kunnen we dus nooit garanderen. Bij een ernstige notenallergie meldt u dit best al bij de reservatie, dan bekijkt de chef vooraf welke gerechten zonder risico bereid kunnen worden. De bediening geeft uw allergie altijd expliciet door aan de keuken.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Dieetwensen vooraf melden",
+    "category": "allergenen",
+    "content": "Vegan, zoutarm, zwangerschapsgerelateerde wensen of andere diëten: hoe vroeger we het weten, hoe beter de keuken kan voorbereiden. Vermeld dieetwensen daarom bij uw reservatie via 011 23 45 67 of info@brasseriedelinde.be. Voor groepen vragen we om alle dieetwensen ten laatste 3 dagen op voorhand door te geven.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Bierkaart",
+    "category": "dranken",
+    "content": "Van het vat schenken we pils en een wisselend seizoensbier. Op fles hebben we een selectie Limburgse streekbieren, enkele trappisten en abdijbieren. De bediening adviseert u graag welk bier past bij uw gerecht.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Wijnkaart",
+    "category": "dranken",
+    "content": "De huiswijnen, wit, rood en rosé, schenken we per glas of per fles. Daarnaast is er een compacte wijnkaart met Europese wijnen die de chef zelf selecteerde bij de kaart van het seizoen. Bij elk hoofdgerecht staat een wijnsuggestie vermeld.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Aperitieven",
+    "category": "dranken",
+    "content": "Het huisaperitief van De Linde is een cava met vlierbloesemlikeur, fris en licht zoet. Verder serveren we de klassiekers: cava, porto, martini, picon en gin-tonic met een keuze uit drie gins. Bij het aperitief kunt u een hapjesplankje bestellen om te delen.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Alcoholvrij aanbod",
+    "category": "dranken",
+    "content": "Naast de gewone frisdranken hebben we alcoholvrij bier van het vat en op fles, een alcoholvrije gin-tonic en een wisselende mocktail. Vers geperst fruitsap maken we op bestelling. Zo hoeft de bob van dienst niets te missen bij het aperitief.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Koffie en thee",
+    "category": "dranken",
+    "content": "Onze koffie komt van een lokale Hasseltse branderij en serveren we altijd met een zoetigheid. De theekaart telt een tiental soorten losse thee. Als dessertkoffie is de Hasseltse koffie met jenever van de stokerij om de hoek een echte aanrader.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Privézaal De Serre",
+    "category": "feesten",
+    "content": "Achteraan de zaak ligt onze privézaal De Serre, een lichte veranda met plaats voor maximaal 30 gasten en een eigen toegang tot het terras. De zaal is geschikt voor familiefeesten, recepties en vergaderingen met lunch. Er is een groot scherm beschikbaar voor presentaties of foto's.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Feestmenu's voor groepen",
+    "category": "feesten",
+    "content": "Vanaf 10 personen werken we met vaste feestmenu's: een driegangenmenu of een all-in formule met aperitief en aangepaste wijnen. Per menu kiest de groep vooraf één gezamenlijke lijn, met individuele aanpassingen voor allergieën en vegetariërs. De gerechtkeuzes geeft u ten laatste één week op voorhand door.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Communies, verjaardagen en rouwmaaltijden",
+    "category": "feesten",
+    "content": "Voor communiefeesten en verjaardagen denken we graag mee over een kindvriendelijke invulling van het menu. Ook voor koffietafels en rouwmaaltijden kunt u bij ons terecht; we zorgen dan voor een rustige ontvangst in De Serre, apart van de gewone zaal. Alles wordt vooraf in alle sereniteit met u doorgesproken.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Bedrijfslunches en -diners",
+    "category": "feesten",
+    "content": "Bedrijven kunnen bij ons terecht voor teamlunches, klantendiners en vergaderingen met lunch in De Serre. Betalen op factuur is mogelijk; bezorg ons vooraf de facturatiegegevens van uw onderneming. Voor terugkerende reservaties maken we graag vaste afspraken.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Offerte voor een feest aanvragen",
+    "category": "feesten",
+    "content": "Een feest of groepsreservatie vraagt u aan bij onze gastvrouw Lies Wouters, telefonisch op 011 23 45 67 of via info@brasseriedelinde.be. U ontvangt binnen 2 werkdagen een offerte op maat met menuvoorstel. De datum ligt definitief vast zodra het voorschot betaald is; de voorwaarden daarvan vindt u bij onze prijsinformatie.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Openingsuren",
+    "category": "praktisch",
+    "content": "Brasserie De Linde is open van woensdag tot en met zondag. De keuken is open van 12:00 tot 14:00 en van 18:00 tot 21:30; de zaak zelf sluit om 23:00. Maandag en dinsdag zijn onze vaste sluitingsdagen. Op feestdagen die op een sluitingsdag vallen, communiceren we de openingsuren via de website en onze sociale media.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Ligging en parkeren",
+    "category": "praktisch",
+    "content": "U vindt ons in de Kapelstraat 27, 3500 Hasselt, in het centrum van de stad. Parkeren doet u het makkelijkst in de parking aan de Blauwe Boulevard, op 5 minuten wandelen. In de omliggende straten is beperkt betalend straatparkeren mogelijk.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Bereikbaarheid",
+    "category": "praktisch",
+    "content": "Het station van Hasselt ligt op ongeveer 10 minuten wandelen van de zaak. De dichtstbijzijnde bushalte ligt op 100 meter in de winkelstraat. Kom je met de fiets, dan is er een fietsenstalling vlak voor de deur.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Terras",
+    "category": "praktisch",
+    "content": "Op de binnenkoer hebben we een zonnig, windluw terras met 40 plaatsen, open van de lente tot de vroege herfst als het weer het toelaat. Terrasplaatsen kunnen niet apart gereserveerd worden: bij uw aankomst kijken we of er een tafel buiten vrij is. Bij regen schuiven terrasgasten gewoon mee naar binnen.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Betaalmethodes",
+    "category": "praktisch",
+    "content": "U betaalt bij ons met Bancontact, Payconiq, Visa, Mastercard of cash. Elektronische maaltijdcheques aanvaarden we ook. Bedrijven kunnen op factuur betalen als dat vooraf is afgesproken. De rekening splitsen per gast is geen probleem.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Cadeaubonnen kopen en gebruiken",
+    "category": "praktisch",
+    "content": "Cadeaubonnen koopt u in de zaak of via www.brasseriedelinde.be; online bestelde bonnen sturen we per post of per e-mail op. Een bon is 1 jaar geldig vanaf de aankoopdatum. Bij het afrekenen geeft u de bon gewoon af; een resterend saldo blijft staan voor een volgend bezoek. De beschikbare bedragen vindt u bij onze prijsinformatie.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Huisdieren",
+    "category": "praktisch",
+    "content": "Aangelijnde honden zijn welkom op het terras; we zetten graag een waterbakje klaar. In de binnenzaal laten we huisdieren niet toe, met uitzondering van assistentiehonden, die uiteraard overal welkom zijn.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Toegankelijkheid",
+    "category": "praktisch",
+    "content": "De zaak is volledig gelijkvloers en rolstoeltoegankelijk, inclusief een aangepast toilet. Ook het terras op de binnenkoer is zonder drempels bereikbaar. Meld bij uw reservatie dat u met een rolstoel komt, dan voorzien we een tafel met voldoende ruimte.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Wie is wie",
+    "category": "praktisch",
+    "content": "Brasserie De Linde wordt gerund door chef-eigenaar Karel Jacobs, die de keuken leidt, en gastvrouw Lies Wouters, die de zaal en alle reservaties beheert. Voor vragen over feesten, groepen of facturen is Lies uw aanspreekpunt; voor vragen over gerechten en allergenen antwoordt Karel via de bediening. Beiden bereikt u via 011 23 45 67 of info@brasseriedelinde.be.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Annulatievoorwaarden feesten",
+    "category": "beleid",
+    "content": "Een feest of groepsmenu ligt pas definitief vast na betaling van het voorschot. Annuleert u tot 14 dagen voor de datum, dan krijgt u het voorschot volledig terug; annuleert u later, dan wordt het ingehouden als vergoeding voor de gereserveerde zaal en ingekochte producten. Verplaatsen naar een andere datum proberen we altijd eerst kosteloos te regelen als de agenda het toelaat.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Menukeuze bij grote groepen",
+    "category": "beleid",
+    "content": "Vanaf 10 personen vragen we één gezamenlijk menu voor de hele groep in plaats van à-la-carte bestellen; zo kan de keuken iedereen tegelijk en warm bedienen. Individuele afwijkingen voor allergieën, vegetariërs en kinderen zijn daarbij geen probleem. De definitieve gerechtkeuzes verwachten we ten laatste één week op voorhand.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Eigen taart meebrengen",
+    "category": "beleid",
+    "content": "Bij een feest in De Serre mag u een eigen verjaardagstaart of communietaart meebrengen als dat vooraf is afgesproken. We serveren de taart dan met borden, bestek en koffie; daarvoor rekenen we een kleine serveerkost per persoon aan, vraag ernaar bij uw reservatie. Eigen dranken meebrengen is niet mogelijk.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  },
+  {
+    "title": "Klachten en feedback",
+    "category": "beleid",
+    "content": "Is er iets niet naar wens, zeg het ons dan meteen tijdens uw bezoek; de zaal of de chef lost het liefst direct aan tafel op. Nadien kunt u altijd terecht via info@brasseriedelinde.be; u krijgt binnen 2 werkdagen een persoonlijk antwoord van Lies of Karel. Eerlijke feedback, goed of slecht, helpt ons vooruit.",
+    "source": "seed",
+    "source_detail": "horeca-template"
+  }
+]
