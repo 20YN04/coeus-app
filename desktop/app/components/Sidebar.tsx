@@ -34,6 +34,18 @@ const KLANT_NAV = [
       </svg>
     ),
   },
+  {
+    href: '/graph',
+    labelKey: 'nav.graph',
+    icon: (
+      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
+        <circle cx="3.5" cy="3.5" r="1.75" />
+        <circle cx="12.5" cy="5" r="1.75" />
+        <circle cx="7" cy="12.5" r="1.75" />
+        <path d="M5 4.3l6 .9M4.6 5.2l2 5.6M8.6 11.6l3-5.2" />
+      </svg>
+    ),
+  },
 ];
 
 const BEHEER_NAV = [
@@ -53,18 +65,6 @@ const BEHEER_NAV = [
     icon: (
       <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
         <path d="M8 2v12M2 8h12" />
-      </svg>
-    ),
-  },
-  {
-    href: '/graph',
-    labelKey: 'nav.graph',
-    icon: (
-      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
-        <circle cx="3.5" cy="3.5" r="1.75" />
-        <circle cx="12.5" cy="5" r="1.75" />
-        <circle cx="7" cy="12.5" r="1.75" />
-        <path d="M5 4.3l6 .9M4.6 5.2l2 5.6M8.6 11.6l3-5.2" />
       </svg>
     ),
   },
