@@ -77,6 +77,13 @@ class IngestCrawlRequest(BaseModel):
     category: Optional[str] = None
 
 
+class ConnectFolderRequest(BaseModel):
+    # Lokale-map-connector: koppel een absolute map op deze machine. Geen OAuth —
+    # het brein draait als sidecar op dezelfde machine en leest rechtstreeks
+    # van schijf. Validatie (bestaat/is-dir/leesbaar) gebeurt in brain/connector.py.
+    path: str = Field(..., min_length=1, max_length=4096)
+
+
 class FeedbackRequest(BaseModel):
     # Antwoord-feedback-loop: duim omhoog/omlaag op een /ask-antwoord, key-vrij,
     # lokaal opgeslagen (brain/feedback.py). answer_excerpt is bewust kort

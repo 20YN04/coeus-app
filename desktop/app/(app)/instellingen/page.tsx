@@ -6,6 +6,7 @@ import DataBeheer from './DataBeheer';
 import BackupBeheer from './BackupBeheer';
 import Opschonen from './Opschonen';
 import AiSleutel from './AiSleutel';
+import GekoppeldeMap from './GekoppeldeMap';
 import { useT, type Lang } from '@/lib/i18n';
 
 export default function InstellingenPage() {
@@ -135,6 +136,8 @@ export default function InstellingenPage() {
         <DataBeheer />
 
         <BackupBeheer />
+
+        <GekoppeldeMap />
 
         <Opschonen />
 
