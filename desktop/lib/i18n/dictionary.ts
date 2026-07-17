@@ -353,6 +353,20 @@ const nl = {
     disconnectConfirm: 'Dit ontkoppelt de map. De al geleerde items blijven gewoon bewaard. Doorgaan?',
     disconnectDone: 'Map ontkoppeld.',
   },
+feedback: {
+    up: 'Nuttig antwoord',
+    down: 'Niet nuttig antwoord',
+    reasonPrompt: 'Wat klopt er niet?',
+    reasons: {
+      onjuist: 'Klopt niet',
+      verouderd: 'Verouderd',
+      onvolledig: 'Onvolledig',
+    },
+    notePlaceholder: 'Optioneel: vertel wat er mis is…',
+    send: 'Versturen',
+    thanks: 'Bedankt — dit helpt Coeus verbeteren.',
+    sendFailed: 'Versturen mislukt — probeer opnieuw.',
+  },
 } as const;
 
 const en: Dictionary = {
@@ -694,6 +708,20 @@ const en: Dictionary = {
     disconnectFailed: 'Disconnect failed.',
     disconnectConfirm: 'This disconnects the folder. Already-learned items stay in place. Continue?',
     disconnectDone: 'Folder disconnected.',
+  },
+feedback: {
+    up: 'Helpful answer',
+    down: 'Not helpful',
+    reasonPrompt: "What's wrong?",
+    reasons: {
+      onjuist: 'Not correct',
+      verouderd: 'Outdated',
+      onvolledig: 'Incomplete',
+    },
+    notePlaceholder: "Optional: tell us what's wrong…",
+    send: 'Send',
+    thanks: 'Thanks — this helps Coeus improve.',
+    sendFailed: 'Sending failed — try again.',
   },
 };
 

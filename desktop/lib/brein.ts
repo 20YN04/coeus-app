@@ -264,6 +264,40 @@ export async function deleteLlmKey(): Promise<{ configured: boolean }> {
   });
 }
 
+// Antwoord-feedback-loop: duim omhoog/omlaag + optionele reden op een /ask-
+// antwoord. Key-vrij, lokaal opgeslagen (brain/feedback.py) — voedt een later
+// beheer-scherm waar Ynarchive (en de klant zelf) de antwoordkwaliteit opvolgt.
+export type FeedbackInput = {
+  question: string;
+  answerExcerpt: string;
+  rating: 'up' | 'down';
+  reason?: string;
+  sourceIds?: string[];
+};
+
+export type FeedbackRecord = {
+  id: string;
+  timestamp: string;
+  question: string;
+  answer_excerpt: string;
+  rating: 'up' | 'down';
+  reason?: string;
+  source_ids?: string[];
+};
+
+export async function sendFeedback(input: FeedbackInput): Promise<FeedbackRecord> {
+  return req<FeedbackRecord>('/feedback', {
+    method: 'POST',
+    body: JSON.stringify({
+      question: input.question,
+      answer_excerpt: input.answerExcerpt,
+      rating: input.rating,
+      reason: input.reason || undefined,
+      source_ids: input.sourceIds?.length ? input.sourceIds : undefined,
+    }),
+  });
+}
+
 // Semantic knowledge graph (nodes per item, edges from embedding similarity).
 // Key-free: the brein builds it from the local ChromaDB embeddings.
 export async function getGraph(neighbors?: number): Promise<KennisGraph> {
