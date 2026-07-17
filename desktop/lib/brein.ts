@@ -271,6 +271,49 @@ export async function getGraph(neighbors?: number): Promise<KennisGraph> {
   return req<KennisGraph>(`/graph${qs}`);
 }
 
+// Lokale-map-connector: koppel een map op deze machine (bv. de offerte-/
+// documentenmap) en het brein leert automatisch alle .pdf/.md/.markdown/.txt-
+// bestanden erin, met her-scan voor nieuwe/gewijzigde bestanden. Geen OAuth —
+// het brein draait als sidecar op dezelfde machine en leest rechtstreeks van
+// schijf. `path: null` betekent: nog geen map gekoppeld.
+export type ConnectorStatus = {
+  path: string | null;
+  laatste_scan?: string | null;
+  bestanden_bekend?: number;
+  items?: number;
+};
+export type ConnectorRescanResult = {
+  nieuw: number;
+  gewijzigd: number;
+  verwijderd: number;
+  items_toegevoegd: number;
+  items_verwijderd: number;
+};
+
+export async function getFolder(): Promise<ConnectorStatus> {
+  return req<ConnectorStatus>('/connector/folder');
+}
+
+export async function connectFolder(path: string): Promise<ConnectorStatus> {
+  return req<ConnectorStatus>('/connector/folder', {
+    method: 'POST',
+    body: JSON.stringify({ path }),
+  });
+}
+
+export async function rescanFolder(): Promise<ConnectorRescanResult> {
+  return req<ConnectorRescanResult>('/connector/rescan', { method: 'POST' });
+}
+
+export async function disconnectFolder(
+  removeItems = false,
+): Promise<{ ok: boolean; items_verwijderd: number }> {
+  const qs = removeItems ? '?verwijder_items=true' : '';
+  return req<{ ok: boolean; items_verwijderd: number }>(`/connector/folder${qs}`, {
+    method: 'DELETE',
+  });
+}
+
 // Auto-opschonen: clusters van near-duplicate kennis-items, gevonden via de
 // bestaande embeddings (key-free, geen LLM). Per cluster blijft één keeper staan
 // en zijn de overige titels verwijderbaar.
