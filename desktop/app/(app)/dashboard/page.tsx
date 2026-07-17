@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ask, waitForBrein, type AskResult } from '@/lib/brein';
 import { useT } from '@/lib/i18n';
+import { AnswerFeedback } from './AnswerFeedback';
 
 const BREIN_URL = process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://127.0.0.1:8765';
 
@@ -208,6 +209,7 @@ export default function HomePage() {
                   </ul>
                 </div>
               )}
+              <AnswerFeedback question={turn.question} answer={turn.answer} bronnen={turn.bronnen} />
             </div>
           ))}
           <div ref={historyEndRef} />

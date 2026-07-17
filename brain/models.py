@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Literal, Optional
 from datetime import datetime
 
 class KennisItem(BaseModel):
@@ -75,3 +75,22 @@ class IngestCrawlRequest(BaseModel):
     url: str = Field(..., min_length=1, max_length=2000)
     max_pages: int = Field(default=15, ge=1, le=50)
     category: Optional[str] = None
+
+
+class ConnectFolderRequest(BaseModel):
+    # Lokale-map-connector: koppel een absolute map op deze machine. Geen OAuth —
+    # het brein draait als sidecar op dezelfde machine en leest rechtstreeks
+    # van schijf. Validatie (bestaat/is-dir/leesbaar) gebeurt in brain/connector.py.
+    path: str = Field(..., min_length=1, max_length=4096)
+
+
+class FeedbackRequest(BaseModel):
+    # Antwoord-feedback-loop: duim omhoog/omlaag op een /ask-antwoord, key-vrij,
+    # lokaal opgeslagen (brain/feedback.py). answer_excerpt is bewust kort
+    # (frontend stuurt de eerste ~300 tekens) — dit is geen volledige audit-log,
+    # genoeg context om de kwaliteit terug te herkennen.
+    question: str = Field(..., min_length=1, max_length=1000)
+    answer_excerpt: str = Field(..., min_length=1, max_length=500)
+    rating: Literal["up", "down"]
+    reason: Optional[str] = Field(default=None, max_length=500)
+    source_ids: Optional[list[str]] = None

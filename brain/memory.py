@@ -1,10 +1,89 @@
 import chromadb
 import os
+import re
 import uuid
 from datetime import datetime
 from typing import Optional
 from .config import settings
 from .models import KennisItem
+
+# Hybride zoeken: reine semantische ranking liet exacte termen (merknamen,
+# telefoonnummerfragmenten) wegzakken zodra het meertalige embedding-model de
+# zin parafraseerde i.p.v. letterlijk matchte. Token-regex: alnum-reeksen
+# (unicode-vriendelijk), zodat "Pirelli" en "0470" allebei als term tellen.
+_TOKEN_RE = re.compile(r"[^\W_]+", re.UNICODE)
+
+# Kleine functiewoorden-lijst (NL + EN). Geen nieuwe dependency, geen corpus-brede
+# idf-berekening (bleek onstabiel bij een kleine kennisbank: in een corpus van maar
+# een paar items lijkt elk woord toevallig "zeldzaam"). Lidwoorden/voorzetsels/
+# voornaamwoorden uit de query filteren voorkomt dat ze een item zonder de
+# daadwerkelijk gezochte term (merknaam, telefoonnummer) toch lexicaal laten winnen.
+_STOPWORDS = {
+    "de", "het", "een", "en", "van", "in", "op", "te", "dat", "die", "dit",
+    "is", "zijn", "was", "er", "voor", "aan", "met", "als", "ook", "maar",
+    "of", "om", "uit", "bij", "niet", "je", "jij", "jullie", "wij", "we",
+    "ik", "hij", "zij", "ze", "u", "wat", "hoe", "wie", "welke", "welk",
+    "waar", "wanneer", "dan", "dus", "naar", "tot", "over", "onder",
+    "tussen", "zonder", "door", "the", "a", "an", "and", "or", "to", "for",
+    "are", "were", "which", "when", "do", "does", "did", "this", "that",
+    "these", "those", "with", "at", "by", "from", "it", "its", "be", "been",
+    "you", "he", "she", "they",
+}
+
+
+def _tokenize(text: str) -> list[str]:
+    return _TOKEN_RE.findall(text.lower())
+
+
+def _content_tokens(query: str) -> list[str]:
+    # Unieke, betekenisdragende query-tokens (stopwoorden eruit) — bepaalt zowel de
+    # teller (matches) als de noemer (totaal) van de term-overlap-score.
+    return list(dict.fromkeys(t for t in _tokenize(query) if t not in _STOPWORDS))
+
+
+def _token_present(token: str, text_lower: str) -> bool:
+    # Woordgrens (\b), geen kale substring: anders matcht het 2-letter token "is"
+    # ook midden in "adviseren" en vervuilt elke query met een stopwoord de score.
+    return re.search(rf"\b{re.escape(token)}\b", text_lower) is not None
+
+
+def _lexical_score(query: str, content_tokens: list[str], query_digits: str, text: str) -> float:
+    # Genormaliseerde lexicale score in [0, 1] voor één item t.o.v. de query.
+    # Géén nieuwe dependency (geen rank_bm25 o.i.d.) — de kennisbank is klein
+    # (honderden items), een stdlib full-scan per query is prima.
+    if not text:
+        return 0.0
+    text_lower = text.lower()
+
+    # Exacte frase (case-insensitief) — merknaam of letterlijke deelzin — is het
+    # sterkste signaal: volle score, ongeacht token-overlap elders.
+    stripped = query.strip().lower()
+    if stripped and stripped in text_lower:
+        return 1.0
+
+    # Cijferreeksen (telefoonnummers) matchen ongeacht spaties/streepjes/punten
+    # in de opmaak — "0470 12 34 56" vindt "0470/12.34.56" en omgekeerd.
+    if len(query_digits) >= 4 and query_digits in re.sub(r"\D", "", text_lower):
+        return 1.0
+
+    if not content_tokens:
+        return 0.0
+    hits = sum(1 for t in content_tokens if _token_present(t, text_lower))
+    return hits / len(content_tokens)
+
+
+# Hybride ranking: gewogen score-mix van semantische score (chroma-afstand →
+# 1/(1+afstand), zelfde conventie als Memory.build_graph verderop) en lexicale score
+# (_lexical_score, [0,1]). 0.7/0.3: semantiek blijft dominant voor vage/parafraserende
+# vragen (bestaand gedrag — bij lexical_score=0 is de ranking een pure schaling van de
+# semantische score, dus identiek geordend), maar een exacte term geeft een vaste
+# lexicale vloer van 0.3 die een semantisch zwak item betrouwbaar boven een concurrent
+# tilt die alleen op semantiek scoort (geverifieerd in test_hybrid_search.py met een
+# gecontroleerde semantische afstand). Bewust GEEN Reciprocal Rank Fusion: RRF's
+# 1/(k+rank)-curve verdunt het maximale lexicale signaal té veel om dat hard te
+# garanderen; een genormaliseerde score-mix geeft een voorspelbare, testbare vloer.
+_SEMANTIC_WEIGHT = 0.7
+_LEXICAL_WEIGHT = 0.3
 
 # Meertalig embedding-model i.p.v. chroma's default all-MiniLM (Engels-centrisch, zwak
 # op NL → "waar gevestigd" matchte "Adres" niet). We draaien het via fastembed
@@ -104,25 +183,62 @@ class Memory:
 
     def search(self, query: str, limit: int = 5,
                category: str = None) -> list[KennisItem]:
-        # Zoek semantisch in de kennisbank, optioneel gefilterd op categorie
+        # Hybride zoeken: semantisch (fastembed/chroma) + lexicaal (exacte term/
+        # cijferreeks), gefuseerd tot één ranking. Lege/blanco query levert niets op
+        # (geen zinvolle semantische embedding, geen lexicale termen).
+        if not query or not query.strip():
+            return []
+
         where_filter = {"category": category} if category else None
+        total = self.collection.count()
+        if total == 0:
+            return []
+
+        # Vraag de volledige (gefilterde) set op — n_results is een max, geen exact
+        # aantal, dus dit is veilig ook als category het resultaat verkleint. Zo
+        # krijgt elk item een semantische rank/score, ook items die buiten een kleine
+        # top-N ANN-afkap zouden vallen maar wél een exacte lexicale match hebben.
         results = self.collection.query(
-            query_embeddings=_embed([query]), n_results=limit, where=where_filter
+            query_embeddings=_embed([query]), n_results=total, where=where_filter
         )
 
+        ids = results['ids'][0] if results['ids'] else []
+        if not ids:
+            return []
+
+        distances = results['distances'][0]
+        documents = results['documents'][0]
+        metadatas = results['metadatas'][0]
+
+        query_digits = re.sub(r"\D", "", query)
+        content_tokens = _content_tokens(query)
+
+        scored = []
+        for i, item_id in enumerate(ids):
+            meta = metadatas[i]
+            content = documents[i] or ""
+            text = f"{meta.get('title', '')} {content}"
+            semantic_score = 1.0 / (1.0 + float(distances[i]))
+            lexical_score = _lexical_score(query, content_tokens, query_digits, text)
+            fused = _SEMANTIC_WEIGHT * semantic_score + _LEXICAL_WEIGHT * lexical_score
+            scored.append((fused, item_id, meta, content))
+
+        # Stabiele sort: bij gelijke fused score wint de oorspronkelijke (semantische)
+        # volgorde van chroma, zodat puur-semantische queries (lexical_score=0 overal)
+        # exact het bestaande gedrag behouden.
+        scored.sort(key=lambda s: s[0], reverse=True)
+
         items = []
-        if results['ids'] and results['ids'][0]:
-            for i in range(len(results['ids'][0])):
-                meta = results['metadatas'][0][i]
-                items.append(KennisItem(
-                    id=results['ids'][0][i],
-                    title=meta['title'],
-                    category=meta['category'],
-                    content=results['documents'][0][i],
-                    source=meta.get('source', 'manual'),
-                    source_detail=meta.get('source_detail'),
-                    created_at=datetime.fromisoformat(meta['created_at'])
-                ))
+        for _, item_id, meta, content in scored[:limit]:
+            items.append(KennisItem(
+                id=item_id,
+                title=meta['title'],
+                category=meta['category'],
+                content=content,
+                source=meta.get('source', 'manual'),
+                source_detail=meta.get('source_detail'),
+                created_at=datetime.fromisoformat(meta['created_at'])
+            ))
         return items
 
     def get(self, item_id: str) -> KennisItem | None:
@@ -327,6 +443,39 @@ class Memory:
                 self.delete(item["id"])
                 removed += 1
         return removed
+
+    def get_by_source_detail(self, source_detail: str) -> list[KennisItem]:
+        # Alle items die van één bron-detail afkomstig zijn (bv. een relatief
+        # bestandspad uit de map-connector). Gebruikt bij een gewijzigd/verwijderd
+        # bestand om eerst de oude items van dat pad op te ruimen.
+        result = self.collection.get(where={"source_detail": source_detail})
+        items = []
+        if result['ids']:
+            for i in range(len(result['ids'])):
+                meta = result['metadatas'][i]
+                items.append(KennisItem(
+                    id=result['ids'][i], title=meta['title'],
+                    category=meta['category'],
+                    content=result['documents'][i],
+                    source=meta.get('source', 'manual'),
+                    source_detail=meta.get('source_detail'),
+                    created_at=datetime.fromisoformat(meta['created_at'])
+                ))
+        return items
+
+    def count_by_source(self, source: str) -> int:
+        # Aantal items met een gegeven source (bv. "connector"), zonder de
+        # volledige documenten/embeddings op te halen.
+        result = self.collection.get(where={"source": source}, include=[])
+        return len(result['ids'] or [])
+
+    def delete_by_source(self, source: str) -> int:
+        # Verwijder alle items met een gegeven source. Geeft het aantal terug.
+        result = self.collection.get(where={"source": source}, include=[])
+        ids = result['ids'] or []
+        if ids:
+            self.collection.delete(ids=ids)
+        return len(ids)
 
     def get_categories(self) -> list[dict]:
         # Geef alle categorieën terug met het aantal items per categorie
