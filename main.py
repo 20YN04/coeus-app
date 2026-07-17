@@ -1,4 +1,7 @@
 import os
+import threading
+import time
+import uuid
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,7 +9,10 @@ import requests
 from brain.memory import Memory
 from brain.learner import Learner
 from brain.seed import seed_if_empty
-from brain.ingest import chunk_text, derive_title, filter_noise_chunks, html_to_text, crawl_site
+from brain.ingest import (
+    chunk_text, derive_title, filter_noise_chunks, html_to_text,
+    crawl_site, crawl_site_with_progress,
+)
 from brain.config import settings
 from brain.models import (
     KennisItem, CreateKennisRequest, UpdateKennisRequest,
@@ -330,12 +336,62 @@ def ingest_url(request: IngestUrlRequest):
     return {"toegevoegd": added, "ai_extractie": bool(settings.llm_api_key)}
 
 
+# Crawl-voortgang — in-memory job-store voor de async /ingest/crawl-flow (single-
+# user lokale desktop-app: geen persistentie/multi-worker nodig, de sidecar
+# draait per klant op hun eigen machine). Klaar-jobs blijven ~1u opvraagbaar
+# zodat de wizard/Importeren-UI de eindstatus nog kan tonen na een trage tab-
+# switch; oudere jobs ruimen we lazy op bij het starten van een nieuwe job.
+_crawl_jobs: dict[str, dict] = {}
+CRAWL_JOB_RETENTION_SECONDS = 3600
+
+
+def _prune_crawl_jobs() -> None:
+    cutoff = time.time() - CRAWL_JOB_RETENTION_SECONDS
+    stale = [
+        jid for jid, job in _crawl_jobs.items()
+        if job["status"] != "running" and job.get("afgerond_op", cutoff + 1) < cutoff
+    ]
+    for jid in stale:
+        del _crawl_jobs[jid]
+
+
+def _run_crawl_job(job_id: str, url: str, max_pages: int, category: str | None) -> None:
+    # Draait in een achtergrond-thread (stdlib threading — geen celery/nieuwe
+    # deps). Elke stap schrijft naar de job-dict; GET /ingest/status/{id} leest
+    # 'm read-only. Faalt de crawl halverwege, dan eindigt de job netjes op
+    # status "error" i.p.v. voor altijd op "running" te blijven hangen — de
+    # tellingen tot dat punt blijven staan (partial credit).
+    job = _crawl_jobs[job_id]
+    added = 0
+    pages = 0
+    try:
+        for page_url, text, bezocht, queue_len in crawl_site_with_progress(url, max_pages):
+            job["huidige_url"] = page_url
+            added += _ingest_page(text, category, page_url)
+            pages = bezocht
+            job["paginas_bezocht"] = pages
+            job["paginas_totaal_geschat"] = bezocht + queue_len
+            job["toegevoegd"] = added
+        job["opgeschoond"] = memory.dedupe(CLEANUP_DEFAULT_THRESHOLD) if added else 0
+        job["status"] = "done"
+    except Exception as exc:  # noqa: BLE001 — achtergrond-thread mag nooit stil crashen
+        job["error"] = str(exc)
+        job["status"] = "error"
+    finally:
+        job["afgerond_op"] = time.time()
+
+
 @app.post("/ingest/crawl")
-def ingest_crawl(request: IngestCrawlRequest):
+def ingest_crawl(request: IngestCrawlRequest, async_: bool = Query(default=False, alias="async")):
     # Onboarding-motor: hele site crawlen vanaf url (BFS, dezelfde host), per pagina
     # leesbare tekst extraheren en in stukken hakken. Resilient: onbereikbare
     # start → 502, niet-HTML start → 422, en losse pagina's die falen worden
     # tijdens de crawl stilletjes overgeslagen (zie crawl_site).
+    #
+    # Default blijft het oude synchrone gedrag — ongewijzigd, zodat bestaande
+    # callers/tests niets merken. ?async=true start in plaats daarvan een
+    # achtergrond-thread en geeft meteen {job_id} terug; voortgang via
+    # GET /ingest/status/{job_id}. De wizard en Importeren gebruiken dit pad.
     url = request.url.strip()
     if not url.lower().startswith(("http://", "https://")):
         raise HTTPException(422, "Ongeldige URL — gebruik http:// of https://")
@@ -358,23 +414,62 @@ def ingest_crawl(request: IngestCrawlRequest):
     if "html" not in content_type and "text" not in content_type:
         raise HTTPException(422, "De URL bevat geen leesbare tekst (geen HTML)")
 
-    added = 0
-    pages = 0
-    for page_url, text in crawl_site(url, request.max_pages):
-        added += _ingest_page(text, request.category, page_url)
-        pages += 1
+    if not async_:
+        added = 0
+        pages = 0
+        for page_url, text in crawl_site(url, request.max_pages):
+            added += _ingest_page(text, request.category, page_url)
+            pages += 1
 
-    # Auto-opschonen ná de crawl: dezelfde near-duplicate-pass als Instellingen →
-    # Opschonen, maar automatisch — blokken die over meerdere pagina's herhaald
-    # worden (uitgelekte boilerplate, dubbele feiten) verdwijnen meteen i.p.v. dat
-    # de klant zelf moet opschonen. Alleen draaien als er echt iets is toegevoegd.
-    opgeschoond = memory.dedupe(CLEANUP_DEFAULT_THRESHOLD) if added else 0
+        # Auto-opschonen ná de crawl: dezelfde near-duplicate-pass als Instellingen →
+        # Opschonen, maar automatisch — blokken die over meerdere pagina's herhaald
+        # worden (uitgelekte boilerplate, dubbele feiten) verdwijnen meteen i.p.v. dat
+        # de klant zelf moet opschonen. Alleen draaien als er echt iets is toegevoegd.
+        opgeschoond = memory.dedupe(CLEANUP_DEFAULT_THRESHOLD) if added else 0
 
+        return {
+            "toegevoegd": added,
+            "paginas": pages,
+            "opgeschoond": opgeschoond,
+            "ai_extractie": bool(settings.llm_api_key),
+        }
+
+    _prune_crawl_jobs()
+    job_id = uuid.uuid4().hex
+    _crawl_jobs[job_id] = {
+        "status": "running",
+        "paginas_bezocht": 0,
+        "paginas_totaal_geschat": 1,
+        "toegevoegd": 0,
+        "huidige_url": url,
+        "opgeschoond": None,
+        "error": None,
+    }
+    thread = threading.Thread(
+        target=_run_crawl_job,
+        args=(job_id, url, request.max_pages, request.category),
+        daemon=True,
+    )
+    thread.start()
+    return {"job_id": job_id}
+
+
+@app.get("/ingest/status/{job_id}")
+def ingest_crawl_status(job_id: str):
+    # Voortgang van een async crawl-job (zie POST /ingest/crawl?async=true).
+    # Read-only view op de job-dict; 404 als de job niet (meer) bestaat —
+    # klaar-jobs blijven CRAWL_JOB_RETENTION_SECONDS opvraagbaar.
+    job = _crawl_jobs.get(job_id)
+    if not job:
+        raise HTTPException(404, "Job niet gevonden")
     return {
-        "toegevoegd": added,
-        "paginas": pages,
-        "opgeschoond": opgeschoond,
-        "ai_extractie": bool(settings.llm_api_key),
+        "status": job["status"],
+        "paginas_bezocht": job["paginas_bezocht"],
+        "paginas_totaal_geschat": job["paginas_totaal_geschat"],
+        "toegevoegd": job["toegevoegd"],
+        "huidige_url": job["huidige_url"],
+        "opgeschoond": job["opgeschoond"],
+        "error": job["error"],
     }
 
 

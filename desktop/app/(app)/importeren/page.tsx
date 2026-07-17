@@ -6,11 +6,12 @@ import {
   ingestText,
   learnText,
   ingestUrl,
-  ingestCrawl,
+  ingestCrawlAsync,
   ingestFile,
   waitForBrein,
 } from '@/lib/brein';
 import { useT } from '@/lib/i18n';
+import CrawlProgress from '@/app/components/CrawlProgress';
 
 type Mode = 'tekst' | 'website' | 'bestand';
 type WebMode = 'pagina' | 'crawl';
@@ -34,6 +35,9 @@ export default function ImporterenPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<string | null>(null);
+  // Crawl-mode vervangt het blocking-wachten door een lopende job + inline
+  // voortgang (zie CrawlProgress) — dezelfde async-flow als /welkom stap 3.
+  const [crawlJob, setCrawlJob] = useState<{ id: string; url: string } | null>(null);
 
   // Wacht op de lokale brein-sidecar voordat we kunnen importeren.
   useEffect(() => {
@@ -55,6 +59,12 @@ export default function ImporterenPage() {
     setMode(next);
     setError('');
     setResult(null);
+    setCrawlJob(null);
+  }
+
+  function switchWebMode(next: WebMode) {
+    setWebMode(next);
+    setCrawlJob(null);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -100,16 +110,8 @@ export default function ImporterenPage() {
         setText('');
       } else if (mode === 'website') {
         if (webMode === 'crawl') {
-          const res = await ingestCrawl(url.trim(), { category: cat, maxPages });
-          const crawlMsg =
-            res.toegevoegd === 1 && res.paginas === 1
-              ? t('importeren.resultCrawlSingle', { count: res.toegevoegd, pages: res.paginas })
-              : t('importeren.resultCrawlPlural', { count: res.toegevoegd, pages: res.paginas });
-          setResult(
-            res.opgeschoond > 0
-              ? `${crawlMsg} · ${t('importeren.resultCrawlCleaned', { cleaned: res.opgeschoond })}`
-              : crawlMsg,
-          );
+          const res = await ingestCrawlAsync(url.trim(), { category: cat, maxPages });
+          setCrawlJob({ id: res.job_id, url: url.trim() });
         } else {
           const res = await ingestUrl(url.trim(), { category: cat });
           setResult(
@@ -201,6 +203,9 @@ export default function ImporterenPage() {
         </div>
       )}
 
+      {mode === 'website' && webMode === 'crawl' && crawlJob ? (
+        <CrawlProgress jobId={crawlJob.id} sourceUrl={crawlJob.url} doneHref="/kennisbank" />
+      ) : (
       <form onSubmit={handleSubmit} className="kennis-form">
         {mode === 'tekst' && (
           <div className="form-field">
@@ -241,7 +246,7 @@ export default function ImporterenPage() {
                 aria-selected={webMode === 'pagina'}
                 className="filter-chip"
                 data-active={webMode === 'pagina' ? 'true' : undefined}
-                onClick={() => setWebMode('pagina')}
+                onClick={() => switchWebMode('pagina')}
               >
                 {t('importeren.webSinglePage')}
               </button>
@@ -251,7 +256,7 @@ export default function ImporterenPage() {
                 aria-selected={webMode === 'crawl'}
                 className="filter-chip"
                 data-active={webMode === 'crawl' ? 'true' : undefined}
-                onClick={() => setWebMode('crawl')}
+                onClick={() => switchWebMode('crawl')}
               >
                 {t('importeren.webCrawl')}
               </button>
@@ -348,6 +353,7 @@ export default function ImporterenPage() {
           </button>
         </div>
       </form>
+      )}
     </>
   );
 }
