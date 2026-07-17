@@ -8,10 +8,12 @@ from brain.learner import Learner
 from brain.seed import seed_if_empty
 from brain.ingest import chunk_text, derive_title, filter_noise_chunks, html_to_text, crawl_site
 from brain.config import settings
+from brain.feedback import append_feedback, read_feedback
 from brain.models import (
     KennisItem, CreateKennisRequest, UpdateKennisRequest,
     LearnRequest, AskRequest, IngestTextRequest, IngestUrlRequest,
     IngestCrawlRequest, CleanupApplyRequest, LlmKeyRequest, LlmStatus,
+    FeedbackRequest,
 )
 
 # Auto-opschonen: standaard embedding-afstand waaronder twee items als duplicaat
@@ -476,3 +478,21 @@ def cleanup_apply(request: CleanupApplyRequest):
     threshold = request.threshold if request.threshold is not None else CLEANUP_DEFAULT_THRESHOLD
     removed = memory.dedupe(threshold)
     return {"verwijderd": removed}
+
+
+@app.post("/feedback")
+def submit_feedback(request: FeedbackRequest):
+    # Duim omhoog/omlaag op een /ask-antwoord: key-vrij, lokaal, append-only
+    # (zie brain/feedback.py). exclude_none zodat een niet-meegegeven reason/
+    # source_ids niet als "null" in het JSONL-bestand belandt.
+    try:
+        return append_feedback(settings.data_dir, request.model_dump(exclude_none=True))
+    except OSError:
+        raise HTTPException(500, "Feedback kon niet opgeslagen worden")
+
+
+@app.get("/feedback")
+def list_feedback(limit: int = Query(default=100, ge=1, le=500)):
+    # Nieuwste eerst — voedt een later beheer-scherm waar Ynarchive (en de klant)
+    # de antwoordkwaliteit opvolgt.
+    return read_feedback(settings.data_dir, limit)

@@ -324,6 +324,20 @@ const nl = {
       moreLabel: '+{count} meer',
     },
   },
+  feedback: {
+    up: 'Nuttig antwoord',
+    down: 'Niet nuttig antwoord',
+    reasonPrompt: 'Wat klopt er niet?',
+    reasons: {
+      onjuist: 'Klopt niet',
+      verouderd: 'Verouderd',
+      onvolledig: 'Onvolledig',
+    },
+    notePlaceholder: 'Optioneel: vertel wat er mis is…',
+    send: 'Versturen',
+    thanks: 'Bedankt — dit helpt Coeus verbeteren.',
+    sendFailed: 'Versturen mislukt — probeer opnieuw.',
+  },
 } as const;
 
 const en: Dictionary = {
@@ -636,6 +650,20 @@ const en: Dictionary = {
       removed: '{count} removed.',
       moreLabel: '+{count} more',
     },
+  },
+  feedback: {
+    up: 'Helpful answer',
+    down: 'Not helpful',
+    reasonPrompt: "What's wrong?",
+    reasons: {
+      onjuist: 'Not correct',
+      verouderd: 'Outdated',
+      onvolledig: 'Incomplete',
+    },
+    notePlaceholder: "Optional: tell us what's wrong…",
+    send: 'Send',
+    thanks: 'Thanks — this helps Coeus improve.',
+    sendFailed: 'Sending failed — try again.',
   },
 };
 
