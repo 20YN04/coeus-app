@@ -92,3 +92,29 @@ in `src-tauri/.tauri/` and is `.gitignore`d.
 | `COEUS_CORS_ORIGINS` | shell | webview origins allowed through CORS |
 | `COEUS_SEED_FILE` | shell (if client seed bundled) | per-client seed path |
 | `COEUS_BREIN_BIN` | dev only | path to a locally-built sidecar for `tauri dev` |
+
+## Industrie-sjablonen (seed-kennisbanken)
+
+Een nieuwe klant start nooit leeg: naast de default garage-seed liggen er
+industrie-sjablonen klaar in `seed/`. Kies bij een per-client build het sjabloon
+dat het dichtst bij de sector van de klant ligt en vertrek daarvan.
+
+| Sjabloon | Bestand | Fictieve zaak | Sectoren |
+|---|---|---|---|
+| Garage (default) | `seed/default.json` | Garage Vermeulen, Hasselt | garages, carrosserie, banden |
+| Horeca | `seed/horeca.json` | Brasserie De Linde, Hasselt | restaurants, brasseries, eetcafés |
+| Kapper | `seed/kapper.json` | Salon Elise, Genk | kapsalons, schoonheidssalons |
+
+Recept per sjabloon (zelfde mechanisme als een client-seed — `COEUS_SEED_FILE`
+wint van de default):
+
+- **Garage**: niets doen; zonder `COEUS_SEED_FILE` laadt de brein `seed/default.json`.
+- **Horeca**: kopieer `seed/horeca.json` naar `desktop/src-tauri/seed/client-seed.json`
+  (of zet `COEUS_SEED_FILE=<pad>/seed/horeca.json` bij een losse brein-run).
+- **Kapper**: idem met `seed/kapper.json`.
+
+De sjablonen zijn bewust fictief maar intern consistent (één naam, adres,
+telefoonnummer en openingsuren per sjabloon; euro-bedragen alleen in
+prijs-items). Voor een echte klant vervang je daarna de fictieve identiteit door
+de echte gegevens, of laat je de klant de seed-items in de app zelf bijwerken.
+Validatie: `tests/test_seeds.py` parseert en checkt alle `seed/*.json`.
