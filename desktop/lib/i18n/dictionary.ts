@@ -22,6 +22,7 @@ const nl = {
     importeren: 'Importeren',
     nieuw: 'Nieuw',
     graph: 'Kenniskaart',
+    digest: 'Weekrapport',
     automatisaties: 'Automatisaties',
     instellingen: 'Instellingen',
     footerMark: 'Coeus · lokaal',
@@ -417,6 +418,47 @@ const nl = {
       leaveScreen: 'Scherm verlaten',
     },
   },
+  // Weekrapport (feat/digest-roi) — GET /digest, key-vrij berekend uit chroma-
+  // metadata + het usage-log + feedback.jsonl. Nieuwe top-level blokken van
+  // andere in-flight branches landen hierna, vlak vóór het sluiten van dit object.
+  digest: {
+    eyebrow: 'Kennisbank',
+    title: 'Weekrapport',
+    periodeLabel: 'Periode',
+    period7: '7 dagen',
+    period30: '30 dagen',
+    itemsGeleerd: 'Items geleerd',
+    vragenBeantwoord: 'Vragen beantwoord',
+    onbeantwoordTitle: 'Waar men naar vroeg zonder antwoord',
+    onbeantwoordHint: 'Dit zijn de kennis-gaten — vul ze aan en Coeus kan de volgende keer wél antwoorden.',
+    onbeantwoordCount: '{count}×',
+    onbeantwoordEmpty: 'Geen onbeantwoorde vragen deze periode.',
+    answerCta: 'Beantwoord dit →',
+    categorieenTitle: 'Dunne categorieën',
+    categorieenHint: 'Minder dan 3 items — nog te weinig kennis om op te vertrouwen.',
+    categorieenEmpty: 'Geen dunne categorieën.',
+    categorieenCount: '{count} item(s)',
+    feedbackTitle: 'Negatieve feedback',
+    feedbackEmpty: 'Geen negatieve feedback deze periode.',
+    feedbackReasonUnknown: 'Geen reden opgegeven',
+    samenvattingTitle: 'Samenvatting',
+    emptyLabel: 'Weekrapport',
+    emptyHeading: 'Nog te weinig activiteit',
+    emptyHint: 'Zodra er vragen gesteld zijn en er kennis is toegevoegd, verschijnt hier elke periode een overzicht.',
+  },
+  // Waarde/ROI-blok (feat/digest-roi) — bovenaan Overzicht, deelt dezelfde
+  // usage-basis als het weekrapport hierboven.
+  waarde: {
+    title: 'Wat Coeus je opleverde',
+    vragenBeantwoord: 'Vragen beantwoord (30d)',
+    itemsGeleerd: 'Items geleerd (totaal)',
+    tijdwinst: 'Geschatte tijdwinst',
+    tijdwinstValue: '{hours} uur',
+    waardeLabel: 'Geschatte waarde',
+    minutenLabel: 'Minuten per vraag',
+    uurloonLabel: 'Uurloon (€)',
+    caption: 'Geschat op basis van jouw instellingen — geen exacte meting.',
+  },
 } as const;
 
 const en: Dictionary = {
@@ -428,6 +470,7 @@ const en: Dictionary = {
     importeren: 'Import',
     nieuw: 'New',
     graph: 'Knowledge map',
+    digest: 'Weekly report',
     automatisaties: 'Automations',
     instellingen: 'Settings',
     footerMark: 'Coeus · local',
@@ -822,6 +865,47 @@ const en: Dictionary = {
       pollErrorHint: 'Fetching progress isn\'t working right now — Coeus is retrying automatically.',
       leaveScreen: 'Leave screen',
     },
+  },
+  // Weekly report (feat/digest-roi) — GET /digest, computed key-free from
+  // chroma metadata + the usage log + feedback.jsonl. New top-level blocks
+  // from other in-flight branches land after this, right before this object closes.
+  digest: {
+    eyebrow: 'Knowledge base',
+    title: 'Weekly report',
+    periodeLabel: 'Period',
+    period7: '7 days',
+    period30: '30 days',
+    itemsGeleerd: 'Items learned',
+    vragenBeantwoord: 'Questions answered',
+    onbeantwoordTitle: 'What people asked without an answer',
+    onbeantwoordHint: 'These are the knowledge gaps — fill them in and Coeus can answer next time.',
+    onbeantwoordCount: '{count}×',
+    onbeantwoordEmpty: 'No unanswered questions this period.',
+    answerCta: 'Answer this →',
+    categorieenTitle: 'Thin categories',
+    categorieenHint: 'Fewer than 3 items — not enough knowledge to rely on yet.',
+    categorieenEmpty: 'No thin categories.',
+    categorieenCount: '{count} item(s)',
+    feedbackTitle: 'Negative feedback',
+    feedbackEmpty: 'No negative feedback this period.',
+    feedbackReasonUnknown: 'No reason given',
+    samenvattingTitle: 'Summary',
+    emptyLabel: 'Weekly report',
+    emptyHeading: 'Not enough activity yet',
+    emptyHint: 'Once questions are asked and knowledge is added, an overview will appear here every period.',
+  },
+  // Value/ROI block (feat/digest-roi) — top of Overview, shares the same
+  // usage basis as the weekly report above.
+  waarde: {
+    title: 'What Coeus got you',
+    vragenBeantwoord: 'Questions answered (30d)',
+    itemsGeleerd: 'Items learned (total)',
+    tijdwinst: 'Estimated time saved',
+    tijdwinstValue: '{hours} hours',
+    waardeLabel: 'Estimated value',
+    minutenLabel: 'Minutes per question',
+    uurloonLabel: 'Hourly rate (€)',
+    caption: 'Estimated from your own settings — not an exact measurement.',
   },
 };
 

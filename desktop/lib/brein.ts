@@ -381,6 +381,32 @@ export async function disconnectFolder(
   });
 }
 
+// Weekrapport (digest): key-vrij berekend uit chroma-metadata + het brein's
+// usage-log (vragen/ingest) + feedback.jsonl. `samenvatting` is de enige
+// LLM-stap — null zonder AI-sleutel, de rest werkt altijd.
+export type DigestPerCategorie = { categorie: string; nieuw: number };
+export type DigestPerBron = { bron: string; nieuw: number };
+export type DigestOnbeantwoord = { vraag: string; count: number };
+export type DigestFeedbackNegatief = { vraag: string; reason?: string | null };
+export type DigestZwakkeCategorie = { categorie: string; items: number };
+export type DigestResult = {
+  periode: { dagen: number; van: string; tot: string };
+  items_nieuw: number;
+  per_categorie: DigestPerCategorie[];
+  per_bron: DigestPerBron[];
+  vragen_gesteld: number;
+  vragen_onbeantwoord: DigestOnbeantwoord[];
+  feedback_negatief: DigestFeedbackNegatief[];
+  zwakke_categorieen: DigestZwakkeCategorie[];
+  samenvatting: string | null;
+};
+
+export async function getDigest(days = 7, lang?: 'nl' | 'en'): Promise<DigestResult> {
+  const params = new URLSearchParams({ days: String(days) });
+  if (lang) params.set('lang', lang);
+  return req<DigestResult>(`/digest?${params}`);
+}
+
 // Auto-opschonen: clusters van near-duplicate kennis-items, gevonden via de
 // bestaande embeddings (key-free, geen LLM). Per cluster blijft één keeper staan
 // en zijn de overige titels verwijderbaar.

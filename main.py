@@ -1,3 +1,4 @@
+import logging
 import os
 import threading
 import time
@@ -16,6 +17,8 @@ from brain.ingest import (
 from brain.files import ALLOWED_SUFFIXES, MAX_UPLOAD_BYTES, extract_text, pdf_to_text
 from brain.config import settings
 from brain.feedback import append_feedback, read_feedback
+from brain.usage import append_usage
+from brain.digest import build_digest
 from brain.models import (
     KennisItem, CreateKennisRequest, UpdateKennisRequest,
     LearnRequest, AskRequest, IngestTextRequest, IngestUrlRequest,
@@ -24,6 +27,8 @@ from brain.models import (
     FeedbackRequest,
 )
 from brain import connector as connector_mod
+
+logger = logging.getLogger("coeus.main")
 
 # Auto-opschonen: standaard embedding-afstand waaronder twee items als duplicaat
 # gelden. Empirisch getuned op de default embedding (all-MiniLM, cosine-afstand):
@@ -64,6 +69,17 @@ app.add_middleware(
 memory = Memory()
 learner = Learner()
 
+
+def _log_usage(event_type: str, meta: dict | None = None) -> None:
+    # Gedeelde basis voor het weekrapport (GET /digest, brain/digest.py):
+    # append-only usage.jsonl, zie brain/usage.py. Nooit een request laten
+    # falen door logging — een schijf-/rechtenprobleem hier mag /ask,
+    # /kennis/search of een ingest-route niet breken.
+    try:
+        append_usage(settings.data_dir, event_type, meta)
+    except Exception:  # noqa: BLE001 — logging mag nooit de request breken
+        logger.warning("Kon usage-event '%s' niet loggen", event_type, exc_info=True)
+
 @app.get("/")
 def root():
     # Statuscheck van de API
@@ -77,8 +93,11 @@ def list_kennis(category: str = None):
 @app.get("/kennis/search")
 def search_kennis(q: str, category: str = None,
                   limit: int = Query(default=5, ge=1, le=50)):
-    # Zoek semantisch in de kennisbank
-    return memory.search(q, limit, category)
+    # Zoek semantisch in de kennisbank. Usage-log zonder zoekterm (privacy) —
+    # het weekrapport telt enkel dát er gezocht is, niet waarnaar.
+    results = memory.search(q, limit, category)
+    _log_usage("search")
+    return results
 
 @app.get("/kennis/{item_id}")
 def get_kennis(item_id: str):
@@ -170,6 +189,11 @@ def ask(request: AskRequest):
         answer = learner.answer_question(request.question, context, lang=request.lang)
     except RuntimeError:
         raise HTTPException(503, "Upstream AI-service niet bereikbaar")
+
+    # Usage-log: de vraag zelf (nodig voor het weekrapport — "waar vroeg men
+    # naar") + answered (echt antwoord vs. de letterlijke "weet ik niet"-
+    # fallback, zie Learner.is_fallback).
+    _log_usage("ask", {"vraag": request.question, "answered": not learner.is_fallback(answer)})
 
     return {
         "antwoord": answer,
@@ -309,6 +333,7 @@ def ingest_text(request: IngestTextRequest):
     # en als kennis-items opslaan. source_detail = de meegegeven URL of "tekst-import".
     source_detail = (request.source_url or "").strip() or "tekst-import"
     added = _ingest_chunks(request.text, request.category, source_detail)
+    _log_usage("ingest", {"bron": "text", "toegevoegd": added})
     return {"toegevoegd": added}
 
 
@@ -341,6 +366,7 @@ def ingest_url(request: IngestUrlRequest):
         raise HTTPException(422, "Geen leesbare tekst gevonden op deze pagina")
 
     added = _ingest_page(text, request.category, url)
+    _log_usage("ingest", {"bron": "url", "toegevoegd": added})
     return {"toegevoegd": added, "ai_extractie": bool(settings.llm_api_key)}
 
 
@@ -387,6 +413,8 @@ def _run_crawl_job(job_id: str, url: str, max_pages: int, category: str | None) 
         job["status"] = "error"
     finally:
         job["afgerond_op"] = time.time()
+        # Partial credit: log wat er binnen is, ook als de job halverwege faalde.
+        _log_usage("ingest", {"bron": "crawl", "toegevoegd": added})
 
 
 @app.post("/ingest/crawl")
@@ -434,6 +462,7 @@ def ingest_crawl(request: IngestCrawlRequest, async_: bool = Query(default=False
         # worden (uitgelekte boilerplate, dubbele feiten) verdwijnen meteen i.p.v. dat
         # de klant zelf moet opschonen. Alleen draaien als er echt iets is toegevoegd.
         opgeschoond = memory.dedupe(CLEANUP_DEFAULT_THRESHOLD) if added else 0
+        _log_usage("ingest", {"bron": "crawl", "toegevoegd": added})
 
         return {
             "toegevoegd": added,
@@ -511,6 +540,7 @@ async def ingest_file(file: UploadFile = File(...), category: str | None = Form(
         raise HTTPException(422, "Geen leesbare tekst gevonden in dit bestand")
 
     added = _ingest_chunks(text, category, name)
+    _log_usage("ingest", {"bron": "file", "toegevoegd": added})
     return {"toegevoegd": added, "bestand": name}
 
 
@@ -577,16 +607,20 @@ def connector_connect(request: ConnectFolderRequest):
     # Koppel een absolute map en draai meteen de eerste scan. Ongeldig/
     # onbereikbaar pad → 422 (bestaat niet, is geen map, of niet leesbaar).
     try:
-        return connector_mod.connect_folder(memory, request.path)
+        status = connector_mod.connect_folder(memory, request.path)
     except connector_mod.ConnectorError as e:
         raise HTTPException(422, str(e))
+    _log_usage("ingest", {"bron": "connector", "toegevoegd": status.get("items_toegevoegd", 0)})
+    return status
 
 
 @app.post("/connector/rescan")
 def connector_rescan():
     # Scan de gekoppelde map opnieuw: nieuw/gewijzigd/verwijderd bijwerken.
     # Geen koppeling → lege tellers (geen 404; "niets te doen" is geen fout).
-    return connector_mod.scan_folder(memory)
+    result = connector_mod.scan_folder(memory)
+    _log_usage("ingest", {"bron": "connector", "toegevoegd": result.get("items_toegevoegd", 0)})
+    return result
 
 
 @app.delete("/connector/folder")
@@ -612,4 +646,19 @@ def list_feedback(limit: int = Query(default=100, ge=1, le=500)):
     # Nieuwste eerst — voedt een later beheer-scherm waar Ynarchive (en de klant)
     # de antwoordkwaliteit opvolgt.
     return read_feedback(settings.data_dir, limit)
+
+
+@app.get("/digest")
+def digest(days: int = Query(default=7, ge=1, le=90), lang: str = Query(default="nl", max_length=5)):
+    # Weekrapport: key-vrij berekend uit chroma-metadata + usage.jsonl +
+    # feedback.jsonl (brain/digest.py, deelt de usage-basis met het waarde-blok
+    # in de Overzicht-UI). "samenvatting" is de enige LLM-stap — optioneel: zonder
+    # sleutel blijft dat veld null, de rest van het rapport werkt altijd.
+    result = build_digest(memory, settings.data_dir, days)
+    if settings.llm_api_key:
+        try:
+            result["samenvatting"] = learner.summarize_digest(result, lang=lang)
+        except RuntimeError:
+            result["samenvatting"] = None
+    return result
 

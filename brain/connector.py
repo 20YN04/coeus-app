@@ -208,8 +208,13 @@ def connect_folder(memory: Memory, path: str) -> dict:
     # blijven gewoon staan; v1 doet geen automatische opruiming bij wisselen).
     manifest = existing.get("manifest") if existing.get("path") == str(root) else {}
     _save_state({"path": str(root), "manifest": manifest or {}, "last_scan": None})
-    scan_folder(memory)
-    return get_status(memory)
+    scan_counts = scan_folder(memory)
+    status = get_status(memory)
+    # Extra veld t.o.v. GET /connector/folder: hoeveel items déze scan toevoegde
+    # (i.p.v. het all-time totaal in "items") — main.py gebruikt dit om het
+    # ingest-usage-event voor het weekrapport te loggen.
+    status["items_toegevoegd"] = scan_counts["items_toegevoegd"]
+    return status
 
 
 def get_status(memory: Memory) -> dict:
