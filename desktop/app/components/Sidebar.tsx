@@ -138,7 +138,7 @@ export default function Sidebar({ tenantName }: { tenantName: string }) {
 
       <div className="sidebar__footer">
         <span className="sidebar__footer-mark">
-          {t('nav.footerMark')} · v{process.env.NEXT_PUBLIC_APP_VERSION ?? '0.3.0'}
+          {t('nav.footerMark')} · v{process.env.NEXT_PUBLIC_APP_VERSION ?? '0.4.0'}
         </span>
         <div className="sidebar__lang" role="group" aria-label="Taal / Language">
           <button
