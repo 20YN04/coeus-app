@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { listKennis, getCategories, waitForBrein, type KennisItem } from '@/lib/brein';
 import { useT, type Lang } from '@/lib/i18n';
+import WaardeBlok from './WaardeBlok';
 
 const BREIN_URL = process.env.NEXT_PUBLIC_BREIN_URL ?? 'http://127.0.0.1:8765';
 
@@ -162,6 +163,8 @@ export default function OverzichtPage() {
 
       {!loading && !apiError && (
         <div className="ovz">
+          <WaardeBlok itemsTotaal={allItems.length} />
+
           <div className="ovz-controls">
             <div className="ovz-controls__left">
               {categories.length > 0 && (

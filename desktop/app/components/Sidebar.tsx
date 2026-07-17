@@ -46,6 +46,16 @@ const KLANT_NAV = [
       </svg>
     ),
   },
+  {
+    href: '/digest',
+    labelKey: 'nav.digest',
+    icon: (
+      <svg className="sidebar__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25">
+        <path d="M3 2.5h7l3 3v8a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5Z" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M5.5 7h5M5.5 9.3h5M5.5 11.6h3" strokeLinecap="round" />
+      </svg>
+    ),
+  },
 ];
 
 const BEHEER_NAV = [

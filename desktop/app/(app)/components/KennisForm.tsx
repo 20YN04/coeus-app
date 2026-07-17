@@ -8,12 +8,16 @@ import { useT } from '@/lib/i18n';
 type Props = {
   mode: 'create' | 'edit';
   item?: KennisItem;
+  // Voorgevulde titel bij create-mode — komt van het weekrapport ("Beantwoord
+  // dit →" linkt hierheen met de onbeantwoorde vraag als titel, zie
+  // app/(app)/digest/page.tsx). Genegeerd in edit-mode (item.title wint altijd).
+  initialTitle?: string;
 };
 
-export default function KennisForm({ mode, item }: Props) {
+export default function KennisForm({ mode, item, initialTitle }: Props) {
   const router = useRouter();
   const { t } = useT();
-  const [title, setTitle] = useState(item?.title ?? '');
+  const [title, setTitle] = useState(item?.title ?? initialTitle ?? '');
   const [category, setCategory] = useState(item?.category ?? '');
   const [customCategory, setCustomCategory] = useState('');
   const [content, setContent] = useState(item?.content ?? '');
