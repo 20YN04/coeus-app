@@ -1,12 +1,15 @@
 import logging
 import os
+import re
 import threading
 import time
 import uuid
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import requests
+from brain.net import safe_get, BlockedURLError
 from brain.memory import Memory
 from brain.learner import Learner
 from brain.seed import seed_if_empty
@@ -59,13 +62,47 @@ app = FastAPI(
 # de semantische zoek. Specifieke origins i.p.v. "*" want dit is een muterende API.
 # Productie-origins komma-gescheiden via COEUS_CORS_ORIGINS.
 _cors_origins = [o.strip() for o in os.environ.get("COEUS_CORS_ORIGINS", "").split(",") if o.strip()]
+_LOOPBACK_ORIGIN = r"https?://(localhost|127\.0\.0\.1)(:\d+)?"
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_origin_regex=_LOOPBACK_ORIGIN,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# CSRF-guard — het brein luistert op loopback zonder auth, maar loopback ≠
+# isolatie: élke webpagina die het slachtoffer bezoekt kan blind naar 127.0.0.1
+# POST'en (een `text/plain` simple-request triggert geen CORS-preflight, en CORS
+# blokkeert enkel het uitlezen van de response, niet het verwerken van de
+# request). Zonder deze check kan zo'n pagina o.a. de LLM-key overschrijven of
+# een lokale map laten ingesten. De browser hangt aan élke cross-origin
+# muterende fetch een Origin-header die JS niet kan weglaten → een Origin die
+# niet de onze is, is een forged request. Ontbrekende Origin = geen browser-
+# cross-origin-fetch (curl, native client, de test-client) → toegestaan.
+_LOOPBACK_ORIGIN_RE = re.compile(rf"^{_LOOPBACK_ORIGIN}$")
+_STATE_CHANGING = {"POST", "PUT", "PATCH", "DELETE"}
+
+
+def _origin_allowed(origin: str) -> bool:
+    # Exact dezelfde allowlist als CORS hierboven → nooit uit sync.
+    return origin in _cors_origins or bool(_LOOPBACK_ORIGIN_RE.match(origin))
+
+
+@app.middleware("http")
+async def csrf_origin_guard(request: Request, call_next):
+    if request.method in _STATE_CHANGING:
+        origin = request.headers.get("origin")
+        sec_fetch_site = request.headers.get("sec-fetch-site")
+        if origin is not None and not _origin_allowed(origin):
+            return JSONResponse({"detail": "Verboden — ongeldige origin"}, status_code=403)
+        # Belt-and-braces: blokkeer een expliciet cross-site Sec-Fetch-Site zelfs
+        # als de Origin (theoretisch) zou ontbreken.
+        if sec_fetch_site in ("cross-site", "same-site") and not (
+            origin is not None and _origin_allowed(origin)
+        ):
+            return JSONResponse({"detail": "Verboden — cross-site request"}, status_code=403)
+    return await call_next(request)
 memory = Memory()
 learner = Learner()
 
@@ -346,12 +383,10 @@ def ingest_url(request: IngestUrlRequest):
         raise HTTPException(422, "Ongeldige URL — gebruik http:// of https://")
 
     try:
-        resp = requests.get(
-            url,
-            timeout=15,
-            headers={"User-Agent": "Coeus-Onboarding/1.0 (+kennisbank-import)"},
-        )
+        resp = safe_get(url)
         resp.raise_for_status()
+    except BlockedURLError:
+        raise HTTPException(422, "Interne of privé-adressen zijn niet toegestaan")
     except requests.exceptions.Timeout:
         raise HTTPException(502, "De website reageerde niet op tijd")
     except requests.exceptions.RequestException:
@@ -435,12 +470,10 @@ def ingest_crawl(request: IngestCrawlRequest, async_: bool = Query(default=False
     # Valideer de startpagina expliciet zodat een dode/niet-HTML URL een nette
     # foutmelding geeft i.p.v. een lege crawl (de generator slaat fouten stil over).
     try:
-        resp = requests.get(
-            url,
-            timeout=15,
-            headers={"User-Agent": "Coeus-Onboarding/1.0 (+kennisbank-import)"},
-        )
+        resp = safe_get(url)
         resp.raise_for_status()
+    except BlockedURLError:
+        raise HTTPException(422, "Interne of privé-adressen zijn niet toegestaan")
     except requests.exceptions.Timeout:
         raise HTTPException(502, "De website reageerde niet op tijd")
     except requests.exceptions.RequestException:

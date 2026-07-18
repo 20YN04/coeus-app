@@ -244,10 +244,11 @@ def crawl_site_with_progress(
     """
     import requests
 
+    from brain.net import safe_get
+
     host = urlparse(start_url).netloc
     seen: set[str] = set()
     queue: list[str] = [urldefrag(start_url)[0]]
-    headers = {"User-Agent": "Coeus-Onboarding/1.0 (+kennisbank-import)"}
 
     while queue and len(seen) < max_pages:
         url = queue.pop(0)
@@ -256,10 +257,13 @@ def crawl_site_with_progress(
         seen.add(url)
 
         try:
-            resp = requests.get(url, timeout=15, headers=headers)
+            # safe_get weert interne/privé-doelen (SSRF) op start-URL én elke
+            # redirect-hop; BlockedURLError is een RequestException-subclass, dus
+            # een geblokkeerde link wordt hier gewoon overgeslagen.
+            resp = safe_get(url)
             resp.raise_for_status()
         except requests.exceptions.RequestException:
-            continue  # onbereikbare pagina: overslaan, niet crashen
+            continue  # onbereikbare/geblokkeerde pagina: overslaan, niet crashen
 
         content_type = resp.headers.get("content-type", "")
         if "html" not in content_type and "text" not in content_type:

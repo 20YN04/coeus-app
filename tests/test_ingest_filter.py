@@ -65,7 +65,7 @@ def test_crawl_filters_noise_and_dedupes(client, monkeypatch):
         def raise_for_status(self):
             return None
 
-    def fake_get(url, timeout=15, headers=None):
+    def fake_get(url, timeout=15):
         return FakeResponse()
 
     def fake_crawl(url, max_pages=15):
@@ -75,7 +75,7 @@ def test_crawl_filters_noise_and_dedupes(client, monkeypatch):
         yield f"{url}/b", page_text
 
     import main
-    monkeypatch.setattr(main.requests, "get", fake_get)
+    monkeypatch.setattr(main, "safe_get", fake_get)
     monkeypatch.setattr(main, "crawl_site", fake_crawl)
 
     before = len(client.get("/kennis").json())
