@@ -4,6 +4,12 @@
 
 Found a vulnerability? Mail yentl.nerinckx@icloud.com — do not open a public issue.
 
+## Acknowledgments
+
+With thanks to the researchers who responsibly disclosed issues in Coeus:
+
+- **Alessio Micciche** ([@AM1407](https://github.com/AM1407)) — reported the loopback CSRF (LLM-key overwrite + forced folder ingestion) and SSRF via URL ingestion, fixed in v0.6.1, plus a follow-up dependency & hardening review.
+
 ## CI security
 
 - `security.yml` runs npm audit (`desktop/`) + `cargo audit` (`desktop/src-tauri/`) + `pip-audit` (the brein), gitleaks secret scanning, CodeQL (JS/TS + Python), and dependency review on PRs. Weekly schedule + on push/PR.
