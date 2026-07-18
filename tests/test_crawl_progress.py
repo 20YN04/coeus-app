@@ -16,7 +16,7 @@ class FakeResponse:
         return None
 
 
-def _fake_get(url, timeout=15, headers=None):
+def _fake_get(url, timeout=15):
     return FakeResponse()
 
 
@@ -39,7 +39,7 @@ def test_crawl_async_returns_job_id_immediately(client, monkeypatch):
         release.wait(timeout=5)
         yield f"{url}/b", "Tweede pagina met genoeg tekst om als los kennis-item te tellen, ook honderd tekens lang.", 2, 0
 
-    monkeypatch.setattr(main.requests, "get", _fake_get)
+    monkeypatch.setattr(main, "safe_get", _fake_get)
     monkeypatch.setattr(main, "crawl_site_with_progress", fake_crawl)
 
     r = client.post("/ingest/crawl", params={"async": "true"}, json={"url": "https://async-a.test"})
@@ -75,7 +75,7 @@ def test_crawl_async_page_error_ends_job_cleanly(client, monkeypatch):
         yield f"{url}/a", "Een geldige eerste pagina met voldoende inhoud om als kennis-item te tellen hier.", 1, 1
         raise RuntimeError("kaboom halverwege de crawl")
 
-    monkeypatch.setattr(main.requests, "get", _fake_get)
+    monkeypatch.setattr(main, "safe_get", _fake_get)
     monkeypatch.setattr(main, "crawl_site_with_progress", fake_crawl)
 
     r = client.post("/ingest/crawl", params={"async": "true"}, json={"url": "https://async-error.test"})
@@ -97,7 +97,7 @@ def test_crawl_sync_default_unchanged(client, monkeypatch):
     def fake_crawl(url, max_pages=15):
         yield f"{url}/a", "Synchrone crawl-pagina met genoeg tekst om als kennis-item geteld te worden hier."
 
-    monkeypatch.setattr(main.requests, "get", _fake_get)
+    monkeypatch.setattr(main, "safe_get", _fake_get)
     monkeypatch.setattr(main, "crawl_site", fake_crawl)
 
     r = client.post("/ingest/crawl", json={"url": "https://sync-default.test"})
