@@ -4,6 +4,7 @@ import './globals.css';
 import tenant from '@/config/tenant';
 import AutoUpdate from './AutoUpdate';
 import { I18nProvider } from '@/lib/i18n';
+import { AuthProvider } from '@/lib/authContext';
 
 export const metadata: Metadata = {
   title: `Kennisbank — ${tenant.name}`,
@@ -76,7 +77,7 @@ export default function RootLayout({
       <body>
         {accent && <style dangerouslySetInnerHTML={{ __html: accent }} />}
         <I18nProvider>
-          {children}
+          <AuthProvider>{children}</AuthProvider>
           <AutoUpdate />
         </I18nProvider>
       </body>

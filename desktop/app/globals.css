@@ -3153,6 +3153,106 @@ a.vraag-bron:hover {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   Auth gate — login / inactive-entitlement screens
+   Deliberately separate from .welkom-* (first-run wizard): same
+   full-viewport centred-column tokens, but the two screens evolve
+   independently — the login gate ships behind NEXT_PUBLIC_AUTH_REQUIRED
+   and shouldn't be coupled to onboarding-wizard changes.
+   ───────────────────────────────────────────────────────────── */
+.auth-screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-8);
+  background: var(--c-field);
+}
+
+.auth-shell {
+  width: 100%;
+  max-width: 24rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-8);
+}
+
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.auth-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-ink-muted);
+  margin: 0;
+}
+
+.auth-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.875rem, 5vw, 2.75rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  color: var(--c-ink);
+  margin: 0;
+}
+
+.auth-lead {
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  color: var(--c-ink-muted);
+  margin: 0;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.auth-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+
+.auth-link {
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  color: var(--c-ink-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: color var(--d-fast) var(--ease-out);
+}
+.auth-link:hover { color: var(--c-accent); }
+.auth-link:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.auth-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  font-family: var(--font-ui);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-danger);
+  border: 1px solid rgba(var(--c-danger-rgb), 0.3);
+  padding: 0.375rem var(--s-3);
+}
+
+/* ─────────────────────────────────────────────────────────────
    Weekrapport (Digest) — GET /digest
    ───────────────────────────────────────────────────────────── */
 .digest {
