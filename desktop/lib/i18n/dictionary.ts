@@ -268,6 +268,17 @@ const nl = {
       availableInstalling: 'Update {version} beschikbaar — wordt geïnstalleerd…',
       installed: 'Update {version} geïnstalleerd — de app herstart.',
       checkFailed: 'Controle mislukt.',
+      // Startup banner (AutoUpdate.tsx) — separate wording from the settings-page
+      // control above, same `update` block per the i18n convention.
+      banner: {
+        available: 'Coeus-update {version} beschikbaar.',
+        installNow: 'Nu installeren',
+        later: 'Later',
+        downloading: 'Update {version} wordt gedownload… {percent}%',
+        downloadingUnknown: 'Update {version} wordt gedownload…',
+        installingRestart: 'Installeren… app herstart zo',
+        installFailed: 'Installeren mislukt.',
+      },
     },
     ai: {
       label: 'AI',
@@ -716,6 +727,15 @@ const en: Dictionary = {
       availableInstalling: 'Update {version} available — installing…',
       installed: 'Update {version} installed — the app is restarting.',
       checkFailed: 'Check failed.',
+      banner: {
+        available: 'Coeus update {version} available.',
+        installNow: 'Install now',
+        later: 'Later',
+        downloading: 'Downloading update {version}… {percent}%',
+        downloadingUnknown: 'Downloading update {version}…',
+        installingRestart: 'Installing… the app restarts shortly',
+        installFailed: 'Install failed.',
+      },
     },
     ai: {
       label: 'AI',
