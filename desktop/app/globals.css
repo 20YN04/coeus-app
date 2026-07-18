@@ -47,6 +47,8 @@
   --c-border:         rgba(var(--c-ink-rgb), 0.12);   /* neutral hairline on the light field */
   --c-border-paper:   rgba(245, 245, 247, 0.22);      /* light hairline on accent panels */
 
+  --shadow-panel:     0 8px 28px rgba(0, 0, 0, 0.18); /* floating panels, e.g. the update toast */
+
   --spine-x: 4.5rem;
 
   /* Instrument Sans + Fraunces both loaded via next/font/google in layout.tsx
@@ -77,6 +79,86 @@
   --d-base:      320ms;
   --d-slow:      560ms;
   --d-extra:     900ms;
+
+  /* ───────────────────────────────────────────────────────────
+     Dark palette — source of truth only, not applied by itself.
+     Referenced by both the system media query and the manual
+     [data-theme="dark"] override below, so the two triggers can
+     never drift apart. Comfortable near-black (never pure #000),
+     near-white ink, and an accent lightened from the light-mode
+     #1F1FD1 into a periwinkle so it clears AA both as text (on the
+     near-black field) and as the primary-button fill (with the
+     flipped --c-paper-ink as label colour) — one token, two roles,
+     measured both ways. Ratios (WCAG relative-luminance formula):
+       ink        #ECEEF4 on field  #121319 → 15.98:1 (AAA, target ≥7:1)
+       ink-muted  #9BA0B8 on field  #121319 →  7.16:1 (target ≥4.5:1)
+       accent     #8B93FF on field  #121319 →  6.81:1 (text, target ≥4.5:1)
+       paper-ink  #14151C on paper  #8B93FF →  6.69:1 (button label on accent fill)
+       danger     #FF6B5E on field  #121319 →  6.63:1
+       paper-muted#2E2F52 on paper  #8B93FF →  4.69:1
+     ─────────────────────────────────────────────────────────── */
+  --dark-c-field:          #121319;
+  --dark-c-field-deep:     #1A1C24;
+  --dark-c-ink:            #ECEEF4;
+  --dark-c-ink-rgb:        236, 238, 244;
+  --dark-c-ink-muted:      #9BA0B8;
+  --dark-c-ink-muted-rgb:  155, 160, 184;
+  --dark-c-accent:         #8B93FF;
+  --dark-c-accent-rgb:     139, 147, 255;
+  --dark-c-brand:          #0000F2;  /* pure brand blue stays constant across themes — a logo pixel, not UI */
+  --dark-c-danger:         #FF6B5E;
+  --dark-c-danger-rgb:     255, 107, 94;
+  /* Paper (accent-filled panels/buttons) flips its label ink dark, since the
+     panel itself is now the light periwinkle — same coupling as light mode,
+     inverted roles. --c-paper stays `var(--c-accent)`, no reassignment needed. */
+  --dark-c-paper-ink:      #14151C;
+  --dark-c-paper-muted:    #2E2F52;
+  --dark-c-border-paper:   rgba(20, 21, 28, 0.22);   /* dark hairline — paper bg is now light */
+  --dark-shadow-panel:     0 10px 32px rgba(0, 0, 0, 0.55);
+}
+
+/* System preference — the default "Systeem" mode. Wins whenever no manual
+   override is stamped on <html> (see the pre-paint script in layout.tsx and
+   lib/theme.tsx for the toggle). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --c-field:          var(--dark-c-field);
+    --c-field-deep:     var(--dark-c-field-deep);
+    --c-ink:            var(--dark-c-ink);
+    --c-ink-rgb:        var(--dark-c-ink-rgb);
+    --c-ink-muted:      var(--dark-c-ink-muted);
+    --c-ink-muted-rgb:  var(--dark-c-ink-muted-rgb);
+    --c-accent:         var(--dark-c-accent);
+    --c-accent-rgb:     var(--dark-c-accent-rgb);
+    --c-brand:          var(--dark-c-brand);
+    --c-danger:         var(--dark-c-danger);
+    --c-danger-rgb:     var(--dark-c-danger-rgb);
+    --c-paper-ink:      var(--dark-c-paper-ink);
+    --c-paper-muted:    var(--dark-c-paper-muted);
+    --c-border-paper:   var(--dark-c-border-paper);
+    --shadow-panel:     var(--dark-shadow-panel);
+  }
+}
+
+/* Manual override via the Instellingen toggle — same property list, applied
+   regardless of system preference. "Systeem" removes this attribute entirely
+   so the media query above decides again. */
+:root[data-theme="dark"] {
+  --c-field:          var(--dark-c-field);
+  --c-field-deep:     var(--dark-c-field-deep);
+  --c-ink:            var(--dark-c-ink);
+  --c-ink-rgb:        var(--dark-c-ink-rgb);
+  --c-ink-muted:      var(--dark-c-ink-muted);
+  --c-ink-muted-rgb:  var(--dark-c-ink-muted-rgb);
+  --c-accent:         var(--dark-c-accent);
+  --c-accent-rgb:     var(--dark-c-accent-rgb);
+  --c-brand:          var(--dark-c-brand);
+  --c-danger:         var(--dark-c-danger);
+  --c-danger-rgb:     var(--dark-c-danger-rgb);
+  --c-paper-ink:      var(--dark-c-paper-ink);
+  --c-paper-muted:    var(--dark-c-paper-muted);
+  --c-border-paper:   var(--dark-c-border-paper);
+  --shadow-panel:     var(--dark-shadow-panel);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -2400,7 +2482,7 @@ body {
   color: var(--c-paper-ink);
   border: 1px solid var(--c-border-paper);
   border-radius: 0.4rem;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow-panel);
   font-family: var(--font-ui);
   font-size: 0.75rem;
   max-width: 26rem;

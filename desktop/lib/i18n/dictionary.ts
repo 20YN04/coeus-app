@@ -251,6 +251,13 @@ const nl = {
       nl: 'Nederlands',
       en: 'English',
     },
+    theme: {
+      label: 'Weergave',
+      desc: 'Systeem volgt automatisch de licht/donker-instelling van je besturingssysteem.',
+      system: 'Systeem',
+      light: 'Licht',
+      dark: 'Donker',
+    },
     version: {
       label: 'Versie',
       app: 'App',
@@ -755,6 +762,13 @@ const en: Dictionary = {
       desc: 'Choose the interface language. AI answers automatically follow the same language.',
       nl: 'Nederlands',
       en: 'English',
+    },
+    theme: {
+      label: 'Appearance',
+      desc: 'System automatically follows your operating system\'s light/dark setting.',
+      system: 'System',
+      light: 'Light',
+      dark: 'Dark',
     },
     version: {
       label: 'Version',
