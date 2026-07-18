@@ -10,10 +10,14 @@ import GekoppeldeMap from './GekoppeldeMap';
 import Uitloggen from './Uitloggen';
 import { useT, type Lang } from '@/lib/i18n';
 import { useAuth } from '@/lib/authContext';
+import { useTheme, type ThemeMode } from '@/lib/theme';
+
+const THEME_MODES: ThemeMode[] = ['system', 'light', 'dark'];
 
 export default function InstellingenPage() {
   const { t, lang, setLang } = useT();
   const { required: authRequired } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   return (
     <>
@@ -41,6 +45,29 @@ export default function InstellingenPage() {
                 onClick={() => setLang(l)}
               >
                 {t(`instellingen.language.${l}`)}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="settings-section">
+          <div className="settings-section__header">
+            <p className="settings-section__label">{t('instellingen.theme.label')}</p>
+            <p className="settings-section__desc">{t('instellingen.theme.desc')}</p>
+          </div>
+
+          <div className="kb-filters" role="tablist" aria-label={t('instellingen.theme.label')}>
+            {THEME_MODES.map((m) => (
+              <button
+                key={m}
+                type="button"
+                role="tab"
+                aria-selected={theme === m}
+                className="filter-chip"
+                data-active={theme === m ? 'true' : undefined}
+                onClick={() => setTheme(m)}
+              >
+                {t(`instellingen.theme.${m}`)}
               </button>
             ))}
           </div>

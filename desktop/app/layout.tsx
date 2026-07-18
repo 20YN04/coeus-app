@@ -1,15 +1,26 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Instrument_Sans, Fraunces } from 'next/font/google';
 import './globals.css';
 import tenant from '@/config/tenant';
 import AutoUpdate from './AutoUpdate';
 import { I18nProvider } from '@/lib/i18n';
 import { AuthProvider } from '@/lib/authContext';
+import { ThemeProvider } from '@/lib/theme';
 
 export const metadata: Metadata = {
   title: `Kennisbank — ${tenant.name}`,
   description: `De Coeus kennisbank voor ${tenant.name}.`,
 };
+
+// Reads the manually-stored theme choice (coeus.theme = light|dark, written
+// by lib/theme.tsx) and stamps data-theme on <html> before first paint.
+// "system" (or nothing stored) intentionally stamps nothing — the
+// prefers-color-scheme block in globals.css decides, no JS involved either
+// way, so there's no flash for the default path. `beforeInteractive` is the
+// Next.js Script strategy documented for scripts that must run before
+// hydration/any page module — https://nextjs.org/docs/app/api-reference/components/script
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('coeus.theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`;
 
 // Self-hosted at build time (static export → out/_next/static/media), no
 // runtime request to fonts.googleapis.com. https://nextjs.org/docs/app/api-reference/components/font
@@ -75,11 +86,16 @@ export default function RootLayout({
   return (
     <html lang="nl" className={`${instrumentSans.variable} ${fraunces.variable}`}>
       <body>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {THEME_INIT_SCRIPT}
+        </Script>
         {accent && <style dangerouslySetInnerHTML={{ __html: accent }} />}
-        <I18nProvider>
-          <AuthProvider>{children}</AuthProvider>
-          <AutoUpdate />
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider>
+            <AuthProvider>{children}</AuthProvider>
+            <AutoUpdate />
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
