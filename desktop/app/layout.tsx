@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Instrument_Sans } from 'next/font/google';
+import { Instrument_Sans, Fraunces } from 'next/font/google';
 import './globals.css';
 import tenant from '@/config/tenant';
 import AutoUpdate from './AutoUpdate';
@@ -16,6 +16,19 @@ const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
   variable: '--font-ui',
   display: 'swap',
+});
+
+// Variable weight + the opsz axis: one self-hosted file covers everything
+// from the display hero down to the small sidebar wordmark, via the
+// browser's default `font-optical-sizing: auto` — high-contrast display
+// forms at large sizes, sturdier text forms at small sizes, no manual
+// weight-swap needed. Same build-time self-hosting as Instrument Sans above.
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+  style: ['normal', 'italic'],
+  axes: ['opsz'],
 });
 
 const DEFAULT_ACCENT = '#1f1fd1';
@@ -59,7 +72,7 @@ export default function RootLayout({
 }>) {
   const accent = accentStyle();
   return (
-    <html lang="nl" className={instrumentSans.variable}>
+    <html lang="nl" className={`${instrumentSans.variable} ${fraunces.variable}`}>
       <body>
         {accent && <style dangerouslySetInnerHTML={{ __html: accent }} />}
         <I18nProvider>

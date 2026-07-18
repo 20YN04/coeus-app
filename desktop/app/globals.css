@@ -2,30 +2,10 @@
 
 /* ─────────────────────────────────────────────────────────────
    Self-hosted fonts
-   Zodiak (display serif) — Fontshare, OFL 1.1
+   Fraunces (display serif) — next/font/google, build-time self-hosted,
+   see layout.tsx (variable weight + opsz axis, zero runtime fetches)
    JetBrains Mono — JetBrains, OFL 1.1
    ───────────────────────────────────────────────────────────── */
-@font-face {
-  font-family: 'Zodiak';
-  src: url('/fonts/Zodiak-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Zodiak';
-  src: url('/fonts/Zodiak-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Zodiak';
-  src: url('/fonts/Zodiak-Italic.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-  font-style: italic;
-}
 @font-face {
   font-family: 'JetBrains Mono';
   src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
@@ -69,11 +49,12 @@
 
   --spine-x: 4.5rem;
 
-  /* Instrument Sans loaded via next/font/google in layout.tsx (self-hosted,
-     build-time — see the html element's className). This declaration is a
-     static-render fallback only; the injected variable wins on cascade. */
+  /* Instrument Sans + Fraunces both loaded via next/font/google in layout.tsx
+     (self-hosted, build-time — see the html element's className). These
+     declarations are a static-render fallback only; the injected variables
+     win on cascade. */
   --font-ui:    'Instrument Sans', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Zodiak', 'Georgia', serif;
+  --font-serif: 'Fraunces', Georgia, serif;
   --font-mono:  'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --s-1:  0.25rem;
@@ -504,7 +485,7 @@ body {
   margin: 0;
 }
 
-/* Weekrapport (Digest) is de enige paginakop in Zodiak — een rapport leest als
+/* Weekrapport (Digest) is de enige paginakop in Fraunces — een rapport leest als
    een klein document, niet als een werkscherm. Overschrijft alleen de font;
    size/weight/tracking blijven .page-title's schaal. */
 .page-title--serif {
