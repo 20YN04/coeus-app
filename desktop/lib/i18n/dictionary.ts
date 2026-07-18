@@ -335,6 +335,16 @@ const nl = {
       removed: '{count} verwijderd.',
       moreLabel: '+{count} meer',
     },
+    // Uitloggen (feat/app-login-gate) — sectie enkel zichtbaar als
+    // NEXT_PUBLIC_AUTH_REQUIRED aan staat, zie Uitloggen.tsx.
+    account: {
+      label: 'Account',
+      desc: 'Je bent ingelogd bij coeus-auth.',
+      loggedInAs: 'Ingelogd als {email}',
+      logoutBtn: 'Uitloggen',
+      loggingOut: 'Uitloggen…',
+      logoutFailed: 'Uitloggen mislukt — probeer opnieuw.',
+    },
   },
   // Map-connector: "Gekoppelde map" in Instellingen (feat/map-connector). Nieuwe
   // top-level blokken van andere in-flight branches (feedback, welkom) landen
@@ -427,6 +437,42 @@ const nl = {
       timeoutHint: 'De crawl loopt gewoon door op de achtergrond. Je kan dit scherm gerust verlaten — je kennisbank vult zich vanzelf.',
       pollErrorHint: 'Voortgang ophalen lukt even niet — Coeus probeert het automatisch opnieuw.',
       leaveScreen: 'Scherm verlaten',
+    },
+  },
+  // Login-gate (feat/app-login-gate) — enkel actief achter
+  // NEXT_PUBLIC_AUTH_REQUIRED, zie lib/authContext.tsx.
+  auth: {
+    login: {
+      eyebrow: 'Coeus',
+      title: 'Welkom bij Coeus',
+      lead: 'Log in om verder te gaan.',
+      emailLabel: 'E-mail',
+      emailPlaceholder: 'jij@bedrijf.nl',
+      passwordLabel: 'Wachtwoord',
+      passwordPlaceholder: '••••••••••',
+      submit: 'Inloggen',
+      submitting: 'Inloggen…',
+      forgotLink: 'Wachtwoord vergeten?',
+      errInvalid: 'E-mail of wachtwoord klopt niet.',
+      errUnverified: 'Bevestig eerst je e-mail — check je inbox voor de verificatielink.',
+      errRateLimited: 'Te veel pogingen — probeer het straks opnieuw.',
+      errNetwork: 'Geen verbinding met coeus-auth — controleer je internetverbinding.',
+      errUnknown: 'Er ging iets mis bij het inloggen.',
+    },
+    reset: {
+      title: 'Wachtwoord resetten',
+      lead: 'Vul je e-mailadres in — we sturen een resetlink.',
+      submit: 'Verstuur resetlink',
+      submitting: 'Versturen…',
+      backLink: '← Terug naar inloggen',
+      sent: 'Check je e-mail voor de resetlink.',
+      errUnknown: 'Er ging iets mis — probeer het later opnieuw.',
+    },
+    inactive: {
+      badge: 'Geen toegang',
+      title: 'Toegang niet actief',
+      lead: 'Je bent ingelogd, maar er staat nog geen actieve licentie op dit account. Neem contact op met Ynarchive om dit te activeren.',
+      logout: 'Uitloggen',
     },
   },
   // Weekrapport (feat/digest-roi) — GET /digest, key-vrij berekend uit chroma-
@@ -792,6 +838,14 @@ const en: Dictionary = {
       removed: '{count} removed.',
       moreLabel: '+{count} more',
     },
+    account: {
+      label: 'Account',
+      desc: "You're signed in to coeus-auth.",
+      loggedInAs: 'Signed in as {email}',
+      logoutBtn: 'Sign out',
+      loggingOut: 'Signing out…',
+      logoutFailed: 'Sign-out failed — try again.',
+    },
   },
   // Folder connector: "Connected folder" in Settings (feat/map-connector). New
   // top-level blocks from other in-flight branches (feedback, welkom) land in
@@ -884,6 +938,40 @@ const en: Dictionary = {
       timeoutHint: 'The crawl keeps running in the background. Feel free to leave this screen — your knowledge base fills itself in.',
       pollErrorHint: 'Fetching progress isn\'t working right now — Coeus is retrying automatically.',
       leaveScreen: 'Leave screen',
+    },
+  },
+  auth: {
+    login: {
+      eyebrow: 'Coeus',
+      title: 'Welcome to Coeus',
+      lead: 'Sign in to continue.',
+      emailLabel: 'Email',
+      emailPlaceholder: 'you@company.com',
+      passwordLabel: 'Password',
+      passwordPlaceholder: '••••••••••',
+      submit: 'Sign in',
+      submitting: 'Signing in…',
+      forgotLink: 'Forgot your password?',
+      errInvalid: "Email or password doesn't match.",
+      errUnverified: 'Confirm your email first — check your inbox for the verification link.',
+      errRateLimited: 'Too many attempts — try again shortly.',
+      errNetwork: 'Can\'t reach coeus-auth — check your internet connection.',
+      errUnknown: 'Something went wrong while signing in.',
+    },
+    reset: {
+      title: 'Reset password',
+      lead: "Enter your email — we'll send a reset link.",
+      submit: 'Send reset link',
+      submitting: 'Sending…',
+      backLink: '← Back to sign in',
+      sent: 'Check your email for the reset link.',
+      errUnknown: 'Something went wrong — try again later.',
+    },
+    inactive: {
+      badge: 'No access',
+      title: 'Access not active',
+      lead: "You're signed in, but this account has no active license yet. Contact Ynarchive to activate it.",
+      logout: 'Sign out',
     },
   },
   // Weekly report (feat/digest-roi) — GET /digest, computed key-free from

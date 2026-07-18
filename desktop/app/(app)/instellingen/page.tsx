@@ -7,10 +7,13 @@ import BackupBeheer from './BackupBeheer';
 import Opschonen from './Opschonen';
 import AiSleutel from './AiSleutel';
 import GekoppeldeMap from './GekoppeldeMap';
+import Uitloggen from './Uitloggen';
 import { useT, type Lang } from '@/lib/i18n';
+import { useAuth } from '@/lib/authContext';
 
 export default function InstellingenPage() {
   const { t, lang, setLang } = useT();
+  const { required: authRequired } = useAuth();
 
   return (
     <>
@@ -140,6 +143,8 @@ export default function InstellingenPage() {
         <GekoppeldeMap />
 
         <Opschonen />
+
+        {authRequired && <Uitloggen />}
 
         <section className="settings-section">
           <div className="settings-section__header">
