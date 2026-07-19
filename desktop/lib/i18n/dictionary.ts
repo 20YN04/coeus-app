@@ -229,6 +229,10 @@ const nl = {
   instellingen: {
     eyebrow: 'Systeem',
     title: 'Instellingen',
+    advanced: {
+      label: 'Geavanceerd',
+      desc: 'Technische configuratie voor wie de app opzet of onderhoudt. Voor dagelijks gebruik is dit niet nodig.',
+    },
     tenant: {
       label: 'Tenant',
       desc: 'Per-deploy configuratie via omgevingsvariabelen. Pas de waarden aan in je .env.local of hosting-dashboard.',
@@ -268,6 +272,8 @@ const nl = {
       desc: 'Plak dit in je .env.local en herstart de dev-server.',
     },
     update: {
+      label: 'Update',
+      desc: 'Coeus controleert dit niet automatisch — klik hieronder om te checken of er een nieuwe versie klaarstaat.',
       check: 'Controleer op updates',
       checking: 'Controleren…',
       installing: 'Installeren…',
@@ -741,6 +747,10 @@ const en: Dictionary = {
   instellingen: {
     eyebrow: 'System',
     title: 'Settings',
+    advanced: {
+      label: 'Advanced',
+      desc: 'Technical configuration for whoever sets up or maintains the app. Not needed for everyday use.',
+    },
     tenant: {
       label: 'Tenant',
       desc: 'Per-deploy configuration via environment variables. Adjust values in your .env.local or hosting dashboard.',
@@ -780,6 +790,8 @@ const en: Dictionary = {
       desc: 'Paste this into your .env.local and restart the dev server.',
     },
     update: {
+      label: 'Update',
+      desc: 'Coeus doesn\'t check for this automatically — click below to see if a new version is ready.',
       check: 'Check for updates',
       checking: 'Checking…',
       installing: 'Installing…',

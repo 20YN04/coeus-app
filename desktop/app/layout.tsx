@@ -56,11 +56,58 @@ function hexToRgbTriplet(hex: string): string | null {
   return `${r}, ${g}, ${b}`;
 }
 
+// WCAG relative luminance (gamma-corrected) — the actual perceptual measure,
+// not the naive Rec.709 weighted average GraphClient.tsx uses for its bloom
+// threshold. Contrast math needs the real one.
+function srgbToLinear(c: number): number {
+  const cs = c / 255;
+  return cs <= 0.03928 ? cs / 12.92 : Math.pow((cs + 0.055) / 1.055, 2.4);
+}
+function relLuminance(r: number, g: number, b: number): number {
+  return 0.2126 * srgbToLinear(r) + 0.7152 * srgbToLinear(g) + 0.0722 * srgbToLinear(b);
+}
+
+// The app's own dark accent (#8B93FF) is #1F1FD1 lifted toward white until
+// it clears AA on the near-black dark field (see the ratio table in
+// globals.css). This is that same colour's luminance — the target a custom
+// tenant accent gets lifted toward, so white-label dark mode gets the same
+// "opheldering" instead of silently falling back to the Coeus default.
+const DARK_ACCENT_TARGET_LUMINANCE = relLuminance(139, 147, 255);
+
+// Mixes toward white in sRGB channel space (same space CSS color-mix(in
+// srgb, ...) uses elsewhere in this file) via binary search — gamma makes
+// the luminance/mix relationship non-linear, so there's no closed form.
+// Clamped to [0.1, 0.9]: a floor so an already-light tenant colour still
+// gets a visible dark-mode lift, a ceiling so a near-black one keeps its
+// hue instead of washing out to grey-white.
+function lightenForDark(r: number, g: number, b: number): [number, number, number] {
+  const mixAt = (t: number): [number, number, number] => [
+    r + (255 - r) * t,
+    g + (255 - g) * t,
+    b + (255 - b) * t,
+  ];
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 20; i++) {
+    const mid = (lo + hi) / 2;
+    const [mr, mg, mb] = mixAt(mid);
+    if (relLuminance(mr, mg, mb) < DARK_ACCENT_TARGET_LUMINANCE) lo = mid;
+    else hi = mid;
+  }
+  const t = Math.min(0.9, Math.max(0.1, hi));
+  const [mr, mg, mb] = mixAt(t);
+  return [Math.round(mr), Math.round(mg), Math.round(mb)];
+}
+
 // White-label theming: a per-client build sets NEXT_PUBLIC_TENANT_ACCENT. Text
 // ink stays neutral regardless of tenant — only the *interactive* accent family
 // re-tints (links, active nav, primary actions, the small accent panels). Only
 // emit when it's a real, hex colour that differs from the Coeus default;
 // hex-only guard prevents CSS injection via the (build-time constant) value.
+// The light value is used verbatim; the dark-mode blocks below carry a
+// luma-lifted variant so the accent stays legible/AA on the dark field
+// instead of the plain :root injection getting outranked by globals.css's
+// higher-specificity dark selectors and silently reverting to the default.
 function accentStyle(): string | null {
   const accent = tenant.accentColor?.trim();
   if (!accent) return null;
@@ -68,11 +115,25 @@ function accentStyle(): string | null {
   if (!/^#[0-9a-fA-F]{3,8}$/.test(accent)) return null;
   const rgb = hexToRgbTriplet(accent);
   if (!rgb) return null;
+  const [r, g, b] = rgb.split(',').map((n) => parseInt(n, 10));
+  const [dr, dg, db] = lightenForDark(r, g, b);
+  const darkColor = `rgb(${dr}, ${dg}, ${db})`;
+  const darkRgb = `${dr}, ${dg}, ${db}`;
   return [
     ':root{',
     `--c-accent:${accent};`,
     `--c-accent-rgb:${rgb};`,
     `--c-paper-muted:color-mix(in srgb, ${accent} 45%, #ffffff);`,
+    '}',
+    '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){',
+    `--c-accent:${darkColor};`,
+    `--c-accent-rgb:${darkRgb};`,
+    `--c-paper-muted:color-mix(in srgb, ${darkColor} 45%, #ffffff);`,
+    '}}',
+    ':root[data-theme="dark"]{',
+    `--c-accent:${darkColor};`,
+    `--c-accent-rgb:${darkRgb};`,
+    `--c-paper-muted:color-mix(in srgb, ${darkColor} 45%, #ffffff);`,
     '}',
   ].join('');
 }

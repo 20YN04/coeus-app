@@ -75,40 +75,6 @@ export default function InstellingenPage() {
 
         <section className="settings-section">
           <div className="settings-section__header">
-            <p className="settings-section__label">{t('instellingen.tenant.label')}</p>
-            <p className="settings-section__desc">
-              {t('instellingen.tenant.desc').split('.env.local')[0]}
-              <code className="code-inline">.env.local</code>
-              {t('instellingen.tenant.desc').split('.env.local')[1]}
-            </p>
-          </div>
-
-          <div className="config-table">
-            <ConfigRow
-              label={t('instellingen.tenant.companyName')}
-              value={tenant.name}
-              envKey="NEXT_PUBLIC_TENANT_NAME"
-            />
-            <ConfigRow
-              label={t('instellingen.tenant.slug')}
-              value={tenant.slug}
-              envKey="NEXT_PUBLIC_TENANT_SLUG"
-            />
-            <ConfigRow
-              label={t('instellingen.tenant.breinUrl')}
-              value={tenant.breinUrl ?? '—'}
-              envKey="NEXT_PUBLIC_BREIN_URL"
-            />
-            <ConfigRow
-              label={t('instellingen.tenant.logoUrl')}
-              value={tenant.logo ?? '—'}
-              envKey="NEXT_PUBLIC_TENANT_LOGO"
-            />
-          </div>
-        </section>
-
-        <section className="settings-section">
-          <div className="settings-section__header">
             <p className="settings-section__label">{t('instellingen.branding.label')}</p>
             <p className="settings-section__desc">
               {t('instellingen.branding.desc').split('NEXT_PUBLIC_TENANT_ACCENT')[0]}
@@ -148,19 +114,6 @@ export default function InstellingenPage() {
           )}
         </section>
 
-        <section className="settings-section">
-          <div className="settings-section__header">
-            <p className="settings-section__label">{t('instellingen.version.label')}</p>
-          </div>
-
-          <div className="config-table">
-            <ConfigRow label={t('instellingen.version.app')} value={process.env.NEXT_PUBLIC_APP_VERSION ?? '0.6.3'} />
-            <ConfigRow label={t('instellingen.version.stack')} value="Next.js 16 · React 19 · Tailwind 4" />
-          </div>
-
-          <UpdateCheck />
-        </section>
-
         <AiSleutel />
 
         <DataBeheer />
@@ -171,19 +124,80 @@ export default function InstellingenPage() {
 
         <Opschonen />
 
-        {authRequired && <Uitloggen />}
-
         <section className="settings-section">
           <div className="settings-section__header">
-            <p className="settings-section__label">{t('instellingen.env.label')}</p>
-            <p className="settings-section__desc">
-              {t('instellingen.env.desc').split('.env.local')[0]}
-              <code className="code-inline">.env.local</code>
-              {t('instellingen.env.desc').split('.env.local')[1]}
-            </p>
+            <p className="settings-section__label">{t('instellingen.update.label')}</p>
+            <p className="settings-section__desc">{t('instellingen.update.desc')}</p>
           </div>
 
-          <pre className="env-example">{`NEXT_PUBLIC_TENANT_NAME="Uw Bedrijf"
+          <UpdateCheck />
+        </section>
+
+        {authRequired && <Uitloggen />}
+
+        <details className="settings-advanced">
+          <summary className="settings-advanced__summary">
+            {t('instellingen.advanced.label')}
+          </summary>
+          <p className="settings-advanced__desc">{t('instellingen.advanced.desc')}</p>
+
+          <div className="settings-advanced__body">
+            <section className="settings-section">
+              <div className="settings-section__header">
+                <p className="settings-section__label">{t('instellingen.tenant.label')}</p>
+                <p className="settings-section__desc">
+                  {t('instellingen.tenant.desc').split('.env.local')[0]}
+                  <code className="code-inline">.env.local</code>
+                  {t('instellingen.tenant.desc').split('.env.local')[1]}
+                </p>
+              </div>
+
+              <div className="config-table">
+                <ConfigRow
+                  label={t('instellingen.tenant.companyName')}
+                  value={tenant.name}
+                  envKey="NEXT_PUBLIC_TENANT_NAME"
+                />
+                <ConfigRow
+                  label={t('instellingen.tenant.slug')}
+                  value={tenant.slug}
+                  envKey="NEXT_PUBLIC_TENANT_SLUG"
+                />
+                <ConfigRow
+                  label={t('instellingen.tenant.breinUrl')}
+                  value={tenant.breinUrl ?? '—'}
+                  envKey="NEXT_PUBLIC_BREIN_URL"
+                />
+                <ConfigRow
+                  label={t('instellingen.tenant.logoUrl')}
+                  value={tenant.logo ?? '—'}
+                  envKey="NEXT_PUBLIC_TENANT_LOGO"
+                />
+              </div>
+            </section>
+
+            <section className="settings-section">
+              <div className="settings-section__header">
+                <p className="settings-section__label">{t('instellingen.version.label')}</p>
+              </div>
+
+              <div className="config-table">
+                <ConfigRow label={t('instellingen.version.app')} value={process.env.NEXT_PUBLIC_APP_VERSION ?? '0.6.3'} />
+                <ConfigRow label={t('instellingen.version.stack')} value="Next.js 16 · React 19 · Tailwind 4" />
+              </div>
+            </section>
+
+            <section className="settings-section">
+              <div className="settings-section__header">
+                <p className="settings-section__label">{t('instellingen.env.label')}</p>
+                <p className="settings-section__desc">
+                  {t('instellingen.env.desc').split('.env.local')[0]}
+                  <code className="code-inline">.env.local</code>
+                  {t('instellingen.env.desc').split('.env.local')[1]}
+                </p>
+              </div>
+
+              <pre className="env-example">{`NEXT_PUBLIC_TENANT_NAME="Uw Bedrijf"
 NEXT_PUBLIC_TENANT_SLUG="uwbedrijf"
 NEXT_PUBLIC_TENANT_LOGO="/logo.svg"
 NEXT_PUBLIC_TENANT_ACCENT="#C2410C"
@@ -191,7 +205,9 @@ NEXT_PUBLIC_TENANT_LANG="nl"
 
 # Lokale brein-sidecar (loopback) — bewerk dit zelden.
 NEXT_PUBLIC_BREIN_URL="http://127.0.0.1:8765"`}</pre>
-        </section>
+            </section>
+          </div>
+        </details>
       </div>
     </>
   );
