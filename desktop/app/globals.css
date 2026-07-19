@@ -115,6 +115,42 @@
   --dark-c-paper-muted:    #2E2F52;
   --dark-c-border-paper:   rgba(20, 21, 28, 0.22);   /* dark hairline — paper bg is now light */
   --dark-shadow-panel:     0 10px 32px rgba(0, 0, 0, 0.55);
+
+  /* ───────────────────────────────────────────────────────────
+     Kenniskaart categorical palette — 11 tones anchored on the
+     app accent, not a stock rainbow. Cat 1 *is* --c-accent (no
+     separate token, one less thing to drift). Cats 2-11 stay in
+     the same cool blue/teal/slate family, with two muted warm
+     outliers (terracotta, amber) for the categories that would
+     otherwise collide on hue. Light values sit mid-tone for
+     ≥3:1 non-text contrast on --c-field-deep; dark values are
+     the same hues lifted for the same contrast target on the
+     dark --c-field-deep. Read via getComputedStyle in
+     GraphClient.tsx — no colour is hand-duplicated in JS.
+     ─────────────────────────────────────────────────────────── */
+  --c-graph-1:  var(--c-accent);
+  --c-graph-2:  #6A4FE0;  /* periwinkle */
+  --c-graph-3:  #8347B8;  /* indigo-plum */
+  --c-graph-4:  #2E6DA4;  /* steel blue */
+  --c-graph-5:  #12857A;  /* teal */
+  --c-graph-6:  #1F8F5E;  /* sea-green */
+  --c-graph-7:  #55607A;  /* slate */
+  --c-graph-8:  #2A7FA6;  /* cyan-slate */
+  --c-graph-9:  #1E4E8C;  /* denim */
+  --c-graph-10: #B0542F;  /* terracotta — warm outlier 1 */
+  --c-graph-11: #9C7A1E;  /* amber — warm outlier 2 */
+
+  --dark-c-graph-1:  var(--dark-c-accent);
+  --dark-c-graph-2:  #B4A6FF;
+  --dark-c-graph-3:  #C9A6E8;
+  --dark-c-graph-4:  #8DBBEA;
+  --dark-c-graph-5:  #5FD9CB;
+  --dark-c-graph-6:  #6FD1A0;
+  --dark-c-graph-7:  #A7B0CC;
+  --dark-c-graph-8:  #7FCBE8;
+  --dark-c-graph-9:  #7FA8E8;
+  --dark-c-graph-10: #E89A6E;
+  --dark-c-graph-11: #E0BD5E;
 }
 
 /* System preference — the default "Systeem" mode. Wins whenever no manual
@@ -137,6 +173,17 @@
     --c-paper-muted:    var(--dark-c-paper-muted);
     --c-border-paper:   var(--dark-c-border-paper);
     --shadow-panel:     var(--dark-shadow-panel);
+    --c-graph-1:  var(--dark-c-graph-1);
+    --c-graph-2:  var(--dark-c-graph-2);
+    --c-graph-3:  var(--dark-c-graph-3);
+    --c-graph-4:  var(--dark-c-graph-4);
+    --c-graph-5:  var(--dark-c-graph-5);
+    --c-graph-6:  var(--dark-c-graph-6);
+    --c-graph-7:  var(--dark-c-graph-7);
+    --c-graph-8:  var(--dark-c-graph-8);
+    --c-graph-9:  var(--dark-c-graph-9);
+    --c-graph-10: var(--dark-c-graph-10);
+    --c-graph-11: var(--dark-c-graph-11);
   }
 }
 
@@ -159,6 +206,17 @@
   --c-paper-muted:    var(--dark-c-paper-muted);
   --c-border-paper:   var(--dark-c-border-paper);
   --shadow-panel:     var(--dark-shadow-panel);
+  --c-graph-1:  var(--dark-c-graph-1);
+  --c-graph-2:  var(--dark-c-graph-2);
+  --c-graph-3:  var(--dark-c-graph-3);
+  --c-graph-4:  var(--dark-c-graph-4);
+  --c-graph-5:  var(--dark-c-graph-5);
+  --c-graph-6:  var(--dark-c-graph-6);
+  --c-graph-7:  var(--dark-c-graph-7);
+  --c-graph-8:  var(--dark-c-graph-8);
+  --c-graph-9:  var(--dark-c-graph-9);
+  --c-graph-10: var(--dark-c-graph-10);
+  --c-graph-11: var(--dark-c-graph-11);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -1954,7 +2012,11 @@ body {
   border: 1px solid var(--c-border);
   border-radius: 0.5rem;
   overflow: hidden;
-  background: #0E0833;
+  /* One step off the page field, same token the sidebar uses — a recessed
+     surface in light mode, an elevated one in dark (see the --dark-c-field-deep
+     rationale above). The graph never owns its own colour, it just sits a
+     notch deeper than the page it's embedded in. */
+  background: var(--c-field-deep);
 }
 
 .graph-canvas {
@@ -1972,21 +2034,19 @@ body {
   flex-direction: column;
   gap: 0.4rem;
   padding: var(--s-4);
-  background: rgba(14, 8, 51, 0.78);
+  background: color-mix(in srgb, var(--c-field-deep) 86%, transparent);
   border: 1px solid var(--c-border);
   border-radius: 0.4rem;
   backdrop-filter: blur(6px);
   pointer-events: none;
 }
 
-/* The graph overlay UI sits on the dark viz canvas regardless of app theme —
-   keep its text light explicitly (don't follow the inverted light tokens). */
 .graph-legend__title {
   font-family: var(--font-mono);
   font-size: 0.6rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #C5BFEE;
+  color: var(--c-ink-muted);
   margin-bottom: 0.2rem;
 }
 
@@ -1996,7 +2056,7 @@ body {
   gap: 0.5rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #F4F2FB;
+  color: var(--c-ink);
 }
 
 .graph-legend__dot {
@@ -2009,10 +2069,10 @@ body {
 .graph-legend__meta {
   margin-top: 0.4rem;
   padding-top: 0.4rem;
-  border-top: 1px solid rgba(245, 245, 245, 0.14);
+  border-top: 1px solid var(--c-border);
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: #C5BFEE;
+  color: var(--c-ink-muted);
 }
 
 .graph-toggle {
@@ -2023,8 +2083,8 @@ body {
   display: flex;
   gap: 0.2rem;
   padding: 0.2rem;
-  background: rgba(14, 8, 51, 0.78);
-  border: 1px solid rgba(245, 245, 245, 0.14);
+  background: color-mix(in srgb, var(--c-field-deep) 86%, transparent);
+  border: 1px solid var(--c-border);
   border-radius: 0.4rem;
   backdrop-filter: blur(6px);
 }
@@ -2037,14 +2097,14 @@ body {
   border: none;
   border-radius: 0.25rem;
   background: transparent;
-  color: #C5BFEE;
+  color: var(--c-ink-muted);
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
-.graph-toggle__btn:hover { color: #F4F2FB; }
+.graph-toggle__btn:hover { color: var(--c-ink); }
 .graph-toggle__btn.is-active {
   background: var(--c-accent);
-  color: #F4F2FB;
+  color: var(--c-paper-ink);
 }
 
 .graph-empty {

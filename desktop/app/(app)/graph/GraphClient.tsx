@@ -5,13 +5,59 @@ import { useRouter } from 'next/navigation';
 import type { KennisGraph } from '@/lib/brein';
 import { useT } from '@/lib/i18n';
 
-// Coeus-palet: indigo eerst, daarna onderscheidende tinten per categorie.
-const PALETTE = [
-  '#7C6CFF', '#006B2B', '#2DD4BF', '#F59E0B',
-  '#EC4899', '#38BDF8', '#A3E635', '#FB7185',
+// De 11-tinten kenniskaart-palet leeft als CSS-custom-properties in
+// globals.css (--c-graph-1..11, met een dark-tegenhanger per token) zodat
+// licht/donker uit één bron komt. Cat 1 = var(--c-accent), dus ook
+// white-label tenant-accent (NEXT_PUBLIC_TENANT_ACCENT) trekt automatisch
+// door. Deze fallbacks zijn alleen een vangnet als een var() onverhoopt
+// leeg teruggeeft — nooit de bron van waarheid.
+const GRAPH_PALETTE_SIZE = 11;
+const FALLBACK_PALETTE = [
+  '#1F1FD1', '#6A4FE0', '#8347B8', '#2E6DA4', '#12857A', '#1F8F5E',
+  '#55607A', '#2A7FA6', '#1E4E8C', '#B0542F', '#9C7A1E',
 ];
 
-const BG = '#0E0833';
+function cssVar(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
+
+// Volgt data-theme (handmatige toggle) én prefers-color-scheme (systeem-modus,
+// geen attribuut op <html> — zie lib/theme.tsx). Geeft een teller terug die bij
+// elke wissel omhoog gaat, zodat de graph-effect hem als dependency kan nemen
+// en een volledige her-render met de nieuwe getComputedStyle-waarden triggert.
+function useThemeSignal(): number {
+  const [version, setVersion] = useState(0);
+  useEffect(() => {
+    const bump = () => setVersion((v) => v + 1);
+    const observer = new MutationObserver(bump);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    media.addEventListener('change', bump);
+    return () => {
+      observer.disconnect();
+      media.removeEventListener('change', bump);
+    };
+  }, []);
+  return version;
+}
+
+// Dubbel gegated: (1) gelezen vóór de eerste 3D-build via de sync-call in het
+// effect hieronder, (2) live via de change-listener, die de state — en dus de
+// graph-rebuild-dependency — opnieuw zet zodra het OS-voorkeur wijzigt terwijl
+// de kaart al open staat.
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReduced(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
+  return reduced;
+}
 
 // Narrow structurele types voor de force-graph-instanties (alleen wat we gebruiken),
 // zodat we geen `any` nodig hebben maar ook niet vastlopen op de generieke lib-typen.
@@ -84,22 +130,27 @@ export default function GraphClient({ graph, categories }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('2d');
+  const themeVersion = useThemeSignal();
+  const reducedMotion = usePrefersReducedMotion();
 
-  // Stabiele categorie→kleur map. Val terug op de categorieën in de graph zelf
-  // als /categories niets gaf.
-  const categoryColors = useMemo(() => {
+  // Stabiele categorie→paletindex map (0..10). Val terug op de categorieën in
+  // de graph zelf als /categories niets gaf. De index wordt op twee plekken
+  // vertaald naar een kleur: de legenda leest `var(--c-graph-N)` rechtstreeks
+  // (auto-themed, geen JS nodig), het canvas/three.js-effect resolvet dezelfde
+  // token naar een echte hex via getComputedStyle.
+  const categoryIndex = useMemo(() => {
     const cats =
       categories.length > 0
         ? categories
         : Array.from(new Set(graph.nodes.map((n) => n.category)));
-    const map = new Map<string, string>();
-    cats.forEach((c, i) => map.set(c, PALETTE[i % PALETTE.length]));
+    const map = new Map<string, number>();
+    cats.forEach((c, i) => map.set(c, i % GRAPH_PALETTE_SIZE));
     return map;
   }, [categories, graph.nodes]);
 
-  const colorFor = useCallback(
-    (category: string) => categoryColors.get(category) ?? '#9CA3AF',
-    [categoryColors],
+  const colorVarFor = useCallback(
+    (category: string) => `var(--c-graph-${(categoryIndex.get(category) ?? 0) + 1})`,
+    [categoryIndex],
   );
 
   useEffect(() => {
@@ -135,7 +186,24 @@ export default function GraphClient({ graph, categories }: Props) {
       const valFor = (id: string) => 1 + (degree.get(id) ?? 0);
       const idOf = (end: string | { id?: string }) => (typeof end === 'object' ? end.id : end);
 
-      // ── 3D-pad (three.js, lazy) — holografische "neuraal netwerk in de ruimte" ──
+      // ── Thema-tokens, live gelezen ──────────────────────────────
+      // getComputedStyle op <html> resolvet de --c-graph-N var()-keten (ook de
+      // white-label tenant-accent injectie in layout.tsx) naar echte hex/rgb-
+      // strings — canvas en three.js kunnen geen var() consumeren. Dit draait
+      // per effect-run, dus bij elke mode- of thema-wissel opnieuw.
+      const paletteHex = Array.from({ length: GRAPH_PALETTE_SIZE }, (_, i) =>
+        cssVar(`--c-graph-${i + 1}`, FALLBACK_PALETTE[i]),
+      );
+      const hexForCategory = (category: string) => paletteHex[categoryIndex.get(category) ?? 0];
+      const surfaceHex = cssVar('--c-field-deep', '#EEF0F6');
+      const inkHex = cssVar('--c-ink', '#1B1D26');
+      const inkRgb = cssVar('--c-ink-rgb', '27, 29, 38');
+      const accentHex = cssVar('--c-accent', '#1F1FD1');
+      const accentRgb = cssVar('--c-accent-rgb', '31, 31, 209');
+      const edgeBase = `rgba(${inkRgb}, 0.16)`;
+      const edgeLit = `rgba(${accentRgb}, 0.55)`;
+
+      // ── 3D-pad (three.js, lazy) — rustige node-cluster in de ruimte ──
       if (mode === '3d') {
         const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }] = await Promise.all([
           import('3d-force-graph'),
@@ -145,34 +213,30 @@ export default function GraphClient({ graph, categories }: Props) {
         if (disposed || !containerRef.current) return;
         const container = containerRef.current;
 
-        // Iets dieper, bijna-zwart blauwpaars zodat de neon-bloom maximaal pop heeft.
-        const SPACE_BG = '#070425';
-
         const g = new ForceGraph3D(container) as unknown as FG3DInstance;
         g
           .width(container.clientWidth)
           .height(container.clientHeight)
-          .backgroundColor(SPACE_BG)
+          .backgroundColor(surfaceHex)
           .cooldownTime(4000)
           .graphData(data)
           .nodeId('id')
           .nodeLabel((n) => n.title)
-          .nodeColor((n) => colorFor(n.category))
+          .nodeColor((n) => hexForCategory(n.category))
           .nodeVal((n) => valFor(n.id))
-          // Helderdere, bijna lichtgevende bollen — hogere opacity + resolutie zodat
-          // de bloom-pass ze tot zachte gloed-orbs vervaagt.
-          .nodeOpacity(1)
-          .nodeResolution(20)
-          // Neon-links: dun en fel, lage opacity zodat de bloom ze tot strepen trekt.
-          .linkColor(() => 'rgba(124, 108, 255, 0.85)')
-          .linkWidth((l) => 0.2 + l.weight * 0.8)
-          .linkOpacity(0.35)
-          // Data die door het netwerk pulseert: deeltjes die langs de links stromen,
-          // aantal en snelheid gewogen naar de verbindingssterkte.
-          .linkDirectionalParticles((l) => 2 + Math.round(l.weight * 3))
-          .linkDirectionalParticleSpeed((l) => 0.004 + l.weight * 0.006)
-          .linkDirectionalParticleWidth(1.4)
-          .linkDirectionalParticleColor(() => '#2DD4BF')
+          .nodeOpacity(0.92)
+          .nodeResolution(16)
+          // Hairline links in dezelfde ink-toon als het 2D-pad — geen apart
+          // kleursysteem voor de twee viewmodi.
+          .linkColor(() => edgeBase)
+          .linkWidth((l) => 0.2 + l.weight * 0.6)
+          .linkOpacity(0.45)
+          // Zeer spaarzame accent-deeltjes, alleen op de sterkste verbindingen —
+          // een hint van datastroom, geen firehose. Volledig uit bij reduced-motion.
+          .linkDirectionalParticles((l) => (reducedMotion ? 0 : l.weight > 0.55 ? 1 : 0))
+          .linkDirectionalParticleSpeed((l) => 0.0015 + l.weight * 0.002)
+          .linkDirectionalParticleWidth(1.1)
+          .linkDirectionalParticleColor(() => accentHex)
           .onNodeHover((n) => {
             container.style.cursor = n ? 'pointer' : 'grab';
           })
@@ -181,36 +245,20 @@ export default function GraphClient({ graph, categories }: Props) {
           });
         fg = g as unknown as FGCommon;
 
-        // ── Bloom / glow: de grootste sci-fi-winst ────────────────────
-        // UnrealBloomPass op de composer van de instance, getuned voor neon-gloed.
+        // ── Bloom: hooguit een zachte gloed, geen sci-fi-pop ───────────
+        // Hoge threshold zodat alleen de felste highlights iets gloeien;
+        // een statische post-effect, geen animatie — reduced-motion raakt hier niet aan.
         const composer = g.postProcessingComposer();
         const bloom = new UnrealBloomPass(
           new THREE.Vector2(container.clientWidth, container.clientHeight),
-          2.2, // strength — felle gloed
-          0.85, // radius — zachte halo
-          0.05, // threshold — laag, zodat ook de mid-tints gloeien
+          0.18, // strength — net genoeg om highlights te laten ademen
+          0.2, // radius — kleine halo, geen full-frame diffusie
+          0.82, // threshold — hoog: alleen de felste highlights gloeien, de
+          // achtergrond blijft de theme-surface (UnrealBloom's blur-mips
+          // diffunderen anders zichtbaar over het hele frame en wassen het
+          // donkere-modus-oppervlak uit naar grijs)
         );
         composer.addPass(bloom);
-
-        // ── Sterrenveld-backdrop (goedkoop: één Points-cloud) ─────────
-        const STAR_COUNT = 1400;
-        const starPos = new Float32Array(STAR_COUNT * 3);
-        for (let i = 0; i < STAR_COUNT * 3; i++) {
-          // Ver buiten de graph zodat sterren niet met de nodes botsen.
-          starPos[i] = (Math.random() - 0.5) * 4000;
-        }
-        const starGeo = new THREE.BufferGeometry();
-        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-        const starMat = new THREE.PointsMaterial({
-          color: 0xa7b6ff,
-          size: 1.6,
-          sizeAttenuation: true,
-          transparent: true,
-          opacity: 0.55,
-          depthWrite: false,
-        });
-        const starfield = new THREE.Points(starGeo, starMat);
-        g.scene().add(starfield);
 
         const fit = () => g.zoomToFit(600, 80);
         const fitTimer = setTimeout(fit, 1200);
@@ -224,11 +272,9 @@ export default function GraphClient({ graph, categories }: Props) {
         };
         window.addEventListener('resize', onResize);
 
-        // Eigen cleanup bovenop _destructor: dispose bloom + sterrenveld.
+        // Eigen cleanup bovenop _destructor: dispose bloom.
         extraCleanup = () => {
           bloom.dispose();
-          starGeo.dispose();
-          starMat.dispose();
         };
         return;
       }
@@ -246,7 +292,7 @@ export default function GraphClient({ graph, categories }: Props) {
       g
         .width(container.clientWidth)
         .height(container.clientHeight)
-        .backgroundColor(BG)
+        .backgroundColor(surfaceHex)
         .cooldownTime(3000)
         .graphData(data)
         .nodeId('id')
@@ -255,23 +301,33 @@ export default function GraphClient({ graph, categories }: Props) {
           const s = idOf(l.source);
           const t = idOf(l.target);
           const lit = !hoverId || (hoverId === s || hoverId === t);
-          return lit ? 'rgba(124, 108, 255, 0.35)' : 'rgba(244, 242, 251, 0.06)';
+          return lit ? edgeLit : edgeBase;
         })
         .linkWidth((l) => 0.4 + l.weight * 2.5)
         .nodeCanvasObjectMode(() => 'replace')
         .nodeCanvasObject((n, ctx, scale) => {
           const r = radiusFor(n.id);
           const lit = isLit(n.id);
+          const hovered = hoverId === n.id;
           ctx.globalAlpha = lit ? 1 : 0.18;
           ctx.beginPath();
           ctx.arc(n.x, n.y, r, 0, 2 * Math.PI);
-          ctx.fillStyle = colorFor(n.category);
+          ctx.fillStyle = hexForCategory(n.category);
           ctx.fill();
-          if (scale > 1.4 || hoverId === n.id) {
+          // Hover-highlight in het accent: een dunne ring, geen kleurwissel —
+          // de categoriekleur van de node blijft leidend.
+          if (hovered) {
+            ctx.lineWidth = 1.5 / scale;
+            ctx.strokeStyle = accentHex;
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, r + 2.5 / scale, 0, 2 * Math.PI);
+            ctx.stroke();
+          }
+          if (scale > 1.4 || hovered) {
             ctx.font = `${11 / scale}px 'JetBrains Mono', ui-monospace, monospace`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
-            ctx.fillStyle = '#F4F2FB';
+            ctx.fillStyle = inkHex;
             ctx.fillText(n.title, n.x, n.y + r + 3 / scale);
           }
           ctx.globalAlpha = 1;
@@ -314,7 +370,7 @@ export default function GraphClient({ graph, categories }: Props) {
       fg?._destructor();
       if (el) el.innerHTML = '';
     };
-  }, [graph, router, colorFor, mode]);
+  }, [graph, router, categoryIndex, mode, themeVersion, reducedMotion]);
 
   if (graph.nodes.length === 0) {
     return (
@@ -355,7 +411,7 @@ export default function GraphClient({ graph, categories }: Props) {
         <span className="graph-legend__title">{t('graph.categories')}</span>
         {legendCats.map((c) => (
           <span key={c} className="graph-legend__item">
-            <span className="graph-legend__dot" style={{ background: colorFor(c) }} />
+            <span className="graph-legend__dot" style={{ background: colorVarFor(c) }} />
             {c}
           </span>
         ))}
