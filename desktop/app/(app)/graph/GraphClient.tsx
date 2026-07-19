@@ -23,6 +23,21 @@ function cssVar(name: string, fallback: string): string {
   return v || fallback;
 }
 
+// Rec. 709 relatieve luma van een #rrggbb-hex — dezelfde gewichten als de
+// `luminance()`-shaderfunctie die UnrealBloomPass' LuminosityHighPassShader
+// gebruikt (three.js ColorManagement.getLuminanceCoefficients). Gebruikt om
+// de bloom-threshold tegen de actuele scene-achtergrond te toetsen i.p.v.
+// tegen een vaste, op dark-mode getunede constante — zie de 3D-bloom-setup.
+function relLuma(hex: string): number {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return 0;
+  const n = parseInt(m[1], 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
 // Volgt data-theme (handmatige toggle) én prefers-color-scheme (systeem-modus,
 // geen attribuut op <html> — zie lib/theme.tsx). Geeft een teller terug die bij
 // elke wissel omhoog gaat, zodat de graph-effect hem als dependency kan nemen
@@ -203,6 +218,11 @@ export default function GraphClient({ graph, categories }: Props) {
       const edgeBase = `rgba(${inkRgb}, 0.16)`;
       const edgeLit = `rgba(${accentRgb}, 0.55)`;
 
+      // 3D-bloom-threshold, getoetst aan de actuele scene-achtergrond i.p.v.
+      // een vaste constante — zie de bloom-constructie verderop voor het bug-
+      // verhaal (lege 3D-render in light mode).
+      const bloomThreshold = Math.min(0.97, Math.max(0.82, relLuma(surfaceHex) + 0.12));
+
       // ── 3D-pad (three.js, lazy) — rustige node-cluster in de ruimte ──
       if (mode === '3d') {
         const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }] = await Promise.all([
@@ -246,17 +266,21 @@ export default function GraphClient({ graph, categories }: Props) {
         fg = g as unknown as FGCommon;
 
         // ── Bloom: hooguit een zachte gloed, geen sci-fi-pop ───────────
-        // Hoge threshold zodat alleen de felste highlights iets gloeien;
-        // een statische post-effect, geen animatie — reduced-motion raakt hier niet aan.
+        // Threshold was hardcoded 0.82, getuned op de donkere achtergrond
+        // (luma ~0.11) — prima daar, maar de lichte surface zit op luma
+        // ~0.94: ruim boven 0.82, dus UnrealBloom's highlight-pass zag de
+        // volledige achtergrond als "bright", blurde 'm over het hele frame
+        // en de additive composite blowde alles uit naar wit — bollen
+        // onzichtbaar, paneel leeg. bloomThreshold (hierboven) toetst nu aan
+        // de echte surface-luma: in dark ongewijzigd (0.82, blijft de
+        // bevestigde look), in light ruim boven de achtergrond (max 0.97) —
+        // alleen echte highlights (accent-particles, hover-ring) gloeien nog.
         const composer = g.postProcessingComposer();
         const bloom = new UnrealBloomPass(
           new THREE.Vector2(container.clientWidth, container.clientHeight),
           0.18, // strength — net genoeg om highlights te laten ademen
           0.2, // radius — kleine halo, geen full-frame diffusie
-          0.82, // threshold — hoog: alleen de felste highlights gloeien, de
-          // achtergrond blijft de theme-surface (UnrealBloom's blur-mips
-          // diffunderen anders zichtbaar over het hele frame en wassen het
-          // donkere-modus-oppervlak uit naar grijs)
+          bloomThreshold,
         );
         composer.addPass(bloom);
 
